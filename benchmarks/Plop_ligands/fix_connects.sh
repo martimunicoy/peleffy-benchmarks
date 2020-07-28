@@ -35,12 +35,12 @@ do
 	else
 		absolute_path=$(realpath $pdb_file)
 		file_name=$(basename -s .pdb $pdb_file)
-		$SCHRODINGER/utilities/prepwizard $absolute_path $file_name.pdb -noepik -noprotassign -noccd -noimpref
+		$SCHRODINGER/utilities/prepwizard $absolute_path $file_name.pdb -noepik -noprotassign -noccd -noimpref > /dev/null
 		while [ ! -f $file_name.pdb ]; do sleep 1; done
 		sleep 1
 		mv $file_name.pdb $PDB_OUT
 		rm -f $file_name.log
-		$SCHRODINGER/utilities/prepwizard $absolute_path $file_name.mae -noepik -noprotassign -noccd -noimpref
+		$SCHRODINGER/utilities/prepwizard $absolute_path $file_name.mae -noepik -noprotassign -noccd -noimpref > /dev/null
 		while [ ! -f $file_name.mae ]; do sleep 1; done
                 sleep 1
                 mv $file_name.mae $MAE_OUT
