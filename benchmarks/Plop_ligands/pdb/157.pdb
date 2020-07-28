@@ -1,7 +1,6 @@
 REMARK   4      COMPLIES WITH FORMAT V. 3.0, 1-DEC-2006
 REMARK 888
 REMARK 888 WRITTEN BY MAESTRO (A PRODUCT OF SCHRODINGER, LLC)
-MODEL        1
 HETATM    1  C1  LIG Z   1      10.980  20.236   5.689  1.00  0.00           C  
 HETATM    2  C2  LIG Z   1      11.917  19.152   5.125  1.00  0.00           C  
 HETATM    3  C3  LIG Z   1      12.028  17.933   6.068  1.00  0.00           C  
@@ -16,12 +15,12 @@ HETATM   11  O5  LIG Z   1       8.389  17.891   7.073  1.00  0.00           O
 HETATM   12  O6  LIG Z   1       8.863  20.705   6.702  1.00  0.00           O  
 HETATM   13  P1  LIG Z   1      11.902  22.601   4.675  1.00  0.00           P  
 HETATM   14  O7  LIG Z   1      11.900  23.123   3.290  1.00  0.00           O  
-HETATM   15  O8  LIG Z   1      13.189  22.261   5.324  1.00  0.00           O  
+HETATM   15  O8  LIG Z   1      13.189  22.261   5.324  1.00  0.00           O1-
 HETATM   16  O9  LIG Z   1      11.071  23.677   5.685  1.00  0.00           O  
 HETATM   17  P2  LIG Z   1      13.790  15.955   6.161  1.00  0.00           P  
 HETATM   18 O10  LIG Z   1      12.898  14.928   6.827  1.00  0.00           O  
-HETATM   19 O11  LIG Z   1      14.567  16.786   7.162  1.00  0.00           O  
-HETATM   20 O12  LIG Z   1      14.690  15.341   5.109  1.00  0.00           O  
+HETATM   19 O11  LIG Z   1      14.567  16.786   7.162  1.00  0.00           O1-
+HETATM   20 O12  LIG Z   1      14.690  15.341   5.109  1.00  0.00           O1-
 HETATM   21  C7  LIG Z   1       9.936  24.387   5.233  1.00  0.00           C  
 HETATM   22  C8  LIG Z   1      10.282  25.878   5.062  1.00  0.00           C  
 HETATM   23  C9  LIG Z   1       9.602  26.709   6.156  1.00  0.00           C  
@@ -79,10 +78,14 @@ CONECT   10    4   43
 CONECT   11    5   44
 CONECT   12    6   45
 CONECT   13    7   14   15   16
+CONECT   13   14
+CONECT   14   13
 CONECT   14   13
 CONECT   15   13
 CONECT   16   13   21
 CONECT   17    9   18   19   20
+CONECT   17   18
+CONECT   18   17
 CONECT   18   17
 CONECT   19   17
 CONECT   20   17
@@ -90,16 +93,20 @@ CONECT   21   16   22   46   47
 CONECT   22   21   23   32   48
 CONECT   23   22   33   49   50
 CONECT   24   25   33   34
+CONECT   24   34
 CONECT   25   24   26   51   52
 CONECT   26   25   27   53   54
 CONECT   27   26   55   56   57
 CONECT   28   29   32   35
+CONECT   28   35
 CONECT   29   28   30   58   59
 CONECT   30   29   31   60   61
 CONECT   31   30   62   63   64
 CONECT   32   22   28
 CONECT   33   23   24
 CONECT   34   24
+CONECT   34   24
+CONECT   35   28
 CONECT   35   28
 CONECT   36    1
 CONECT   37    2
@@ -130,5 +137,4 @@ CONECT   61   30
 CONECT   62   31
 CONECT   63   31
 CONECT   64   31
-ENDMDL
 END   

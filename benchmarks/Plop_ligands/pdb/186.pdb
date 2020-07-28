@@ -1,7 +1,6 @@
 REMARK   4      COMPLIES WITH FORMAT V. 3.0, 1-DEC-2006
 REMARK 888
 REMARK 888 WRITTEN BY MAESTRO (A PRODUCT OF SCHRODINGER, LLC)
-MODEL        1
 HETATM    1  O1  LIG Z   1      -8.016  14.192  27.937  1.00  0.00           O  
 HETATM    2  O2  LIG Z   1     -10.102  19.428  26.893  1.00  0.00           O  
 HETATM    3  O3  LIG Z   1     -11.801  18.441  28.843  1.00  0.00           O  
@@ -63,35 +62,53 @@ HETATM   58 C40  LIG Z   1      -7.963  16.474  31.076  1.00  0.00           H
 HETATM   59 C41  LIG Z   1      -9.019  16.807  33.232  1.00  0.00           H  
 HETATM   60 C42  LIG Z   1     -10.293  15.528  32.827  1.00  0.00           H  
 CONECT    1    6
+CONECT    1    6
 CONECT    2    8   31
 CONECT    3    9   32
 CONECT    4    6    7   11
 CONECT    5    6   10   28
 CONECT    6    1    4    5
+CONECT    6    1
 CONECT    7    4    8   14   33
 CONECT    8    2    7    9   34
 CONECT    9    3    8   10   35
 CONECT   10    5    9   21   36
 CONECT   11    4   12   37   38
 CONECT   12   11   13   39
+CONECT   12   13
 CONECT   13   12   40   41
+CONECT   13   12
 CONECT   14    7   15   42   43
 CONECT   15   14   16   20
+CONECT   15   20
 CONECT   16   15   17   44
+CONECT   16   17
 CONECT   17   16   18   45
+CONECT   17   16
 CONECT   18   17   19   46
+CONECT   18   19
 CONECT   19   18   20   47
+CONECT   19   18
 CONECT   20   15   19   48
+CONECT   20   15
 CONECT   21   10   22   49   50
 CONECT   22   21   23   27
+CONECT   22   27
 CONECT   23   22   24   51
+CONECT   23   24
 CONECT   24   23   25   52
+CONECT   24   23
 CONECT   25   24   26   53
+CONECT   25   26
 CONECT   26   25   27   54
+CONECT   26   25
 CONECT   27   22   26   55
+CONECT   27   22
 CONECT   28    5   29   56   57
 CONECT   29   28   30   58
+CONECT   29   30
 CONECT   30   29   59   60
+CONECT   30   29
 CONECT   31    2
 CONECT   32    3
 CONECT   33    7
@@ -122,5 +139,4 @@ CONECT   57   28
 CONECT   58   29
 CONECT   59   30
 CONECT   60   30
-ENDMDL
 END   
