@@ -1,0 +1,73 @@
+{ 
+ s_m_m2io_version
+ :::
+ 2.0.0 
+} 
+
+f_m_ct { 
+ s_m_title
+ i_pdb_PDB_Model
+ s_pdb_PDB_format_version
+ b_ppw_prepared
+ s_ppw_prepared_with_version
+ i_m_ct_format
+ :::
+ "" 
+  1
+  3.0 
+  1
+  2019-1 
+  2
+ m_atom[12] { 
+  # First column is atom index #
+  i_m_mmod_type
+  r_m_x_coord
+  r_m_y_coord
+  r_m_z_coord
+  i_m_residue_number
+  s_m_chain_name
+  i_m_color
+  s_m_pdb_residue_name
+  s_m_pdb_atom_name
+  i_m_atomic_number
+  s_m_color_rgb
+  r_m_pdb_occupancy
+  i_m_pdb_convert_problem
+  i_pdb_PDB_serial
+  :::
+  1 2 27.494000 5.846000 2.962000 1 Z 10 "LIG " " C1 " 6 1EE11E  1 4 1
+  2 2 26.485000 5.004000 3.468000 1 Z 10 "LIG " " C2 " 6 1EE11E  1 4 2
+  3 2 28.003000 6.887000 3.760000 1 Z 10 "LIG " " C3 " 6 1EE11E  1 4 3
+  4 2 25.971000 5.210000 4.761000 1 Z 10 "LIG " " C4 " 6 1EE11E  1 4 4
+  5 2 27.509000 7.071000 5.066000 1 Z 10 "LIG " " C5 " 6 1EE11E  1 4 5
+  6 2 26.488000 6.242000 5.565000 1 Z 10 "LIG " " C6 " 6 1EE11E  1 4 6
+  7 41 27.884000 5.688000 1.968000 1 Z 21 "LIG " " H1 " 1 FFFFFF  1 4 7
+  8 41 26.109000 4.195000 2.866000 1 Z 21 "LIG " " H2 " 1 FFFFFF  1 4 8
+  9 41 28.786000 7.528000 3.382000 1 Z 21 "LIG " " H3 " 1 FFFFFF  1 4 9
+  10 41 25.193000 4.566000 5.140000 1 Z 21 "LIG " " H4 " 1 FFFFFF  1 4 10
+  11 41 27.923000 7.838000 5.697000 1 Z 21 "LIG " " H5 " 1 FFFFFF  1 4 11
+  12 41 26.113000 6.388000 6.565000 1 Z 21 "LIG " " H6 " 1 FFFFFF  1 4 12
+  :::
+ } 
+ m_bond[12] { 
+  # First column is bond index #
+  i_m_from
+  i_m_to
+  i_m_order
+  :::
+  1 1 2 1
+  2 1 3 2
+  3 1 7 1
+  4 2 4 2
+  5 2 8 1
+  6 3 5 1
+  7 3 9 1
+  8 4 6 1
+  9 4 10 1
+  10 5 6 2
+  11 5 11 1
+  12 6 12 1
+  :::
+ } 
+} 
+

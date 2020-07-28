@@ -1,0 +1,135 @@
+{ 
+ s_m_m2io_version
+ :::
+ 2.0.0 
+} 
+
+f_m_ct { 
+ s_m_title
+ s_pdb_PDB_TITLE
+ s_pdb_PDB_ID
+ i_pdb_PDB_Model
+ r_pdb_PDB_CRYST1_a
+ r_pdb_PDB_CRYST1_b
+ r_pdb_PDB_CRYST1_c
+ r_pdb_PDB_CRYST1_alpha
+ r_pdb_PDB_CRYST1_beta
+ r_pdb_PDB_CRYST1_gamma
+ s_pdb_PDB_CRYST1_Space_Group
+ i_pdb_PDB_CRYST1_z
+ s_pdb_PDB_CLASSIFICATION
+ s_pdb_PDB_DEPOSITION_DATE
+ s_pdb_PDB_format_version
+ r_pdb_PDB_RESOLUTION
+ s_pdb_PDB_EXPDTA
+ r_pdb_PDB_EXPDTA_TEMPERATURE
+ r_pdb_PDB_EXPDTA_PH
+ s_pdb_PDB_REMARK_350_Biomolecule_1_Transform_1_Chains
+ s_pdb_PDB_REMARK_350_Biomolecule_1_Transform_1_Matrix_1
+ b_ppw_prepared
+ s_ppw_prepared_with_version
+ i_m_ct_format
+ :::
+ 1OXR 
+  "ASPIRIN INDUCES ITS ANTI-INFLAMMATORY EFFECTS THROUGH ITS SPECIFIC BINDING TO PHOSPHOLIPASE A2: CRYSTAL STRUCTURE OF THE COMPLEX FORMED BETWEEN PHOSPHOLIPASE A2 AND ASPIRIN AT 1.9A RESOLUTION" 
+  1OXR 
+  1
+  42.627
+  42.627
+  65.137
+  90
+  90
+  90
+  "P 41" 
+  4
+  HYDROLASE 
+  03-APR-03 
+  3.15 
+  1.93
+  "X-RAY DIFFRACTION" 
+  290
+  6
+  A 
+  "1.000000 0.000000 0.000000   0.000000;0.000000 1.000000 0.000000   0.000000;0.000000 0.000000 1.000000   0.000000" 
+  1
+  2019-1 
+  2
+ m_atom[20] { 
+  # First column is atom index #
+  i_m_mmod_type
+  r_m_x_coord
+  r_m_y_coord
+  r_m_z_coord
+  i_m_residue_number
+  s_m_chain_name
+  i_m_color
+  s_m_pdb_residue_name
+  s_m_pdb_atom_name
+  i_m_atomic_number
+  i_m_formal_charge
+  s_m_color_rgb
+  r_m_pdb_occupancy
+  r_m_pdb_tfactor
+  i_m_pdb_convert_problem
+  i_pdb_PDB_serial
+  :::
+  1 18 13.907000 16.130000 0.624000 141 A 70 "AIN " " O1 " 8 -1 FF2E2E  0.5 28.52 4 1
+  2 2 13.254000 15.778000 1.723000 141 A 10 "AIN " " C7 " 6 0 1EE11E  0.5 32.12 4 2
+  3 15 13.911000 15.759000 2.749000 141 A 70 "AIN " " O2 " 8 0 FF2E2E  0.5 32.9 4 3
+  4 2 11.830000 15.316000 1.664000 141 A 10 "AIN " " C3 " 6 0 1EE11E  0.5 32.34 4 4
+  5 2 11.114000 15.381000 0.456000 141 A 10 "AIN " " C4 " 6 0 1EE11E  0.5 32.08 4 5
+  6 2 9.774000 15.001000 0.429000 141 A 10 "AIN " " C5 " 6 0 1EE11E  0.5 31.39 4 6
+  7 2 9.120000 14.601000 1.580000 141 A 10 "AIN " " C6 " 6 0 1EE11E  0.5 31.52 4 7
+  8 2 9.752000 14.568000 2.802000 141 A 10 "AIN " " C1 " 6 0 1EE11E  0.5 32.96 4 8
+  9 2 11.088000 14.922000 2.923000 141 A 10 "AIN " " C2 " 6 0 1EE11E  0.5 33.22 4 9
+  10 16 11.823000 14.906000 4.090000 141 A 70 "AIN " " O3 " 8 0 FF2E2E  0.5 35.01 4 10
+  11 2 12.477000 13.770000 4.769000 141 A 10 "AIN " " C8 " 6 0 1EE11E  0.5 35.75 4 11
+  12 15 12.686000 13.870000 5.971000 141 A 70 "AIN " " O4 " 8 0 FF2E2E  0.5 37.46 4 12
+  13 3 12.890000 12.509000 4.056000 141 A 10 "AIN " " C9 " 6 0 1EE11E  0.5 36.44 4 13
+  14 41 11.603000 15.724000 -0.444000 141 A 21 "AIN " " H4 " 1 0 FFFFFF  1 32.08 4 14
+  15 41 9.227000 15.016000 -0.502000 141 A 21 "AIN " " H5 " 1 0 FFFFFF  1 31.39 4 15
+  16 41 8.083000 14.303000 1.536000 141 A 21 "AIN " " H6 " 1 0 FFFFFF  1 31.52 4 16
+  17 41 9.207000 14.263000 3.684000 141 A 21 "AIN " " H1 " 1 0 FFFFFF  1 32.96 4 17
+  18 41 13.349000 11.823000 4.767000 141 A 21 "AIN " " H91" 1 0 FFFFFF  1 36.44 4 18
+  19 41 12.013000 12.038000 3.612000 141 A 21 "AIN " " H92" 1 0 FFFFFF  1 36.44 4 19
+  20 41 13.607000 12.753000 3.272000 141 A 21 "AIN " " H93" 1 0 FFFFFF  1 36.44 4 20
+  :::
+ } 
+ m_bond[20] { 
+  # First column is bond index #
+  i_m_from
+  i_m_to
+  i_m_order
+  :::
+  1 1 2 1
+  2 2 3 2
+  3 2 4 1
+  4 4 5 2
+  5 4 9 1
+  6 5 6 1
+  7 5 14 1
+  8 6 7 2
+  9 6 15 1
+  10 7 8 1
+  11 7 16 1
+  12 8 9 2
+  13 8 17 1
+  14 9 10 1
+  15 10 11 1
+  16 11 12 2
+  17 11 13 1
+  18 13 18 1
+  19 13 19 1
+  20 13 20 1
+  :::
+ } 
+ m_PDB_het_residues[1] { 
+  s_pdb_het_id
+  s_pdb_het_name
+  s_pdb_het_formula
+  :::
+  1 AIN  "2-(ACETYLOXY)BENZOIC ACID"  "C9 H8 O4" 
+  :::
+ } 
+} 
+
