@@ -30,7 +30,7 @@ def differentiate(x, y):
         return y  # All y values are unique if x is empty
     elif len(y) == 0 and len(x) > 0:
         return x  # All x values are unique if y is empty
-        
+
     try:
         # Immutable and Unique - Convert list of tuples into set of tuples
         first_set = set(map(tuple, x))
@@ -44,11 +44,13 @@ def differentiate(x, y):
     commond = []
     for first_element in first_set:
         for second_element in secnd_set: 
-            print(first_element, second_element, first_element == second_element)
             if Counter(first_element) == Counter(second_element):
                 commond.append(first_element)
-    return list(set(first_set) - set(commond)), list(Counter(set(secnd_set)) - Coundet(set(commond)))
+    return list(set(first_set) - set(commond)), list(set(secnd_set) - set(commond))
 
 def write_diff(diff1,diff2):
-	f.write(diff1)
-	f.write(diff2)
+	"""Writes into a fill the differences between the to rotamers libraries."""
+	for i in diff1:
+    	f.write('+',i)
+    for j in diff2:
+    	f.write('-',i)
