@@ -22,6 +22,14 @@ class TestRotamers:
 		resolution_differences = u.compare_resolution(resolution_offpele,  resolution_PlopRotTemp)
 		u.write_diff_resolution(self.file, resolution_differences)
 
+	def test_groups(self):
+		groups_offpele = u.get_groups(self.pdb_file)
+		groups_PlopRotTemp = u.get_groups(self.mae_file)
+		u.compare_groups(groups_offpele, groups_PlopRotTemp)
+#		u.write_diff_groups(self.file, result_comparison)
+
+
+
 
 
 

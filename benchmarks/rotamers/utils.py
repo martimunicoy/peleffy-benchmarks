@@ -16,7 +16,6 @@ def commond(x,y):
         return y  # All y values are unique if x is empty
     elif len(y) == 0 and len(x) > 0:
         return x  # All x values are unique if y is empty
-
     first_set = set(map(tuple, x))
     secnd_set = set(map(tuple, y))
     commond = []
@@ -52,7 +51,7 @@ def differentiate(x, y):
 
 def get_bonds(rot_lib):
     """Reads from a file in .pdb/.mae format and returs a list with the bonds in the rotamer library"""
-    bonds = []
+    print(rot_lib)
     for rot in rot_lib: 
         rot = re.sub('_', '', rot)
         rot_list = list(rot.split(" "))
@@ -98,6 +97,66 @@ def compare_resolution(resolution1, resolution2):
                 result = element_resolution1[0],element_resolution2[0], element_resolution1[1]
                 results_list.append(result)
     return results_list
+
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#                                                            Groups
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+def get_number_group(rot_lib):
+    text_string = rot_lib.read()
+    pattern = 'newgrp'
+    return text_string.count(pattern) + 1
+
+def get_groups(rot_lib): 
+    groups = []
+    group = []
+    i = 0
+    for rot in rot_lib: 
+        rot = re.sub('_', '', rot)
+        rot_list = list(rot.split(" "))
+        if  'newgrp' in rot_list:
+            groups.append(group)
+            group = []
+        else:
+            if len(rot_list) == 8:
+                bond = (rot_list[5],rot_list[6])
+                group.append(bond)
+    groups.append(group)
+    return groups
+
+
+def compare_bonds_groups(groups_offpele, groups_PlopRotTemp):
+    """
+    ...
+    """
+    results = []
+    result = []
+    for group1 in groups_offpele:
+        for group2 in groups_PlopRotTemp:
+            result.append( list(commond(group1,group2)))
+            results.append(result)
+            result = []
+    print('RESULTS', results)
+    print('Group1:',len(groups_offpele[0]),'Group2:',len(groups_PlopRotTemp[0]), 'Common:',len(results[0][0]))
+
+
+
+
+def compare_groups(groups_offpele, groups_PlopRotTemp):
+    num_offpele = len(groups_offpele)
+    num_PlopRotTemp = len(groups_PlopRotTemp)
+    result = []
+    if num_offpele == num_PlopRotTemp: 
+        result.append('The number of groups is the same.')
+        print('The number of groups is the same.')
+        compare_bonds_groups(groups_offpele, groups_PlopRotTemp)
+    else: 
+        result.append('The number of groups is not the same.')
+        print('The number of groups is not the same.')
+
+
+
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #                                                            Writing in a file

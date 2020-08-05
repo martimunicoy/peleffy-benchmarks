@@ -3,6 +3,7 @@
 This module is designed in order to run the different test for the rotamers libraries between using
 PlopRotTemp and offpele. 
 """
+
 import argparse
 from test_rotamers import TestRotamers
 import utils
@@ -19,7 +20,7 @@ def parse_args():
     parser.add_argument("rotamer_offpele", type=str, help="File obtained by PELE with offpele")
     parser.add_argument("-o", "--output_path", type=str, default="", help="Path where to write the results")
     parser.add_argument("-of", "--output_file", type=str, default="diff.csv", help="File with differences in the two files, if there are")
-    parser.add_argument("-t","--test_type", metavar="NAME", type=str, default="resolution", help= "Type of test to perform with the rotamers libreries")
+    parser.add_argument("-t","--test_type", metavar="NAME", type=str, default="groups", help= "Type of test to perform with the rotamers libreries")
     args = parser.parse_args()
     return args.rotamer_schrodinguer,args.rotamer_offpele, args.output_path, args.output_file, args.test_type
 
@@ -27,7 +28,7 @@ def parse_args():
 def perform_test(file,test_type, mae_input_file, pdb_input_file):
     """
     Creates the object rotamers with the rotameres library obtained with offpele and with PlopRotTemp and performs the
-    selected test on the data.
+    selected test on the data .
     """
     rotamers = TestRotamers(mae_input_file, pdb_input_file, file)
     if test_type == 'bonds': 
