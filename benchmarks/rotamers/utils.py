@@ -14,6 +14,12 @@ def commond(x, y):
     Function that gets the commond elements of two lists regardless
     the order.
     """
+    # Validate both lists, confirm either are empty
+    if len(x) == 0 and len(y) > 0:
+        return y  # All y values are unique if x is empty
+    elif len(y) == 0 and len(x) > 0:
+        return x  # All x values are unique if y is empty
+
     first_set = set(map(tuple, x))
     secnd_set = set(map(tuple, y))
     commond = []
@@ -35,28 +41,21 @@ def differentiate(x, y):
     :param y: list #2
     :return: list of unique values
     """
-    # Validate both lists, confirm either are empty
-    if len(x) == 0 and len(y) > 0:
-        return y  # All y values are unique if x is empty
-    elif len(y) == 0 and len(x) > 0:
-        return x  # All x values are unique if y is empty
+    commond_set = commond(x, y)
+    first_set = set(x)
+    secnd_set = set(y)
+    diff1 = list(first_set - commond_set)
+    diff2 = list(secnd_set - commond_set)
+    for diff2_element in diff2:
+        for commond_element in commond_set:
+            if Counter(diff2_element) == Counter(commond_element):
+                diff2.remove(diff2_element)
+    for diff1_element in diff1:
+        for commond_element in commond_set:
+            if Counter(diff1_element) == Counter(commond_element):
+                diff1.remove(diff1_element)
 
-    try:
-        # Immutable and Unique - Convert list of tuples into set of tuples
-        first_set = set(map(tuple, x))
-        secnd_set = set(map(tuple, y))
-
-    # Dealing with a 1D dataset (list of items)
-    except TypeError:
-        # Unique values only
-        first_set = set(x)
-        secnd_set = set(y)
-    commond = []
-    for first_element in first_set:
-        for second_element in secnd_set:
-            if Counter(first_element) == Counter(second_element):
-                commond.append(first_element)
-    return list(set(first_set) - set(commond)), list(set(secnd_set) - set(commond))
+    return diff1, diff2
 
 
 # -----
@@ -119,8 +118,11 @@ def compare_resolution(resolution1, resolution2):
     results_list = []
     for element_resolution1 in resolution1_set:
         for element_resolution2 in resolution2_set:
-            if (Counter(element_resolution1[1]) == Counter(element_resolution2[1])) and element_resolution1[0] != element_resolution2[0]:
-                result = element_resolution1[0], element_resolution2[0], element_resolution1[1]
+            if ((Counter(element_resolution1[1])
+                    == Counter(element_resolution2[1]))
+                    and element_resolution1[0] != element_resolution2[0]):
+                result = element_resolution1[0], element_resolution2[0], \
+                    element_resolution1[1]
                 results_list.append(result)
     return results_list
 
@@ -200,3 +202,12 @@ def write_diff_bonds(file, diff1, diff2):
     file.write('Bonds:' + '\n')
     for i in diff1:
         file.write('+' + str(i) + '\n')
+
+
+def write_diff_resolution(file, resolution_differences):
+    """
+    To do
+    """
+    file.write('Resolution:' + '\n')
+    for difference in resolution_differences:
+        file.write(str(difference) + '\n')
