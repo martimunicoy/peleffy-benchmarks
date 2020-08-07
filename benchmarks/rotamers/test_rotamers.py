@@ -1,15 +1,8 @@
 """
 This module contains the test to check the rotamers library.
 """
-import utils as u
 
-
-class TestRotamers:
-
-	def __init__(self, mae_file, pdb_file, file):
-		self.mae_file = mae_file
-		self.pdb_file = pdb_file
-		self.file = file
+class TestRotamers(mae_file, pdb_file):
 
 	def test_bonds(self):
 		bonds_offpele = u.get_bonds(self.pdb_file)
@@ -27,9 +20,4 @@ class TestRotamers:
 		groups_PlopRotTemp = u.get_groups(self.mae_file)
 		u.compare_groups(groups_offpele, groups_PlopRotTemp)
 #		u.write_diff_groups(self.file, result_comparison)
-
-
-
-
-
 
