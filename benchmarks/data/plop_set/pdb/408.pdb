@@ -16,7 +16,7 @@ HETATM   12  C3  LIG Z   1       8.665   7.013  12.761  1.00  0.00           C
 HETATM   13  C4  LIG Z   1       8.723   7.941  13.983  1.00  0.00           C  
 HETATM   14  C5  LIG Z   1       9.963   8.866  14.116  1.00  0.00           C  
 HETATM   15  O8  LIG Z   1       9.248   5.767  13.095  1.00  0.00           O  
-HETATM   16 BR1  LIG Z   1       8.557  10.068  16.403  1.00  0.00          Br  
+HETATM   16  BR1 LIG Z   1       8.557  10.068  16.403  1.00  0.00          Br  
 HETATM   17  H1  LIG Z   1       8.852  10.264  13.360  1.00  0.00           H  
 HETATM   18  H2  LIG Z   1      10.976  10.071  15.641  1.00  0.00           H  
 HETATM   19  H3  LIG Z   1      10.481   8.477  16.196  1.00  0.00           H  
@@ -26,7 +26,7 @@ HETATM   22  H6  LIG Z   1      12.135   8.756  13.982  1.00  0.00           H
 HETATM   23  H7  LIG Z   1       9.117   7.467  11.882  1.00  0.00           H  
 HETATM   24  H8  LIG Z   1       7.624   6.816  12.508  1.00  0.00           H  
 HETATM   25  H9  LIG Z   1       8.627   7.312  14.857  1.00  0.00           H  
-HETATM   26 H10  LIG Z   1       7.817   8.542  14.012  1.00  0.00           H  
+HETATM   26  H10 LIG Z   1       7.817   8.542  14.012  1.00  0.00           H  
 CONECT    1   14   17
 CONECT    2    5
 CONECT    2    5

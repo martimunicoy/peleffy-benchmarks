@@ -28,7 +28,7 @@ HETATM   24  H6  LIG Z   1     -20.224   1.290   4.951  1.00  0.00           H
 HETATM   25  H7  LIG Z   1     -18.857   2.457   3.414  1.00  0.00           H  
 HETATM   26  H8  LIG Z   1     -20.460   3.037   3.067  1.00  0.00           H  
 HETATM   27  H9  LIG Z   1     -20.353   0.936   1.298  1.00  0.00           H  
-HETATM   28 H10  LIG Z   1     -18.659   1.291   1.389  1.00  0.00           H  
+HETATM   28  H10 LIG Z   1     -18.659   1.291   1.389  1.00  0.00           H  
 CONECT    1    7    8   19
 CONECT    2    3    7   20
 CONECT    3    2    4    5
