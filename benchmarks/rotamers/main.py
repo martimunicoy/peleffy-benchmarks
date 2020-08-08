@@ -61,11 +61,11 @@ def main(mae_input_file, pdb_input_file, output_path, output_file, test_type):
     """
     if output_path != "":
         output_file = os.join(output_path, output_file)
-    f = open(output_file, 'w')
-    mae_file = open(mae_input_file, 'r')
-    pdb_file = open(pdb_input_file, 'r')
-    perform_test(f, test_type, mae_file, pdb_file)
-    f.close()
+
+    with open(output_file, 'w') as f:
+        with open(mae_input_file, 'r') as mae_file:
+            with open(pdb_input_file, 'r') as pdb_file:
+                perform_test(f, test_type, mae_file, pdb_file)
 
 
 if __name__ == "__main__":
