@@ -1,0 +1,35 @@
+rot assign res LIG &
+   sidelib FREE30 _C14 _C22 &
+   sidelib FREE30 _N4_ _C14 &
+   sidelib FREE30 _C14 _C15 &
+   sidelib FREE30 _C10 _N4_ &
+   sidelib FREE30 _C15 _C16 &
+   sidelib FREE30 _C9_ _C10 &
+   sidelib FREE30 _N3_ _C9_ &
+   sidelib FREE30 _C9_ _C11 &
+   sidelib FREE30 _C1_ _N3_ &
+   sidelib FREE30 _C11 _C12 &
+   sidelib FREE30 _C11 _C13 &
+   sidelib FREE30 _C1_ _N1_ &
+   sidelib FREE30 _N1_ _C2_ &
+   sidelib FREE30 _N1_ _C3_ &
+   sidelib FREE30 _C3_ _C4_ &
+     newgrp &
+   sidelib FREE30 _C23 _C22 &
+   sidelib FREE30 _C23 _O3_ &
+   sidelib FREE30 _C23 _O4_ &
+   sidelib FREE30 _C23 _C24 &
+   sidelib FREE30 _N5_ _C24 &
+   sidelib FREE30 _C24 _C25 &
+   sidelib FREE30 _N5_ _C33 &
+   sidelib FREE30 _C25 _C26 &
+   sidelib FREE30 _C32 _C33 &
+   sidelib FREE30 _N6_ _C32 &
+   sidelib FREE30 _C32 _C34 &
+   sidelib FREE30 _N6_ _C37 &
+   sidelib FREE30 _C34 _C35 &
+   sidelib FREE30 _C34 _C36 &
+   sidelib FREE30 _C37 _N7_ &
+   sidelib FREE30 _N7_ _C38 &
+   sidelib FREE30 _N7_ _C39 &
+   sidelib FREE30 _C39 _C40 &

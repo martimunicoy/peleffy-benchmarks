@@ -1,0 +1,3 @@
+rot assign res LIG &
+   sidelib FREE10 _C1_ _S3_ &
+   sidelib FREE10 _S3_ _N1_ &

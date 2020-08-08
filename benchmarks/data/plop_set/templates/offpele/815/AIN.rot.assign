@@ -1,0 +1,4 @@
+rot assign res AIN &
+   sidelib FREE30 _C2_ _O3_ &
+     newgrp &
+   sidelib FREE30 _C8_ _O3_ &
