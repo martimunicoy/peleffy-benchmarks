@@ -1,0 +1,16 @@
+rot assign res MI4 &
+   sidelib FREE30 _C16 _C17 &
+   sidelib FREE30 _C10 _C14 &
+   sidelib FREE30 _C12 _O5_ &
+   sidelib FREE30 _C4_ _C10 &
+   sidelib FREE30 _C13 _O6_ &
+   sidelib FREE30 _C3_ _C7_ &
+   sidelib FREE30 _C7_ _C8_ &
+     newgrp &
+   sidelib FREE30 _N1_ _C17 &
+   sidelib FREE30 _N1_ _C21 &
+   sidelib FREE30 _C18 _S1_ &
+   sidelib FREE30 _S1_ _C27 &
+   sidelib FREE30 _C26 _C30 &
+   sidelib FREE30 _C30 _C31 &
+   sidelib FREE30 _C30 _C32 &

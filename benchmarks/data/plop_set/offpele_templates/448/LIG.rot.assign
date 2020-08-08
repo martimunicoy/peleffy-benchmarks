@@ -1,0 +1,9 @@
+rot assign res LIG &
+   sidelib FREE30 _C7_ _C5_ &
+   sidelib FREE30 _C10 _N3_ &
+   sidelib FREE30 _N4_ _C15 &
+     newgrp &
+   sidelib FREE30 _S1_ _C2_ &
+   sidelib FREE30 _S1_ _C18 &
+   sidelib FREE30 _C19 _O3_ &
+   sidelib FREE30 _O3_ _C24 &

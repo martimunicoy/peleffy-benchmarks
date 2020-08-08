@@ -1,0 +1,7 @@
+rot assign res I &
+   sidelib FREE10 _C7_ _O2_ &
+     newgrp &
+   sidelib FREE10 _C8_ _O3_ &
+     newgrp &
+   sidelib FREE10 _C9_ _C10 &
+   sidelib FREE10 _C10 _O5_ &
