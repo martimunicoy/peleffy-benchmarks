@@ -1,4 +1,0 @@
-rot assign res U   &
-   sidelib FREE30 _N1_ _C1* &
-     newgrp &
-   sidelib FREE30 _C5* _C4* &
