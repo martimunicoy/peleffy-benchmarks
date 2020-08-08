@@ -68,7 +68,6 @@ def get_bonds(rot_lib):
     """
     bonds = []
     for rot in rot_lib:
-        rot = re.sub('_', '', rot)
         rot_list = list(rot.split(" "))
         if len(rot_list) == 8:
             bond = (rot_list[5], rot_list[6])
