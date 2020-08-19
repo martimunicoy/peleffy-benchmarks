@@ -1,0 +1,14 @@
+rot assign res UNK &
+   sidelib FREE30 _C10 _N2_ &
+   sidelib FREE30 _C2_ _C10 &
+   sidelib FREE30 _C1_ _C2_ &
+   sidelib FREE30 _C2_ _C3_ &
+   sidelib FREE30 _N1_ _C1_ &
+   sidelib FREE30 _C3_ _C4_ &
+     newgrp &
+   sidelib FREE30 _C11 _N2_ &
+   sidelib FREE30 _C11 _C12 &
+   sidelib FREE30 _C11 _C13 &
+   sidelib FREE30 _C13 _N3_ &
+   sidelib FREE30 _N3_ _C14 &
+   sidelib FREE30 _C14 _C15 &
