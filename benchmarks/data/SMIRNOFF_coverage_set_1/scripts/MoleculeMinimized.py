@@ -21,7 +21,7 @@ class MoleculeMinimized:
 		----------
 
 		Load a molecule from a PDB file and minimize it in the vacuum and OBC solvent. 
-        >>> import MoleculeMinimized as MM
+        	>>> import MoleculeMinimized as MM
 
 		>>> new_molecule = MM.MoleculeMinimized('ligand.pdb', '/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6')
 		>>> new_molecule.minimize(input_file = 'ligand.pdb', PELE_version = '/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6')
