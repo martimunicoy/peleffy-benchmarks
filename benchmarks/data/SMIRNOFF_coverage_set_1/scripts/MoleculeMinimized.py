@@ -21,7 +21,7 @@ class MoleculeMinimized:
 		----------
 
 		Load a molecule from a PDB file and minimize it in the vacuum and OBC solvent. 
-        	>>> import MoleculeMinimized as MM
+        >>> import MoleculeMinimized as MM
 
 		>>> new_molecule = MM.MoleculeMinimized('ligand.pdb', '/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6')
 		>>> new_molecule.minimize(input_file = 'ligand.pdb', PELE_version = '/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6')
@@ -36,10 +36,7 @@ class MoleculeMinimized:
 		"""
 		os.system("mkdir output")
 		os.system("cp %s ./output/" % (input_file))
-		os.system("cd output")
 		os.system("mv ./output/%s ./output/ligand.pdb" % (input_file))
-		os.system("cd output")
-
 
 	def _generate_parameters(self):
 		"""
@@ -61,7 +58,7 @@ class MoleculeMinimized:
 
 		Parameters:
 		----------
-		input_file: .pdb with the parameters of the molecule. 
+		input_file: PDB with the parameters of the molecule. 
 
 		PELE_version: str
 					  path of an executable version of PELE
@@ -70,5 +67,6 @@ class MoleculeMinimized:
 		self._output_folder(input_file)
 		self._link_folders()
 		self._generate_parameters()
-		os.system(" %s /home/lauramalo/tests/geometry/VACUUM_minimization.conf > ./output/VACUUM_minimization.out" % (PELE_version))
-		os.system(" %s /home/lauramalo/tests/geometry/OBC_minimization.conf > ./output/OBC_minimization.out" % (PELE_version))
+		os.chdir("./output/")
+		os.system(" %s /home/lauramalo/tests/geometry/VACUUM_minimization.conf > VACUUM_minimization.out" % (PELE_version))
+		os.system(" %s /home/lauramalo/tests/geometry/OBC_minimization.conf > OBC_minimization.out" % (PELE_version))
