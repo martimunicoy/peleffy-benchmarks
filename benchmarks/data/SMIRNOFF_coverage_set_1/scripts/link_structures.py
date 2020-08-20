@@ -1,9 +1,11 @@
-
+"""
+Script that links PDB ligant structure which all the corresponding QM conformations of the minimized ligand in the 
+SMIRNOFF database. 
+"""
 import argparse
 import os.path as os
 import re
 import json
-
 
 def parse_args():
     """
@@ -20,7 +22,7 @@ def parse_args():
 
 def parse_json_file(file):
     """
-    Parsing the date from s json file into a dictionary.
+    Parsing the date from a json file into a dictionary.
     """
     with open(file, 'r') as json_file:
     	data = json.load(json_file)
@@ -37,6 +39,9 @@ def get_ids(mydict,smarts_label):
 	return ids_list
 
 def get_path(ids):
+	"""
+	Returns a list of the paths of the corresponding conformations in /QM/ of the given ligand. 
+	"""
 	PATH_FOLDER = 'QM'
 	path_list = []
 	for id in ids:
@@ -46,6 +51,22 @@ def get_path(ids):
 	return path_list
 
 def main(pdb_file, pdb_to_smarts, ids_to_smarts):
+	"""
+	Command line:
+	----------
+	>>> python link_structures.py [ligand.pdb] [pdbs_to_smarts.json] [ids_to_smarts.json]
+
+	Example:
+	----------
+	>>> python link_structures.py 2.pdb pdbs_to_smarts.json ids_to_smarts.json 
+
+	PATH of the json files: 
+	----------
+	pdbs_to_smarts.json -> /home/lauramalo/repos/offpele-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/pdb/pdbs_to_smarts.json
+
+	ids_to_smarts.json -> /home/lauramalo/repos/offpele-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/ids/ids_to_smarts.json
+
+	"""
 	args = parse_args()
 	label = pdb_file.replace('.pdb','')
 	dict_pdb = parse_json_file(pdb_to_smarts)
