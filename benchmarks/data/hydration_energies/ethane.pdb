@@ -1,0 +1,23 @@
+REMARK   4      COMPLIES WITH FORMAT V. 3.0, 1-DEC-2006
+REMARK 888
+REMARK 888 WRITTEN BY MAESTRO (A PRODUCT OF SCHRODINGER, LLC)
+TITLE     SingleEthane
+MODEL        1
+HETATM    1  C1  ETH A   1       0.003  -0.003   0.003  1.00  0.00           C  
+HETATM    2  C2  ETH A   1       0.887  -0.887   0.887  1.00  0.00           C  
+HETATM    3  H1  ETH A   1      -0.639   0.639   0.607  1.00  0.00           H  
+HETATM    4  H2  ETH A   1      -0.639  -0.607  -0.639  1.00  0.00           H  
+HETATM    5  H3  ETH A   1       0.607   0.639  -0.639  1.00  0.00           H  
+HETATM    6  H4  ETH A   1       1.528  -1.528   0.282  1.00  0.00           H  
+HETATM    7  H5  ETH A   1       1.528  -0.282   1.528  1.00  0.00           H  
+HETATM    8  H6  ETH A   1       0.282  -1.528   1.528  1.00  0.00           H  
+CONECT    1    2    3    4    5
+CONECT    2    1    6    7    8
+CONECT    3    1
+CONECT    4    1
+CONECT    5    1
+CONECT    6    2
+CONECT    7    2
+CONECT    8    2
+ENDMDL
+END   

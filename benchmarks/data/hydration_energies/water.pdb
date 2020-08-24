@@ -1,0 +1,13 @@
+REMARK   4      COMPLIES WITH FORMAT V. 3.0, 1-DEC-2006
+REMARK 888
+REMARK 888 WRITTEN BY MAESTRO (A PRODUCT OF SCHRODINGER, LLC)
+TITLE     SingleWater
+MODEL        1
+HETATM    1  OW  HOH A   1      -0.007   0.374   0.086  1.00  0.00           O  
+HETATM    2 1HW  HOH A   1      -0.761  -0.196  -0.063  1.00  0.00           H  
+HETATM    3 2HW  HOH A   1       0.768  -0.178  -0.023  1.00  0.00           H  
+CONECT    1    2    3
+CONECT    2    1
+CONECT    3    1
+ENDMDL
+END   
