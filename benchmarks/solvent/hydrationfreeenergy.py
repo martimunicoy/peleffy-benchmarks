@@ -45,8 +45,8 @@ def main(pdb_input_file, out_path, out_file):
     #by default, if it need to be a parameter this should be modified
     PELE_version = '/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6'
     #minimize the molecule
-    #new_ligand = MM.MoleculeMinimized(pdb_input_file, PELE_version)
-    #new_ligand.minimize(pdb_input_file, PELE_version)
+    new_ligand = MM.MoleculeMinimized(pdb_input_file, PELE_version)
+    new_ligand.minimize(pdb_input_file, PELE_version)
     #computes the Hydration Free Energy
     vacuum_input_file, OBC_input_file = get_outputs(pdb_input_file)
     name = os.path.splitext(pdb_input_file)[0]
