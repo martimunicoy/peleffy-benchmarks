@@ -22,18 +22,20 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description="Compute The Hydration Free Energy")
     parser.add_argument("pdb_input_file", type=str, help="PDB for the ligand to minimize and compute the Hydration Free Energy.")
-    parser.add_argument("-o", "--output_path", type=str, default="./output/", help="Path where to write the results")
+    parser.add_argument("-o", "--output_path", type=str, default="", help="Path where to write the results")
     parser.add_argument("-of", "--output_file", type=str, default="hydration_free_energy.csv", help="File with the energy difference.")
     args = parser.parse_args()
     return args.pdb_input_file, args.output_path, args.output_file
 
-def get_outputs():
-	"""
-		It gets the two PDB files from the minimization for the molecule in vacuum and OBC.
-	"""
-	vacuum_input_file = os.path.join(os.getcwd(), 'VACUUM_minimization.out')
-	OBC_input_file = os.path.join(os.getcwd(),'OBC_minimization.out')
-	return vacuum_input_file, OBC_input_file
+def get_outputs(input_file):
+    """
+    It gets the two PDB files from the minimization for the molecule in vacuum and OBC.
+    """
+
+    name = os.path.splitext(input_file)[0]
+    vacuum_input_file = os.path.join(os.getcwd(),name , 'VACUUM_minimization.out')
+    OBC_input_file = os.path.join(os.getcwd(),name, 'OBC_minimization.out')
+    return vacuum_input_file, OBC_input_file
 
 
 def main(pdb_input_file, out_path, out_file):
@@ -43,11 +45,12 @@ def main(pdb_input_file, out_path, out_file):
     #by default, if it need to be a parameter this should be modified
     PELE_version = '/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6'
     #minimize the molecule
-    new_ligand = MM.MoleculeMinimized(pdb_input_file, PELE_version)
-    new_ligand.minimize(pdb_input_file, PELE_version)
+    #new_ligand = MM.MoleculeMinimized(pdb_input_file, PELE_version)
+    #new_ligand.minimize(pdb_input_file, PELE_version)
     #computes the Hydration Free Energy
-    vacuum_input_file, OBC_input_file = get_outputs()
-    f = open(os.path.join(os.getcwd(),out_file), 'w')
+    vacuum_input_file, OBC_input_file = get_outputs(pdb_input_file)
+    name = os.path.splitext(pdb_input_file)[0]
+    f = open(os.path.join(os.getcwd(),name, out_file), 'w')
     DiffEnergies.compare_energies(f, vacuum_input_file, OBC_input_file)
     f.close()
 
