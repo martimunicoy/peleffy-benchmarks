@@ -7,6 +7,8 @@ _Content under construction_
 - PPIs (6y8H, 4ipf)
 - PlopLigands (Ligands to parametrize with offpele and OPLS2005) 
 - Small molecule set with experimental hydration free energies (Need to search)
+- Hydration free energies evaluation
+
 
 ## Analysis features
 _Content under construction_
