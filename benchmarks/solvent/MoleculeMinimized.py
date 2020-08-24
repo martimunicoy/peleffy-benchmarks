@@ -1,4 +1,3 @@
-import os 
 
 class MoleculeMinimized:
 	"""
@@ -21,6 +20,7 @@ class MoleculeMinimized:
 		----------
 
 		Load a molecule from a PDB file and minimize it in the vacuum and OBC solvent. 
+		
         >>> import MoleculeMinimized as MM
 
 		>>> new_molecule = MM.MoleculeMinimized('ligand.pdb', '/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6')
@@ -34,26 +34,60 @@ class MoleculeMinimized:
 		"""
 		It creates an output folder with a copy of the ligand's pdb where all the results will be saved. 
 		"""
-		os.system("mkdir output")
-		os.system("cp %s ./output/" % (input_file))
-		os.system("cd output")
-		os.system("mv ./output/%s ./output/ligand.pdb" % (input_file))
-		os.system("cd output")
+		from pathlib import Path
+		import shutil
+		import os 
+		os.makedirs('output',exist_ok = True)
+		p = Path(input_file)
+		file, folder = p.name, p.parents[0]
+		shutil.copy(p, os.path.join(os.getcwd(),'output', 'ligand.pdb'))
 
 
 	def _generate_parameters(self):
 		"""
 		It generates the parameters of the molecule (from the input_file) as DataLocal in the output folder.
 		"""
-		os.system("python /home/lauramalo/repos/offpele/offpele/main.py ./output/ligand.pdb --with_solvent --as_DataLocal")
-		os.system("mv ./DataLocal/ ./output/DataLocal/")
+		import offpele
+		from offpele.topology import Molecule
+		from offpele.template import Impact
+		from offpele.solvent import OBC2
+		from offpele.main import handle_output_paths
+		import os 
+
+	
+		#Forcefield and charges_method
+		forcefield = 'openff_unconstrained-1.2.0.offxml'
+		charges_method = 'am1bcc'
+
+		# Create representation of a particular molecule
+		PATH_molecule = os.path.join(os.getcwd(),'output', 'ligand.pdb')
+		molecule = Molecule(PATH_molecule)
+
+		#Saving paths
+		rotamer_library_output_path, impact_output_path, solvent_output_path = handle_output_paths(molecule = molecule, output =os.path.join(os.getcwd(),'output'), as_datalocal = True )
+
+		# Generate its rotamer library
+		rotamer_library = offpele.topology.RotamerLibrary(molecule)
+		rotamer_library.to_file(rotamer_library_output_path)
+
+		# Generate its parameters and template file
+		molecule.parameterize(forcefield, charges_method=charges_method)
+		impact = Impact(molecule)
+		impact.write(impact_output_path)
+
+		# Generate its solvent parameters
+		solvent = OBC2(molecule)
+		solvent.to_json_file(solvent_output_path)
+
 
 	def _link_folders(self):
 		"""
 		It links the encessary folders to the output folder.
 		"""
-		os.system("ln -s /home/municoy/repos/PELE-repo/Data ./output/")
-		os.system("ln -s /home/municoy/repos/PELE-repo/Documents ./output/") 
+		import os 
+		os.symlink('/home/municoy/repos/PELE-repo/Data', os.path.join(os.getcwd(),'output','Data'))
+		os.symlink('/home/municoy/repos/PELE-repo/Documents',os.path.join(os.getcwd(),'output', 'Documents'))
+
 
 	def minimize(self,input_file, PELE_version):
 		"""
@@ -61,14 +95,34 @@ class MoleculeMinimized:
 
 		Parameters:
 		----------
-		input_file: .pdb with the parameters of the molecule. 
+		input_file: PDB with the parameters of the molecule. 
 
 		PELE_version: str
 					  path of an executable version of PELE
 
 		"""
+		import os
+		import requests
+		from pathlib import Path
+
 		self._output_folder(input_file)
 		self._link_folders()
 		self._generate_parameters()
-		os.system(" %s /home/lauramalo/tests/geometry/VACUUM_minimization.conf > ./output/VACUUM_minimization.out" % (PELE_version))
-		os.system(" %s /home/lauramalo/tests/geometry/OBC_minimization.conf > ./output/OBC_minimization.out" % (PELE_version))
+		
+		#Minimization
+		os.chdir("./output/")
+		conf_vacuum = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/VACUUM_minimization.conf'
+		conf_OBC = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OBC_minimization.conf'
+		os.system(" %s %s > VACUUM_minimization.out" % (PELE_version, conf_vacuum))
+		os.system(" %s %s > OBC_minimization.out" % (PELE_version, conf_OBC))
+
+		#rename the output folder to the molecule name
+		os.chdir("..")
+		p = Path(input_file)
+		file, folder = p.name, p.parents[0]
+		new_folder = os.path.splitext(file)[0]
+		os.rename('output', new_folder)
+		os.chdir(new_folder)
+
+
+
