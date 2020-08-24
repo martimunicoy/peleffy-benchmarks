@@ -3,10 +3,12 @@ Datasets to be used in benchmarking studies for offpele.
 
 ## Content
 _Content under construction_
-- `PlopLigands`: A set of small molecules to parametrize with offpele and OPLS2005 to perform general evaluations.
+- `plop_set`: A set of small molecules to parametrize with offpele and OPLS2005 to perform general evaluations.
+- `extra_ligands`: Extra ligands to parameterize with offpele and OPLS2005 for a general checking.
+- `SMIRNOFF_coverage_set_1`: A set of small molecules whose coverage in OFF was analyzed.
 - `hydration_energies`: Some small molecules from the [FreeSolv](https://github.com/MobleyLab/FreeSolv) database to evaluate hydration energies.
-- `GPCR`: GPCRs (5c1m, 6dde, and crossPELE)
-- `PPI`: PPIs (6y8H, 4ipf)
+- `GPCR`: set of GPCR systems (5c1m, 6dde, and crossPELE)
+- `PPI`: set of PPI systems (6y8H, 4ipf)
 
 
 ## Analysis features
