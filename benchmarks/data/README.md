@@ -3,11 +3,10 @@ Datasets to be used in benchmarking studies for offpele.
 
 ## Content
 _Content under construction_
-- GPCRs (5c1m, 6dde, and crossPELE)
-- PPIs (6y8H, 4ipf)
-- PlopLigands (Ligands to parametrize with offpele and OPLS2005) 
-- Small molecule set with experimental hydration free energies (Need to search)
-- Hydration free energies evaluation
+- `PlopLigands`: A set of small molecules to parametrize with offpele and OPLS2005 to perform general evaluations.
+- `hydration_energies`: Some small molecules from the [FreeSolv](https://github.com/MobleyLab/FreeSolv) database to evaluate hydration energies.
+- `GPCR`: GPCRs (5c1m, 6dde, and crossPELE)
+- `PPI`: PPIs (6y8H, 4ipf)
 
 
 ## Analysis features
