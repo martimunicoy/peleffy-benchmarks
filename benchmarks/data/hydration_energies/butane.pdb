@@ -1,0 +1,35 @@
+REMARK   4      COMPLIES WITH FORMAT V. 3.0, 1-DEC-2006
+REMARK 888
+REMARK 888 WRITTEN BY MAESTRO (A PRODUCT OF SCHRODINGER, LLC)
+TITLE     SingleButane
+MODEL        1
+HETATM    1  C1  BUT A   1      -0.006   0.006  -0.002  1.00  0.00           C  
+HETATM    2  C2  BUT A   1       0.882  -0.882   0.877  1.00  0.00           C  
+HETATM    3  C3  BUT A   1       1.798  -1.798   0.052  1.00  0.00           C  
+HETATM    4  C4  BUT A   1       2.685  -2.685   0.932  1.00  0.00           C  
+HETATM    5  H1  BUT A   1      -0.644   0.644   0.610  1.00  0.00           H  
+HETATM    6  H2  BUT A   1      -0.653  -0.594  -0.642  1.00  0.00           H  
+HETATM    7  H3  BUT A   1       0.594   0.653  -0.642  1.00  0.00           H  
+HETATM    8  H4  BUT A   1       1.486  -0.251   1.531  1.00  0.00           H  
+HETATM    9  H5  BUT A   1       0.251  -1.486   1.531  1.00  0.00           H  
+HETATM   10  H6  BUT A   1       1.194  -2.430  -0.601  1.00  0.00           H  
+HETATM   11  H7  BUT A   1       2.430  -1.194  -0.601  1.00  0.00           H  
+HETATM   12  H8  BUT A   1       3.324  -3.324   0.321  1.00  0.00           H  
+HETATM   13  H9  BUT A   1       3.332  -2.085   1.573  1.00  0.00           H  
+HETATM   14  H10 BUT A   1       2.085  -3.332   1.573  1.00  0.00           H  
+CONECT    1    2    5    6    7
+CONECT    2    1    3    8    9
+CONECT    3    2    4   10   11
+CONECT    4    3   12   13   14
+CONECT    5    1
+CONECT    6    1
+CONECT    7    1
+CONECT    8    2
+CONECT    9    2
+CONECT   10    3
+CONECT   11    3
+CONECT   12    4
+CONECT   13    4
+CONECT   14    4
+ENDMDL
+END   

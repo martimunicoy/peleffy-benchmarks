@@ -1,0 +1,41 @@
+REMARK   4      COMPLIES WITH FORMAT V. 3.0, 1-DEC-2006
+REMARK 888
+REMARK 888 WRITTEN BY MAESTRO (A PRODUCT OF SCHRODINGER, LLC)
+TITLE     SinglePentane
+MODEL        1
+HETATM    1  C1  PEN A   1      -0.010   0.021   0.003  1.00  0.00           C  
+HETATM    2  C2  PEN A   1       0.882  -0.884   0.860  1.00  0.00           C  
+HETATM    3  C3  PEN A   1       1.798  -1.777   0.013  1.00  0.00           C  
+HETATM    4  C4  PEN A   1       2.709  -2.668   0.871  1.00  0.00           C  
+HETATM    5  C5  PEN A   1       3.631  -3.551   0.023  1.00  0.00           C  
+HETATM    6  H1  PEN A   1      -0.645   0.648   0.628  1.00  0.00           H  
+HETATM    7  H2  PEN A   1      -0.659  -0.567  -0.647  1.00  0.00           H  
+HETATM    8  H3  PEN A   1       0.586   0.680  -0.629  1.00  0.00           H  
+HETATM    9  H4  PEN A   1       1.485  -0.265   1.526  1.00  0.00           H  
+HETATM   10  H5  PEN A   1       1.190  -2.403  -0.642  1.00  0.00           H  
+HETATM   11  H6  PEN A   1       2.412  -1.154  -0.639  1.00  0.00           H  
+HETATM   12  H7  PEN A   1       0.254  -1.504   1.501  1.00  0.00           H  
+HETATM   13  H8  PEN A   1       3.315  -2.045   1.530  1.00  0.00           H  
+HETATM   14  H9  PEN A   1       2.100  -3.300   1.518  1.00  0.00           H  
+HETATM   15  H10 PEN A   1       4.269  -4.169   0.657  1.00  0.00           H  
+HETATM   16  H11 PEN A   1       3.058  -4.219  -0.621  1.00  0.00           H  
+HETATM   17  H12 PEN A   1       4.280  -2.948  -0.612  1.00  0.00           H  
+CONECT    1    2    6    7    8
+CONECT    2    1    3    9   12
+CONECT    3    2    4   10   11
+CONECT    4    3    5   13   14
+CONECT    5    4   15   16   17
+CONECT    6    1
+CONECT    7    1
+CONECT    8    1
+CONECT    9    2
+CONECT   10    3
+CONECT   11    3
+CONECT   12    2
+CONECT   13    4
+CONECT   14    4
+CONECT   15    5
+CONECT   16    5
+CONECT   17    5
+ENDMDL
+END   

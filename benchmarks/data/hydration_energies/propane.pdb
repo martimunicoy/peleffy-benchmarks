@@ -1,0 +1,29 @@
+REMARK   4      COMPLIES WITH FORMAT V. 3.0, 1-DEC-2006
+REMARK 888
+REMARK 888 WRITTEN BY MAESTRO (A PRODUCT OF SCHRODINGER, LLC)
+TITLE     SinglePropane
+MODEL        1
+HETATM    1  C1  ETH A   1      -0.004   0.004   0.007  1.00  0.00           C  
+HETATM    2  C2  ETH A   1       0.890  -0.890   0.873  1.00  0.00           C  
+HETATM    3  C3  ETH A   1       1.797  -1.797   0.035  1.00  0.00           C  
+HETATM    4  H1  ETH A   1      -0.639   0.639   0.627  1.00  0.00           H  
+HETATM    5  H2  ETH A   1      -0.656  -0.591  -0.634  1.00  0.00           H  
+HETATM    6  H3  ETH A   1       0.591   0.656  -0.634  1.00  0.00           H  
+HETATM    7  H4  ETH A   1       1.502  -0.267   1.527  1.00  0.00           H  
+HETATM    8  H5  ETH A   1       0.267  -1.502   1.527  1.00  0.00           H  
+HETATM    9  H6  ETH A   1       2.422  -2.422   0.675  1.00  0.00           H  
+HETATM   10  H7  ETH A   1       1.212  -2.459  -0.604  1.00  0.00           H  
+HETATM   11  H8  ETH A   1       2.459  -1.212  -0.604  1.00  0.00           H  
+CONECT    1    2    4    5    6
+CONECT    2    1    3    7    8
+CONECT    3    2    9   10   11
+CONECT    4    1
+CONECT    5    1
+CONECT    6    1
+CONECT    7    2
+CONECT    8    2
+CONECT    9    3
+CONECT   10    3
+CONECT   11    3
+ENDMDL
+END   
