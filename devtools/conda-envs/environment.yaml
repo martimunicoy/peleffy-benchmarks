@@ -1,0 +1,23 @@
+name: offpele_bm
+
+channels:
+  - martimunicoy
+  - conda-forge
+  - omnia
+
+dependencies:
+    # Base depends
+  - python
+  - pip
+
+    # Testing and development
+  - pytest
+  - pytest-cov
+  - codecov
+  - flake8
+
+    # Benchmarking
+  - qcportal
+
+    # Standard dependencies
+  - offpele 

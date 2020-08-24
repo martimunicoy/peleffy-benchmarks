@@ -1,0 +1,189 @@
+{ 
+ s_m_m2io_version
+ :::
+ 2.0.0 
+} 
+
+f_m_ct { 
+ s_m_title
+ s_m_entry_id
+ s_m_entry_name
+ s_pdb_PDB_format_version
+ s_m_Source_Path
+ s_m_Source_File
+ i_m_Source_File_Index
+ b_ppw_prepared
+ s_ppw_prepared_with_version
+ s_pdb_PDB_TITLE
+ s_pdb_PDB_ID
+ r_pdb_PDB_CRYST1_a
+ r_pdb_PDB_CRYST1_b
+ r_pdb_PDB_CRYST1_c
+ r_pdb_PDB_CRYST1_alpha
+ r_pdb_PDB_CRYST1_beta
+ r_pdb_PDB_CRYST1_gamma
+ s_pdb_PDB_CRYST1_Space_Group
+ i_pdb_PDB_CRYST1_z
+ s_pdb_PDB_CLASSIFICATION
+ s_pdb_PDB_DEPOSITION_DATE
+ r_pdb_PDB_R
+ r_pdb_PDB_Rfree
+ r_pdb_PDB_RESOLUTION
+ s_pdb_PDB_EXPDTA
+ r_pdb_PDB_EXPDTA_TEMPERATURE
+ r_pdb_PDB_EXPDTA_PH
+ s_pdb_PDB_REMARK_350_Biomolecule_1_Transform_1_Chains
+ s_pdb_PDB_REMARK_350_Biomolecule_1_Transform_1_Matrix_1
+ s_ppw_entry_id_backup
+ b_ppw_assigned_bond_orders
+ b_ppw_added_hydrogens
+ b_ppw_treated_metals
+ b_ppw_created_disulfur
+ i_m_ct_format
+ :::
+ "1ZNK - preprocessed" 
+  5 
+  1znk.1 
+  3.15 
+  /Users/martimunicoy 
+  1znk.pdb 
+  1
+  1
+  2020-2 
+  "STRONG SOLUTE-SOLUTE DISPERSIVE INTERACTIONS IN A PROTEIN- LIGAND COMPLEX" 
+  1ZNK 
+  53.498
+  53.498
+  137.401
+  90
+  90
+  90
+  "P 43 21 2" 
+  8
+  "TRANSPORT PROTEIN" 
+  11-MAY-05 
+  0.213
+  0.255
+  1.6
+  "X-RAY DIFFRACTION" 
+  100
+  4.9
+  A 
+  "1.000000 0.000000 0.000000   0.000000;0.000000 1.000000 0.000000   0.000000;0.000000 0.000000 1.000000   0.000000" 
+  4 
+  1
+  1
+  1
+  1
+  2
+ m_atom[30] { 
+  # First column is atom index #
+  i_m_mmod_type
+  r_m_x_coord
+  r_m_y_coord
+  r_m_z_coord
+  i_m_residue_number
+  s_m_chain_name
+  i_m_color
+  s_m_pdb_residue_name
+  s_m_pdb_atom_name
+  i_m_atomic_number
+  s_m_color_rgb
+  s_m_atom_name
+  s_m_label_format
+  i_m_label_color
+  s_m_label_user_text
+  r_m_pdb_occupancy
+  r_m_pdb_tfactor
+  i_m_pdb_convert_problem
+  i_pdb_PDB_serial
+  i_ppw_het
+  s_ppw_CCD_assignment_status
+  :::
+  1 3 45.131000 28.045000 41.297000 1 L 10 "NOL " " C1 " 6 1EE11E  "C1275"  %PA  32 ""  1 25.69 4 1276 1 "CCD match" 
+  2 3 46.661000 27.986000 41.339000 1 L 10 "NOL " " C2 " 6 1EE11E  "C1276"  %PA  32 ""  1 21.96 4 1277 1 "CCD match" 
+  3 3 47.167000 26.572000 41.630000 1 L 10 "NOL " " C3 " 6 1EE11E  "C1277"  %PA  32 ""  1 24.36 4 1278 1 "CCD match" 
+  4 3 47.225000 25.731000 40.352000 1 L 10 "NOL " " C4 " 6 1EE11E  "C1278"  %PA  32 ""  1 23.23 4 1279 1 "CCD match" 
+  5 3 47.800000 24.340000 40.626000 1 L 10 "NOL " " C5 " 6 1EE11E  "C1279"  %PA  32 ""  1 19.12 4 1280 1 "CCD match" 
+  6 3 49.331000 24.372000 40.630000 1 L 10 "NOL " " C6 " 6 1EE11E  "C1280"  %PA  32 ""  1 18.83 4 1281 1 "CCD match" 
+  7 3 49.909000 22.980000 40.899000 1 L 10 "NOL " " C7 " 6 1EE11E  "C1281"  %PA  32 ""  1 16.93 4 1282 1 "CCD match" 
+  8 3 51.437000 23.043000 40.986000 1 L 10 "NOL " " C8 " 6 1EE11E  "C1282"  %PA  32 ""  1 17.91 4 1283 1 "CCD match" 
+  9 3 52.046000 21.646000 41.123000 1 L 10 "NOL " " C9 " 6 1EE11E  "C1283"  %PA  32 ""  1 19.55 4 1284 1 "CCD match" 
+  10 16 51.882000 21.186000 42.468000 1 L 70 "NOL " " O1 " 8 FF2E2E  "O1284"  %PA  32 ""  1 22.56 4 1285 1 "CCD match" 
+  11 41 44.811859 29.066019 41.087790 1 L 21 "NOL " " H1 " 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  12 41 44.762674 27.382113 40.514046 1 L 21 "NOL " " H2 " 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  13 41 44.728140 27.728913 42.259233 1 L 21 "NOL " " H3 " 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  14 41 47.029299 28.667864 42.105497 1 L 21 "NOL " " H4 " 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  15 41 47.063350 28.325912 40.384707 1 L 21 "NOL " " H5 " 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  16 41 46.505851 26.091255 42.351018 1 L 21 "NOL " " H6 " 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  17 41 48.161025 26.626527 42.073894 1 L 21 "NOL " " H7 " 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  18 41 47.842105 26.239148 39.611009 1 L 21 "NOL " " H8 " 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  19 41 46.222225 25.633554 39.936010 1 L 21 "NOL " " H9 " 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  20 41 47.453508 23.646666 39.859625 1 L 21 "NOL " " H10" 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  21 41 47.441951 23.983066 41.591660 1 L 21 "NOL " " H11" 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  22 41 49.677502 25.063437 41.398083 1 L 21 "NOL " " H12" 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  23 41 49.688925 24.733455 39.665977 1 L 21 "NOL " " H13" 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  24 41 49.618772 22.304686 40.094128 1 L 21 "NOL " " H14" 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  25 41 49.507587 22.595229 41.836507 1 L 21 "NOL " " H15" 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  26 41 51.726814 23.650751 41.843174 1 L 21 "NOL " " H16" 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  27 41 51.831749 23.524709 40.091444 1 L 21 "NOL " " H17" 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  28 41 53.107846 21.687431 40.880377 1 L 21 "NOL " " H18" 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  29 41 51.541437 20.961502 40.441107 1 L 21 "NOL " " H19" 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  30 42 52.263619 20.309485 42.555682 1 L 21 "NOL " " H20" 1 FFFFFF  ""  %PA  32 ""  <> <> <> <> <> <>
+  :::
+ } 
+ m_bond[29] { 
+  # First column is bond index #
+  i_m_from
+  i_m_to
+  i_m_order
+  :::
+  1 1 2 1
+  2 1 11 1
+  3 1 12 1
+  4 1 13 1
+  5 2 3 1
+  6 2 14 1
+  7 2 15 1
+  8 3 4 1
+  9 3 16 1
+  10 3 17 1
+  11 4 5 1
+  12 4 18 1
+  13 4 19 1
+  14 5 6 1
+  15 5 20 1
+  16 5 21 1
+  17 6 7 1
+  18 6 22 1
+  19 6 23 1
+  20 7 8 1
+  21 7 24 1
+  22 7 25 1
+  23 8 9 1
+  24 8 26 1
+  25 8 27 1
+  26 9 10 1
+  27 9 28 1
+  28 9 29 1
+  29 10 30 1
+  :::
+ } 
+ m_PDB_SEQRES[1] { 
+  s_pdb_chain_id
+  s_pdb_SEQRES
+  :::
+  1 A  "MET ARG GLY SER HIS HIS HIS HIS HIS HIS GLY SER GLU GLU ALA SER SER THR GLY ARG ASN PHE ASN VAL GLU LYS ILE ASN GLY GLU TRP HIS THR ILE ILE LEU ALA SER ASP LYS ARG GLU LYS ILE GLU ASP ASN GLY ASN PHE ARG LEU PHE LEU GLU GLN ILE HIS VAL LEU GLU LYS SER LEU VAL LEU LYS PHE HIS THR VAL ARG ASP GLU GLU CYS SER GLU LEU SER MET VAL ALA ASP LYS THR GLU LYS ALA GLY GLU TYR SER VAL THR TYR ASP GLY PHE ASN THR PHE THR ILE PRO LYS THR ASP TYR ASP ASN PHE LEU MET ALA HIS LEU ILE ASN GLU LYS ASP GLY GLU THR PHE GLN LEU MET GLY LEU TYR GLY ARG GLU PRO ASP LEU SER SER ASP ILE LYS GLU ARG PHE ALA GLN LEU CYS GLU GLU HIS GLY ILE LEU ARG GLU ASN ILE ILE ASP LEU SER ASN ALA ASN ARG CYS LEU GLN ALA ARG GLU " 
+  :::
+ } 
+ m_PDB_het_residues[2] { 
+  s_pdb_het_id
+  s_pdb_het_name
+  s_pdb_het_formula
+  :::
+  1 " CD"  "CADMIUM ION"  "CD 2+" 
+  2 "F09"  "NONAN-1-OL"  "C9 H20 O" 
+  :::
+ } 
+} 
+

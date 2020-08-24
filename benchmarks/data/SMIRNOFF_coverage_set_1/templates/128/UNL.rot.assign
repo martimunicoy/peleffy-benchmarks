@@ -1,0 +1,5 @@
+rot assign res UNL &
+   sidelib FREE30 _N1_ _C6_ &
+     newgrp &
+   sidelib FREE30 _S1_ _C3_ &
+   sidelib FREE30 _S1_ _N2_ &

@@ -1,0 +1,33 @@
+REMARK   4      COMPLIES WITH FORMAT V. 3.0, 1-DEC-2006
+REMARK 888
+REMARK 888 WRITTEN BY MAESTRO (A PRODUCT OF SCHRODINGER, LLC)
+TITLE     Structure6 - preprocessed
+MODEL        1
+HETATM    1  N1  AMN L   1      -0.855   0.322   2.003  1.00  0.00           N  
+HETATM    2  C1  AMN L   1       0.384   1.164   2.260  1.00  0.00           C  
+HETATM    3  C2  AMN L   1      -1.727   0.309   3.248  1.00  0.00           C  
+HETATM    4  C3  AMN L   1      -0.441  -1.099   1.660  1.00  0.00           C  
+HETATM    5  H1  AMN L   1       1.009   1.173   1.367  1.00  0.00           H  
+HETATM    6  H2  AMN L   1       0.087   2.183   2.506  1.00  0.00           H  
+HETATM    7  H3  AMN L   1       0.946   0.739   3.092  1.00  0.00           H  
+HETATM    8  H4  AMN L   1      -2.616  -0.294   3.063  1.00  0.00           H  
+HETATM    9  H5  AMN L   1      -1.167  -0.117   4.080  1.00  0.00           H  
+HETATM   10  H6  AMN L   1      -2.025   1.328   3.494  1.00  0.00           H  
+HETATM   11  H7  AMN L   1      -1.330  -1.703   1.475  1.00  0.00           H  
+HETATM   12  H8  AMN L   1       0.183  -1.091   0.766  1.00  0.00           H  
+HETATM   13  H9  AMN L   1       0.120  -1.525   2.491  1.00  0.00           H  
+CONECT    1    2    3    4
+CONECT    2    1    5    6    7
+CONECT    3    1    8    9   10
+CONECT    4    1   11   12   13
+CONECT    5    2
+CONECT    6    2
+CONECT    7    2
+CONECT    8    3
+CONECT    9    3
+CONECT   10    3
+CONECT   11    4
+CONECT   12    4
+CONECT   13    4
+ENDMDL
+END   
