@@ -144,9 +144,7 @@ def get_groups(rot_lib):
     """
     groups = []
     group = []
-    i = 0  # unused variable 'i'
     for rot in rot_lib:
-        rot = re.sub('_', '', rot)
         rot_list = list(rot.split(" "))
         if 'newgrp' in rot_list:
             groups.append(group)
@@ -210,3 +208,205 @@ def write_diff_resolution(file, resolution_differences):
     file.write('Resolution:' + '\n')
     for difference in resolution_differences:
         file.write(str(difference) + '\n')
+
+
+# ------------
+# Reading file
+# ------------
+def extract_rotamer_info_from(path_to_templates, relative_path_to_pdbs):
+    """
+    It searches and returns a collection of data useful for the analysis
+    of rotamer libraries.
+
+    Parameters
+    ----------
+    path_to_templates : str
+        The pattern to all the templates to analyze
+    relative_path_to_pbds : str
+        The relative path from templates from which pdbs can be retrieved
+
+    Returns
+    -------
+    mol_ids : list[int]
+        The ordered list of molecule ids
+    mol_names : list[str]
+        The ordered list of molecule names
+    groups : list[list[list]]
+        The ordered list of bonds defined in each rotamer's library group
+        (or branch)
+    locations : list[dict]
+        The ordered list of dictionaries that link a PDB atom name (key)
+        with its location in molecule (value). The location is represented
+        by a single char which can be either 'M', if it is in the core,
+        or 'S', otherwise
+    pdb_path : list[str]
+        The ordered list of paths to the pdb
+    """
+    from glob import glob
+    from pathlib import Path
+
+    mol_ids = list()
+    mol_names = list()
+    groups = list()
+    locations = list()
+    pdbs = list()
+
+    for template_path in glob(path_to_templates):
+        template_path = Path(template_path)
+        with open(template_path, 'r') as template:
+            try:
+                molecule_id = int(template_path.parent.name)
+                molecule_name = template_path.name.split('.')[0]
+            except ValueError:
+                continue
+
+            groups_to_append = get_groups(template)
+
+        parameters_path = template_path.parent.joinpath(
+            molecule_name.lower() + 'z')
+
+        try:
+            with open(parameters_path, 'r') as template:
+                locations.append(get_atom_locations(template))
+        except FileNotFoundError:
+            continue
+
+        pdb_path = template_path.parent.joinpath(
+            relative_path_to_pdbs, '{}.pdb'.format(molecule_id))
+
+        if not pdb_path.is_file():
+            continue
+
+        groups.append(groups_to_append)
+
+        mol_ids.append(molecule_id)
+        mol_names.append(molecule_name)
+
+        pdbs.append(str(pdb_path))
+
+    assert len(mol_ids) == len(mol_names) \
+        and len(mol_ids) == len(groups) \
+        and len(mol_ids) == len(locations) \
+        and len(mol_ids) == len(pdbs), 'Extracted data has wrong size'
+
+    return mol_ids, mol_names, groups, locations, pdbs
+
+
+# -------------
+# Impact parser
+# -------------
+def get_atom_locations(parameters_path):
+    """
+    It links each PDB atom name with its location inside the molecule.
+    Whether it is in the core (M) or in a branch (S).
+
+    Parameters
+    ----------
+    parameters_path : _io.TextIOWrapper
+        The TextIOWrapper obtained from an Impact file.
+
+    Returns
+    -------
+    locations : dict
+        The dictionary that links a PDB atom name (key) with its location
+        in molecule (value). The location is represented by a single
+        char which can be either 'M', if it is in the core, or 'S',
+        otherwise
+    """
+    locations = dict()
+
+    for line in parameters_path:
+        # Ignore header lines
+        if line.startswith('*'):
+            continue
+
+        # The section we are interesed lies before NBON
+        if line.startswith('NBON'):
+            break
+
+        fields = line.split()
+
+        # We are looking for lines with 9 columns delimited by white spaces
+        if len(fields) != 9:
+            continue
+
+        # PDB atom names are in the fifth column
+        PDB_atom_name = fields[4]
+
+        # Locations are in the third column
+        location = fields[2]
+
+        locations[PDB_atom_name] = location
+
+    return locations
+
+
+# -------------
+# Draw rotamers
+# -------------
+def draw_rotamers(pdb_path, mol_name, groups, locations):
+    """
+    To do
+    """
+
+    COLORS = [(82 / 255, 215 / 255, 255 / 255), (255 / 255, 154 / 255, 71 / 255),
+              (161 / 255, 255 / 255, 102 / 255), (255 / 255, 173 / 255, 209 / 255),
+              (154 / 255, 92 / 255, 255 / 255), (66 / 255, 255 / 255, 167 / 255),
+              (251 / 255, 255 / 255, 17 / 255)]
+
+    from rdkit import Chem
+    from rdkit.Chem.Draw import rdMolDraw2D
+
+    mol = Chem.MolFromPDBFile(str(pdb_path), removeHs=False)
+
+    # Hydrogens do not need to be displayed
+    mol = Chem.RemoveHs(mol)
+
+    bond_indexes = list()
+    bond_color_dict = dict()
+
+    for bond in mol.GetBonds():
+        atom1_name = bond.GetBeginAtom().GetPDBResidueInfo().GetName().replace(' ', '_')
+        atom2_name = bond.GetEndAtom().GetPDBResidueInfo().GetName().replace(' ', '_')
+
+        bond_id = (atom1_name, atom2_name)
+        bond_id_inverse = (atom2_name, atom1_name)
+
+        for color_index, group in enumerate(groups):
+            if bond_id in group or bond_id_inverse in group:
+                bond_indexes.append(bond.GetIdx())
+                try:
+                    bond_color_dict[bond.GetIdx()] = COLORS[color_index]
+                except IndexError:
+                    bond_color_dict[bond.GetIdx()] = (99 / 255,
+                                                      122 / 255,
+                                                      126 / 255)
+                break
+
+    atom_indexes = list()
+    radii_dict = dict()
+    atom_color_dict = dict()
+
+    for atom in mol.GetAtoms():
+        atom_name = atom.GetPDBResidueInfo().GetName().replace(' ', '_')
+        if locations[atom_name] == 'M':
+            atom_indexes.append(atom.GetIdx())
+            radii_dict[atom.GetIdx()] = 0.6
+            atom_color_dict[atom.GetIdx()] = (255 / 255, 243 / 255, 133 / 255)
+
+    Chem.rdDepictor.Compute2DCoords(mol)
+    draw = rdMolDraw2D.MolDraw2DSVG(500, 500)
+    draw.SetLineWidth(4)
+    rdMolDraw2D.PrepareAndDrawMolecule(draw, mol, mol_name,
+                                       highlightAtoms=atom_indexes,
+                                       highlightAtomRadii=radii_dict,
+                                       highlightAtomColors=atom_color_dict,
+                                       highlightBonds=bond_indexes,
+                                       highlightBondColors=bond_color_dict)
+    draw.FinishDrawing()
+
+    from IPython.display import SVG
+
+    image = SVG(draw.GetDrawingText())
+
+    return image
