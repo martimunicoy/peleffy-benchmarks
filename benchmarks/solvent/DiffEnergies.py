@@ -56,17 +56,26 @@ def get_energy(file):
     label = list(energies_minimized.keys())[-1]
     return (energies_minimized.get(label))
 
-def compare_energies(out_file, vacuum_file, OBC_file):
+def compute_energies(vacuum_file, OBC_file):
     """
     Given two files, computes the minimized energy for the two cases and returns the
     difference written in the out_file.
     """
     vacuum_energy = get_energy(vacuum_file)
     OBC_energy = get_energy(OBC_file)
-    out_file.write('Vacuum_energy:' + vacuum_energy + '\n')
-    out_file.write('OBC energy:' +  OBC_energy + '\n')
     hydration_energy = float(OBC_energy) - float(vacuum_energy)
-    out_file.write('Hydration free energy:' + str(hydration_energy) + '\n')
+    return vacuum_energy, OBC_energy, hydration_energy
+    
+
+def write_energies(f, vacuum_energy, OBC_energy, hydration_energy):
+    f.write('Vacuum_energy:' + vacuum_energy + '\n')
+    f.write('OBC energy:' +  OBC_energy + '\n')
+    f.write('Hydration free energy:' + str(hydration_energy) + '\n')
+
+
+def compare_energies(f, vacuum_input_file, OBC_input_file):
+    vacuum_energy, OBC_energy, hydration_energy = compute_energies(vacuum_input_file, OBC_input_file)
+    write_energies(f, vacuum_energy, OBC_energy, hydration_energy)
 
 
 def main(vacuum_input_file, OBC_input_file, out_path, out_file):
