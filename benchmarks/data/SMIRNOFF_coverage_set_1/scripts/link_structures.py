@@ -3,9 +3,10 @@ Script that links PDB ligant structure which all the corresponding QM conformati
 SMIRNOFF database. 
 """
 import argparse
-import os.path as os
+import os
 import re
 import json
+from pathlib import Path
 
 def parse_args():
     """
@@ -45,9 +46,8 @@ def get_path(ids):
 	PATH_FOLDER = 'QM'
 	path_list = []
 	for id in ids:
-		path = os.join('..',PATH_FOLDER, id + '.xyz')
+		path = os.path.join('/home/lauramalo/repos/offpele-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1',PATH_FOLDER, id + '.xyz')
 		path_list.append(path)
-	print(path_list)
 	return path_list
 
 def main(pdb_file, pdb_to_smarts, ids_to_smarts):
@@ -68,7 +68,10 @@ def main(pdb_file, pdb_to_smarts, ids_to_smarts):
 
 	"""
 	args = parse_args()
-	label = pdb_file.replace('.pdb','')
+	p = Path(pdb_file)
+	label = p.name
+	label = label.replace('.pdb','')
+
 	dict_pdb = parse_json_file(pdb_to_smarts)
 	dict_ids = parse_json_file(ids_to_smarts)
 	ids = get_ids(dict_ids,dict_pdb.get(label))

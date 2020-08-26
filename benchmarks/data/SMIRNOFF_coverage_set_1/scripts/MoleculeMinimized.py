@@ -132,7 +132,6 @@ class MoleculeMinimized:
 		file, folder = p.name, p.parents[0]
 		new_folder = os.path.splitext(file)[0]
 		os.rename('output', new_folder)
-		os.chdir(new_folder)
 
 
 
