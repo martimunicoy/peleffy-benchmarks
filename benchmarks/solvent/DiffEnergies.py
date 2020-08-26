@@ -8,6 +8,7 @@ Example:
 -------------
 
 python /home/lauramalo/tests/solvent/DiffEnergies.py VACUUM_minimization.out OBC_minimization.out
+
 """
 
 
@@ -48,7 +49,7 @@ def parse_file(file):
 
 def get_energy(file):
     """
-    Given a file, first it does a data parsing of the file and creates a dictionary of the nergies after minimization. 
+    Given a file, it does a data parsing of the file and creates a dictionary of the energies after minimization. 
     Returns the total energy computed after the minimization.
     """
     data = parse_file(file)
@@ -58,8 +59,7 @@ def get_energy(file):
 
 def compute_energies(vacuum_file, OBC_file):
     """
-    Given two files, computes the minimized energy for the two cases and returns the
-    difference written in the out_file.
+    Given two files, it returns the vacuum energy, the OBC energy and the difference energy.
     """
     vacuum_energy = get_energy(vacuum_file)
     OBC_energy = get_energy(OBC_file)
@@ -68,12 +68,18 @@ def compute_energies(vacuum_file, OBC_file):
     
 
 def write_energies(f, vacuum_energy, OBC_energy, hydration_energy):
+    """
+    If writes the computet energies into an output file (f)
+    """
     f.write('Vacuum_energy:' + vacuum_energy + '\n')
     f.write('OBC energy:' +  OBC_energy + '\n')
     f.write('Hydration free energy:' + str(hydration_energy) + '\n')
 
 
 def compare_energies(f, vacuum_input_file, OBC_input_file):
+    """
+    Computes the difference energy and write the results in a file. 
+    """
     vacuum_energy, OBC_energy, hydration_energy = compute_energies(vacuum_input_file, OBC_input_file)
     write_energies(f, vacuum_energy, OBC_energy, hydration_energy)
 

@@ -21,7 +21,7 @@ class MoleculeMinimized:
 
 		Load a molecule from a PDB file and minimize it in the vacuum and OBC solvent. 
 		
-       		>>> import MoleculeMinimized as MM
+        >>> import MoleculeMinimized as MM
 
 		>>> new_molecule = MM.MoleculeMinimized('ligand.pdb', '/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6')
 		>>> new_molecule.minimize(input_file = 'ligand.pdb', PELE_version = '/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6')
@@ -37,9 +37,14 @@ class MoleculeMinimized:
 		from pathlib import Path
 		import shutil
 		import os 
-		os.makedirs('output',exist_ok = True)
+
+
+		# Handels path of the input file
 		p = Path(input_file)
 		file, folder = p.name, p.parents[0]
+
+		# It makes the output directory
+		os.makedirs('output',exist_ok = True)
 		shutil.copy(p, os.path.join(os.getcwd(),'output', 'ligand.pdb'))
 
 
@@ -55,7 +60,7 @@ class MoleculeMinimized:
 		import os 
 
 	
-		#Forcefield and charges_method
+		# Forcefield and charges method
 		forcefield = 'openff_unconstrained-1.2.0.offxml'
 		charges_method = 'am1bcc'
 
@@ -63,8 +68,9 @@ class MoleculeMinimized:
 		PATH_molecule = os.path.join(os.getcwd(),'output', 'ligand.pdb')
 		molecule = Molecule(PATH_molecule)
 
-		#Saving paths
-		rotamer_library_output_path, impact_output_path, solvent_output_path = handle_output_paths(molecule = molecule, output =os.path.join(os.getcwd(),'output'), as_datalocal = True )
+		# Saving paths
+		rotamer_library_output_path, impact_output_path, solvent_output_path = \
+			handle_output_paths(molecule = molecule, output =os.path.join(os.getcwd(),'output'), as_datalocal = True )
 
 		# Generate its rotamer library
 		rotamer_library = offpele.topology.RotamerLibrary(molecule)
@@ -85,8 +91,11 @@ class MoleculeMinimized:
 		It links the encessary folders to the output folder.
 		"""
 		import os 
-		os.symlink('/home/municoy/repos/PELE-repo/Data', os.path.join(os.getcwd(),'output','Data'))
-		os.symlink('/home/municoy/repos/PELE-repo/Documents',os.path.join(os.getcwd(),'output', 'Documents'))
+
+		PELE_SRC = '/home/municoy/repos/PELE-repo/'
+		
+		os.symlink('{}Data'.format(PELE_SRC), os.path.join(os.getcwd(),'output','Data'))
+		os.symlink('{}Documents'.format(PELE_SRC), os.path.join(os.getcwd(),'output', 'Documents'))
 
 
 	def minimize(self,input_file, PELE_version):
@@ -105,18 +114,19 @@ class MoleculeMinimized:
 		import requests
 		from pathlib import Path
 
+		VACUUM_CF = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/VACUUM_minimization.conf'
+		OBC_CF = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OBC_minimization.conf'
+
 		self._output_folder(input_file)
 		self._link_folders()
 		self._generate_parameters()
 		
-		#Minimization
+		# Minimization
 		os.chdir("./output/")
-		conf_vacuum = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/VACUUM_minimization.conf'
-		conf_OBC = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OBC_minimization.conf'
-		os.system(" %s %s > VACUUM_minimization.out" % (PELE_version, conf_vacuum))
-		os.system(" %s %s > OBC_minimization.out" % (PELE_version, conf_OBC))
+		os.system(" %s %s > VACUUM_minimization.out" % (PELE_version, VACUUM_CF))
+		os.system(" %s %s > OBC_minimization.out" % (PELE_version, OBC_CF))
 
-		#rename the output folder to the molecule name
+		# Rename the output folder to the molecule name
 		os.chdir("..")
 		p = Path(input_file)
 		file, folder = p.name, p.parents[0]
