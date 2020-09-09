@@ -92,9 +92,9 @@ class Minimizer(object):
         import os
 
         # It makes the output directory
-        os.makedirs(self._output_folder, exist_ok=True)
+        os.makedirs(self._output_path, exist_ok=True)
         shutil.copy(input_PDB_file, os.path.join(os.getcwd(),
-                                                 self._output_folder,
+                                                 self._output_path,
                                                  'ligand.pdb'))
 
     def _link_folders(self):
