@@ -177,6 +177,8 @@ class Minimizer(object):
         import os
 
         # Minimization
+        previous_dir = os.getcwd()
         os.chdir(os.path.join(os.getcwd(), self._output_path))
         os.system("{} {} > {}_minimization.out".format(
             self._PELE_exec, self.CONTROL_FILES[solvent], solvent))
+        os.chdir(previous_dir)
