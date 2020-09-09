@@ -104,12 +104,18 @@ class Minimizer(object):
         import os
 
         # Link to Data
+        link_path = os.path.join(os.getcwd(), self._output_path, 'Data')
+        if os.path.isdir(link_path):
+            os.remove(link_path)
         os.symlink(os.path.join(self._PELE_src, 'Data'),
-                   os.path.join(os.getcwd(), self._output_path, 'Data'))
+                   link_path)
 
         # Link to Documents
+        link_path = os.path.join(os.getcwd(), self._output_path, 'Documents')
+        if os.path.isdir(link_path):
+            os.remove(link_path)
         os.symlink(os.path.join(self._PELE_src, 'Documents'),
-                   os.path.join(os.getcwd(), self._output_path, 'Documents'))
+                   link_path)
 
     def _generate_parameters(self,
                              input_PDB_file,
