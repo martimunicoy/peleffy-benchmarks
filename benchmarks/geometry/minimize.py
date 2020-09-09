@@ -76,7 +76,7 @@ class Minimizer(object):
 
         if output_path is None:
             self._output_path = os.path.join('output',
-                                             Path(input_PDB_file).name)
+                                             Path(input_PDB_file).stem)
 
     def _create_directory(self, input_PDB_file):
         """
