@@ -41,7 +41,7 @@ class QCPortal(object):
 
         data = dict()
 
-        for name, record in ds.df.records.items():
+        for name, record in ds.data.records.items():
             record_attributes = dict()
             for attribute in attributes:
                 record_attributes[attribute] = record.attributes[attribute]
