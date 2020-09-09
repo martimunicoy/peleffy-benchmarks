@@ -1,3 +1,6 @@
+"""
+It prepares the system files and runs a PELE minimization.
+"""
 
 
 class Minimizer(object):
