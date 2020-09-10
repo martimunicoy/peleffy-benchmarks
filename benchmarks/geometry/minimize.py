@@ -158,9 +158,13 @@ class Minimizer(object):
         from offpele.template import Impact
         from offpele.solvent import OBC2
         from offpele.main import handle_output_paths
+        import os
 
         # Create representation of a particular molecule
         molecule = Molecule(smiles=smiles, name=mol_id)
+
+        # Save molecule to PDB file
+        molecule.to_pdb_file(os.path.join(output_path, 'ligand.pdb'))
 
         # Saving paths
         rotamer_library_output_path, impact_output_path, \
