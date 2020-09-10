@@ -2,7 +2,7 @@
 It prepares the system files and runs a PELE minimization.
 """
 import os
-LOCAL_DIR = os.path.abspath(__file__)
+LOCAL_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Minimizer(object):
