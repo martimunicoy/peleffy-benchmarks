@@ -85,9 +85,9 @@ class Minimizer(object):
         import os
 
         if output_path is None:
-            self._output_path = os.path.join('output', mol_id)
+            output_path = os.path.join('output', mol_id)
         else:
-            self._output_path = os.path.join(output_path, mol_id)
+            output_path = os.path.join(output_path, mol_id)
 
         return output_path
 
