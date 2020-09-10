@@ -56,7 +56,7 @@ class MultiMinimizer(object):
                                'index_to_name.json'), "w") as f:
             f.write(json_output)
 
-    def _parallel_minimizer(iteration_data):
+    def _parallel_minimizer(self, iteration_data):
         """
         It runs a minimization in parallel.
 
