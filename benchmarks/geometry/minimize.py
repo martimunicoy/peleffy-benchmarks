@@ -27,9 +27,10 @@ class Minimizer(object):
         self._PELE_src = PELE_src
         self._output_path = None
 
-    def minimize(self, input_PDB_file, solvent='vacuum',
+    def minimize(self, input_PDB_file=None, solvent='vacuum',
                  forcefield='openff_unconstrained-1.2.0.offxml',
-                 charges_method='am1bcc', output_path=None):
+                 charges_method='am1bcc', output_path=None,
+                 smiles=None):
         """
         Given an input PDB file, it runs a minimization with PELE.
 
@@ -46,6 +47,8 @@ class Minimizer(object):
             The charges method to calculate the partial charges with
         output_path : str
             The output path where results will be saved
+        smiles : str
+            The smiles tag representing the molecule to minimize
         """
 
         if solvent not in self.CONTROL_FILES:
