@@ -27,17 +27,18 @@ class Minimizer(object):
         self._PELE_src = PELE_src
         self._output_path = None
 
-    def minimize(self, input_PDB_file=None, solvent='vacuum',
+    def minimize(self, smiles, mol_id, solvent='vacuum',
                  forcefield='openff_unconstrained-1.2.0.offxml',
-                 charges_method='am1bcc', output_path=None,
-                 smiles=None):
+                 charges_method='am1bcc', output_path=None):
         """
         Given an input PDB file, it runs a minimization with PELE.
 
         Parameters
         ----------
-        input_PDB_file : str
-            The input PDB file to minimize with PELE
+        smiles : str
+            The smiles tag representing the molecule to minimize
+        mol_id : str
+            Unique id to identify the molecule to minimize
         solvent : str
             The solvent name. One of ['vacuum', 'OBC']. Default is 'vacuum'
         forcefield : str
@@ -47,121 +48,124 @@ class Minimizer(object):
             The charges method to calculate the partial charges with
         output_path : str
             The output path where results will be saved
-        smiles : str
-            The smiles tag representing the molecule to minimize
         """
 
         if solvent not in self.CONTROL_FILES:
             raise ValueError('Invalid solvent:', solvent,
                              'It must be one of', self.CONTROL_FILES.keys())
 
-        self._set_output_path(input_PDB_file, output_path)
+        output_path = self._get_output_path(output_path, mol_id)
 
-        self._create_directory(input_PDB_file)
+        self._create_directory(output_path)
 
-        self._link_folders()
+        self._link_folders(output_path)
 
-        self._generate_parameters(input_PDB_file, forcefield=forcefield,
+        self._generate_parameters(smiles, mol_id, output_path,
+                                  forcefield=forcefield,
                                   charges_method=charges_method)
 
-        self._run_PELE_minimization(solvent)
+        self._run_PELE_minimization(solvent, output_path)
 
-    def _set_output_path(self, input_PDB_file, output_path=None):
+    def _get_output_path(self, output_path, mol_id):
         """
-        It handles and sets output path
+        It sets the output path.
 
         Parameters
         ----------
-        input_PDB_file : str
-            The input PDB file to minimize with PELE
         output_path : str
             The output path where results will be saved
+        mol_id : str
+            Unique id to identify the molecule to minimize
+
+        Returns
+        -------
+        output_path : str
+            The output path that has been assigned
         """
         import os
-        from pathlib import Path
 
         if output_path is None:
-            self._output_path = os.path.join('output',
-                                             Path(input_PDB_file).stem)
+            self._output_path = os.path.join('output', mol_id)
+        else:
+            self._output_path = os.path.join(output_path, mol_id)
 
-    def _create_directory(self, input_PDB_file):
+        return output_path
+
+    def _create_directory(self, output_path):
         """
         It creates an output directory where all the results will be saved
         and copies the ligand's pdb inside.
 
         Parameters
         ----------
-        input_PDB_file : str
-            The input PDB file to minimize with PELE
+        output_path : str
+            The output path where results will be saved
         """
         import shutil
         import os
 
         # It makes the output directory
-        os.makedirs(self._output_path, exist_ok=True)
-        shutil.copy(input_PDB_file, os.path.join(os.getcwd(),
-                                                 self._output_path,
-                                                 'ligand.pdb'))
+        os.makedirs(output_path, exist_ok=True)
 
-    def _link_folders(self):
+    def _link_folders(self, output_path):
         """
         It links the necessary folders to the output folder.
+
+        Parameters
+        ----------
+        output_path : str
+            The output path where results will be saved
         """
         import os
 
         # Link to Data
-        link_path = os.path.join(os.getcwd(), self._output_path, 'Data')
+        link_path = os.path.join(os.getcwd(), output_path, 'Data')
         if os.path.isdir(link_path):
             os.remove(link_path)
         os.symlink(os.path.join(self._PELE_src, 'Data'),
                    link_path)
 
         # Link to Documents
-        link_path = os.path.join(os.getcwd(), self._output_path, 'Documents')
+        link_path = os.path.join(os.getcwd(), output_path, 'Documents')
         if os.path.isdir(link_path):
             os.remove(link_path)
         os.symlink(os.path.join(self._PELE_src, 'Documents'),
                    link_path)
 
-    def _generate_parameters(self,
-                             input_PDB_file,
+    def _generate_parameters(self, smiles, mol_id, output_path,
                              forcefield='openff_unconstrained-1.2.0.offxml',
-                             charges_method='am1bcc',
-                             path=None):
+                             charges_method='am1bcc'):
         """
         It generates the parameters of the molecule (from the input_file)
         as DataLocal in the output folder.
 
         Parameters
         ----------
-        input_PDB_file : str
-            The input PDB file to parameterize with the Open Force Field
-            Toolkit for PELE
+        smiles : str
+            The smiles tag representing the molecule to minimize
+        mol_id : str
+            Unique id to identify the molecule to minimize
+        output_path : str
+            The output path where parameters will be saved
         forcefield : str
             The Open Force Field force field to generate the parameters
             with
         charges_method : str
             The charges method to calculate the partial charges with
-        path : str
-            Path where parameters will be saved
         """
         import offpele
         from offpele.topology import Molecule
         from offpele.template import Impact
         from offpele.solvent import OBC2
         from offpele.main import handle_output_paths
-        from pathlib import Path
-
-        if path is None:
-            general_path = Path(input_PDB_file).parent
 
         # Create representation of a particular molecule
-        molecule = Molecule(input_PDB_file)
+        molecule = Molecule(smiles=smiles, name=mol_id)
 
         # Saving paths
         rotamer_library_output_path, impact_output_path, \
             solvent_output_path = handle_output_paths(molecule=molecule,
-                                                      output=general_path,
+                                                      output=output_path,
                                                       as_datalocal=True)
 
         # Generate its rotamer library
@@ -177,7 +181,7 @@ class Minimizer(object):
         solvent = OBC2(molecule)
         solvent.to_json_file(solvent_output_path)
 
-    def _run_PELE_minimization(self, solvent):
+    def _run_PELE_minimization(self, solvent, output_path):
         """
         It runs a PELE minimization.
 
@@ -185,12 +189,14 @@ class Minimizer(object):
         ----------
         solvent : str
             The solvent name. One of ['vacuum', 'OBC']. Default is 'vacuum'
+        output_path : str
+            The output path where parameters will be saved
         """
         import os
 
         # Minimization
         previous_dir = os.getcwd()
-        os.chdir(os.path.join(os.getcwd(), self._output_path))
+        os.chdir(os.path.join(os.getcwd(), output_path))
         os.system("{} {} > {}_minimization.out".format(
             self._PELE_exec, self.CONTROL_FILES[solvent], solvent))
         os.chdir(previous_dir)
