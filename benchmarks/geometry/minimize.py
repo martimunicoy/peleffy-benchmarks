@@ -10,7 +10,7 @@ class MultiMinimizer(object):
     It handles multiple calls to the Minimizer methods.
     """
 
-    def __init__(self, PELE_exec, PELE_src):
+    def __init__(self, PELE_exec, PELE_src, n_proc):
         """
         It initializes a MultiMinimizer object.
 
@@ -20,10 +20,14 @@ class MultiMinimizer(object):
             Path to the PELE executable
         PELE_src : str
             Path to PELE source folder
+        n_proc : int
+            The number of processors to employ to gather and parse data
         """
+
         self._PELE_exec = PELE_exec
         self._PELE_src = PELE_src
         self._output_path = None
+        self.n_proc = n_proc
 
     def run(self, data, output_path='output'):
         """
@@ -44,7 +48,7 @@ class MultiMinimizer(object):
 
         index_to_name = dict()
 
-        with Pool(2) as p:
+        with Pool(self.n_proc) as p:
             p.map(self._parallel_minimizer, enumerate(data.items()))
 
         for index, name in enumerate(data.keys()):
