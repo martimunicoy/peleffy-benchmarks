@@ -54,8 +54,9 @@ class MultiMinimizer(object):
         index_to_name = dict()
 
         with Pool(self.n_proc) as p:
-            tqdm(p.imap(self._parallel_minimizer, enumerate(data.items())),
-                 total=len(data.items()))
+            list(tqdm(p.imap(self._parallel_minimizer,
+                             enumerate(data.items())),
+                      total=len(data.items())))
 
         for index, name in enumerate(data.keys()):
             index_to_name[index] = name
@@ -81,7 +82,12 @@ class MultiMinimizer(object):
         index, (name, attributes) = iteration_data
 
         smiles = attributes['canonical_isomeric_explicit_hydrogen_smiles']
-        minimizer.minimize(smiles, str(index), output_path=self._output_path)
+        try:
+            minimizer.minimize(smiles, str(index),
+                               output_path=self._output_path)
+        except Exception as e:
+            print('Exception found for molecule {}{}'.format(name, smiles)
+                  + ': ' + str(e))
 
 
 class Minimizer(object):
