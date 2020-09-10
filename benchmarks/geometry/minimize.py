@@ -1,6 +1,8 @@
 """
 It prepares the system files and runs a PELE minimization.
 """
+import os
+LOCAL_DIR = os.path.abspath(__file__)
 
 
 class Minimizer(object):
@@ -9,8 +11,9 @@ class Minimizer(object):
     OpenForceField toolkit for PELE.
     """
 
-    CONTROL_FILES = {'vacuum': 'data/VACUUM_minimization.conf',
-                     'OBC': 'data/OBC_minimization.conf'}
+    CONTROL_FILES = {
+        'vacuum': os.path.join(LOCAL_DIR, 'data/VACUUM_minimization.conf'),
+        'OBC': os.path.join(LOCAL_DIR, 'data/OBC_minimization.conf')}
 
     def __init__(self, PELE_exec, PELE_src):
         """
@@ -161,7 +164,7 @@ class Minimizer(object):
         import os
 
         # Create representation of a particular molecule
-        molecule = Molecule(smiles=smiles, name=mol_id)
+        molecule = Molecule(smiles=smiles, name=mol_id, tag='UNL')
 
         # Save molecule to PDB file
         molecule.to_pdb_file(os.path.join(output_path, 'ligand.pdb'))
