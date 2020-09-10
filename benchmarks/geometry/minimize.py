@@ -5,6 +5,75 @@ import os
 LOCAL_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
+class MultiMinimizer(object):
+    """
+    It handles multiple calls to the Minimizer methods.
+    """
+
+    def __init__(self, PELE_exec, PELE_src):
+        """
+        It initializes a MultiMinimizer object.
+
+        Parameters
+        ----------
+        PELE_exec : str
+            Path to the PELE executable
+        PELE_src : str
+            Path to PELE source folder
+        """
+        self._PELE_exec = PELE_exec
+        self._PELE_src = PELE_src
+        self._output_path = None
+
+    def run(self, data, output_path='output'):
+        """
+        It runs a bunch of minimizations.
+
+        Parameters
+        ----------
+        data : dict[dict]
+            Parsed data containing all the records and their attributes
+            from the retrieved dataset. All of them will be minimized
+        output_path : str
+            The output path where results will be saved
+        """
+        from multiprocessing import Pool
+        import json
+
+        self._output_path = output_path
+
+        index_to_name = dict()
+
+        with Pool(2) as p:
+            p.map(self._parallel_minimizer, enumerate(data.items()))
+
+        for index, name in enumerate(data.keys()):
+            index_to_name[index] = name
+
+        json_output = json.dumps(index_to_name)
+
+        with open(os.path.join(self._output_path,
+                               'index_to_name.json'), "w") as f:
+            f.write(json_output)
+
+    def _parallel_minimizer(iteration_data):
+        """
+        It runs a minimization in parallel.
+
+        Parameters
+        ----------
+        iteration_data : tuple[int, tuple[str, list[str]]]
+            It contains the data for a certain minimization iteration
+        """
+        minimizer = Minimizer(PELE_exec=self._PELE_exec,
+                              PELE_src=self._PELE_src)
+
+        index, (name, attributes) = iteration_data
+
+        smiles = attributes['canonical_isomeric_explicit_hydrogen_smiles']
+        minimizer.minimize(smiles, str(index), output_path=self._output_path)
+
+
 class Minimizer(object):
     """
     It contains all the tools to minimize a molecule with PELE and the
