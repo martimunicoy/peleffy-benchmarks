@@ -10,7 +10,7 @@ class MultiMinimizer(object):
     It handles multiple calls to the Minimizer methods.
     """
 
-    def __init__(self, PELE_exec, PELE_src, n_proc):
+    def __init__(self, PELE_exec, PELE_src, n_proc=1):
         """
         It initializes a MultiMinimizer object.
 
@@ -23,6 +23,10 @@ class MultiMinimizer(object):
         n_proc : int
             The number of processors to employ to gather and parse data
         """
+        # Supress INFO messages from offpele
+        from offpele.utils import Logger
+        log = Logger()
+        log.set_level('WARNING')
 
         self._PELE_exec = PELE_exec
         self._PELE_src = PELE_src
@@ -43,13 +47,15 @@ class MultiMinimizer(object):
         """
         from multiprocessing import Pool
         import json
+        from tqdm import tqdm
 
         self._output_path = output_path
 
         index_to_name = dict()
 
         with Pool(self.n_proc) as p:
-            p.map(self._parallel_minimizer, enumerate(data.items()))
+            tqdm(p.imap(self._parallel_minimizer, enumerate(data.items())),
+                 total=len(data.items()))
 
         for index, name in enumerate(data.keys()):
             index_to_name[index] = name
