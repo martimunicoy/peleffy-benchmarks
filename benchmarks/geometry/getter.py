@@ -53,7 +53,7 @@ class QCPortal(object):
 
     def get_data(self, collection_name,
                  collection_type='OptimizationDataset',
-                 attributes=['canonical_isomeric_explicit_hydrogen_mapped_smiles']):
+                 attributes=['canonical_isomeric_explicit_hydrogen_smiles']):
         """
         It downloads and parses a certain dataset from the QCPortal.
 
