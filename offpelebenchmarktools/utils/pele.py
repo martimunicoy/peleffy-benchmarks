@@ -189,6 +189,11 @@ class PELEBaseJob(object):
         charges_method : str
             The charges method to calculate the partial charges with.
             Default is 'am1bcc'
+
+        Returns
+        -------
+        output_file : str
+            Path to the PELE output file
         """
         import os
 
@@ -215,6 +220,8 @@ class PELEBaseJob(object):
         os.system("{} {} > PELE_output.txt".format(
             self._PELE_exec, control_file))
         os.chdir(previous_dir)
+
+        return os.path.join(os.getcwd(), output_path, 'PELE_output.txt')
 
     @property
     def name(self):
@@ -276,3 +283,88 @@ class PELESinglePoint(PELEBaseJob):
             The path to the control file
         """
         return self._CONTROL_FILES['single_point']
+
+
+class PELEOutputParser(dict):
+    """
+    This class parses the output file of PELE.
+    """
+
+    def __init__(self, output_file):
+        """
+        It initializes a PELEOutputParser object.
+
+        Parameters
+        ----------
+        output_file : str
+            The path to the PELE output file
+        """
+
+        self._output_file = output_file
+
+        self._initialize()
+        self._parse()
+
+    def _initialize(self):
+        """Initializes the dictionary keys."""
+        self['bond energy'] = None
+        self['angle energy'] = None
+        self['torsion energy'] = None
+        self['14 energy'] = None
+        self['nonbonding energy'] = None
+        self['constraints energy'] = None
+        self['vacuum + constraints energy'] = None
+
+    def _parse(self):
+        """Parse the PELE output file."""
+        from simtk import unit
+
+        with open(self.output_file) as f:
+            for line in f:
+                if line.startswith('ENERGY BOND:'):
+                    energy = unit.Quantity(
+                        value=line.strip().split()[-1],
+                        unit=(unit.kilocalorie / unit.mole))
+                    self['bond energy'] = energy
+                elif line.startswith('ENERGY ANGLE:'):
+                    energy = unit.Quantity(
+                        value=line.strip().split()[-1],
+                        unit=(unit.kilocalorie / unit.mole))
+                    self['angle energy'] = energy
+                elif line.startswith('ENERGY TORSION:'):
+                    energy = unit.Quantity(
+                        value=line.strip().split()[-1],
+                        unit=(unit.kilocalorie / unit.mole))
+                    self['torsion energy'] = energy
+                elif line.startswith('ENERGY 14:'):
+                    energy = unit.Quantity(
+                        value=line.strip().split()[-1],
+                        unit=(unit.kilocalorie / unit.mole))
+                    self['14 energy'] = energy
+                elif line.startswith('ENERGY NBOND:'):
+                    energy = unit.Quantity(
+                        value=line.strip().split()[-1],
+                        unit=(unit.kilocalorie / unit.mole))
+                    self['nonbonding energy'] = energy
+                elif line.startswith('ENERGY CONSTRAINTS:'):
+                    energy = unit.Quantity(
+                        value=line.strip().split()[-1],
+                        unit=(unit.kilocalorie / unit.mole))
+                    self['constraints energy'] = energy
+                elif line.startswith('ENERGY VACUUM + CONSTRAINTS:'):
+                    energy = unit.Quantity(
+                        value=line.strip().split()[-1],
+                        unit=(unit.kilocalorie / unit.mole))
+                    self['vacuum + constraints energy'] = energy
+
+    @property
+    def output_file(self):
+        """
+        The path to the PELE output file.
+
+        Returns
+        -------
+        output_file : str
+            The path to the PELE output file
+        """
+        return self._output_file

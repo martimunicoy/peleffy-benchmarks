@@ -174,6 +174,9 @@ class OpenMMEnergeticProfile(EnergeticProfileBaseCalculator):
         dihedral_energies : a simtk.unit.Quantity object
             The array of energies represented with a simtk's Quantity
             object
+        thetas : list[float]
+            The array of thetas, only if requested in the corresponding
+            function parameter
         """
         mol_with_conformers = \
             self.dihedral_benchmark.generate_dihedral_conformers(
@@ -319,6 +322,9 @@ class OpenFFEnergeticProfile(EnergeticProfileBaseCalculator):
         dihedral_energies : a simtk.unit.Quantity object
             The array of energies represented with a simtk's Quantity
             object
+        thetas : list[float]
+            The array of thetas, only if requested in the corresponding
+            function parameter
         """
 
         import numpy as np
@@ -403,6 +409,164 @@ class OpenFFEnergeticProfile(EnergeticProfileBaseCalculator):
         -------
         parameters : dict
             The dictionary containing the dihedral parameters, keyed by
-            atom indexes.
+            atom indexes
         """
         return self._parameters
+
+
+class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
+    """
+    It represents an energetic profile calculator that employs PELE
+    single point calculations.
+    """
+
+    _name = 'PELE energetic profile'
+
+    def __init__(self, dihedral_benchmark,
+                 PELE_exec, PELE_src,
+                 forcefield='openff_unconstrained-1.2.1.offxml'):
+        """
+        It initializes an PELEEnergeticProfile object.
+
+        Parameters
+        ----------
+        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+            The DihedralBenchmark object that will be used to obtain the
+            energetic profile
+        PELE_exec : str
+            Path to the PELE executable
+        PELE_src : str
+            Path to PELE source folder
+        forcefield : str
+            The OpenFF force field to employ to run OpenMM. Default is
+            'openff_unconstrained-1.2.1.offxml'
+        """
+        super().__init__(dihedral_benchmark)
+
+        self._PELE_exec = PELE_exec
+        self._PELE_src = PELE_src
+        self._forcefield = forcefield
+
+    def get_energies(self, resolution=30, get_thetas=False):
+        """
+        It returns the energies of this energetic profile calculator.
+
+        Parameters
+        ----------
+        resolution : float
+            The resolution, in degrees, that is applied when rotating
+            the dihedral rotatable bond. Default is 30 degrees
+        get_thetas : bool
+            Whether to return thetas (dihedral angles) or not. Default
+            is False
+
+        Returns
+        -------
+        dihedral_energies : a simtk.unit.Quantity object
+            The array of energies represented with a simtk's Quantity
+            object
+        thetas : list[float]
+            The array of thetas, only if requested in the corresponding
+            function parameter
+        """
+
+        mol_with_conformers = \
+            self.dihedral_benchmark.generate_dihedral_conformers(
+                resolution)
+
+        from rdkit import Chem
+        import tempfile
+        from offpelebenchmarktools.utils import temporary_cd
+        from offpelebenchmarktools.utils.pele import (PELESinglePoint,
+                                                      PELEOutputParser)
+
+        dihedral_energies = list()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with temporary_cd(tmpdir):
+                for conf in mol_with_conformers.GetConformers():
+                    # Write conformation to PDB file
+                    Chem.rdmolfiles.MolToPDBFile(mol_with_conformers,
+                                                 'ligand.pdb',
+                                                 confId=conf.GetId())
+
+                    pele_job = PELESinglePoint(PELE_exec=self.PELE_exec,
+                                               PELE_src=self.PELE_src)
+
+                    output_file = pele_job.run(
+                        self.dihedral_benchmark.molecule,
+                        pdb_path='ligand.pdb')
+
+                    parsed_output = PELEOutputParser(output_file)
+                    dihedral_energies.append(parsed_output['torsion energy'])
+
+        if get_thetas:
+            from rdkit.Chem import rdMolTransforms
+
+            thetas = list()
+
+            for conf in mol_with_conformers.GetConformers():
+                thetas.append(rdMolTransforms.GetDihedralDeg(
+                    conf, *self.dihedral_benchmark.atom_indexes))
+
+            return dihedral_energies, thetas
+
+        return dihedral_energies
+
+    def _get_plot_values(self, resolution=30):
+        """
+        It plots the energies of this energetic profile calculator.
+
+        Parameters
+        ----------
+        resolution : float
+            The resolution, in degrees, that is applied when rotating
+            the dihedral rotatable bond. Default is 30 degrees
+
+        Returns
+        -------
+        thetas : list[float]
+            The array of thetas
+        dihedral_energies : list[float]
+            The array of dihedral energies
+        """
+        dihedral_energies, thetas = self.get_energies(resolution,
+                                                      get_thetas=True)
+
+        return thetas, dihedral_energies
+
+    @property
+    def PELE_exec(self):
+        """
+        Path to the PELE executable
+
+        Returns
+        -------
+        PELE_exec : str
+            The path to the PELE executable
+        """
+        return self._PELE_exec
+
+    @property
+    def PELE_src(self):
+        """
+        Path to the PELE source code
+
+        Returns
+        -------
+        PELE_src : str
+            The path to the PELE source code
+        """
+        return self._PELE_src
+
+    @property
+    def forcefield(self):
+        """
+        The OpenFF force field to employ to parameterize the molecule.
+
+        Returns
+        -------
+        forcefield : str
+            The forcefield name
+        """
+        return self._forcefield
