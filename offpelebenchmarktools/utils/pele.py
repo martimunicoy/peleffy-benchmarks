@@ -147,11 +147,9 @@ class PELEBaseJob(object):
             The charges method to calculate the partial charges with
         """
         import offpele
-        from offpele.topology import Molecule
         from offpele.template import Impact
         from offpele.solvent import OBC2
         from offpele.main import handle_output_paths
-        import os
 
         # Saving paths
         rotamer_library_output_path, impact_output_path, \
@@ -214,7 +212,7 @@ class PELEBaseJob(object):
 
         previous_dir = os.getcwd()
         os.chdir(os.path.join(os.getcwd(), output_path))
-        os.system("{} {} > {}PELE_output.txt".format(
+        os.system("{} {} > PELE_output.txt".format(
             self._PELE_exec, control_file))
         os.chdir(previous_dir)
 
