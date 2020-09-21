@@ -86,7 +86,7 @@ class MultiMinimizer(object):
             minimizer.minimize(smiles, str(index),
                                output_path=self._output_path)
         except Exception as e:
-            print('Exception found for molecule {}{}'.format(name, smiles)
+            print('Exception found for molecule {} {}'.format(name, smiles)
                   + ': ' + str(e))
 
 
