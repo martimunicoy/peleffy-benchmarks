@@ -247,7 +247,7 @@ class PELESinglePoint(PELEBaseJob):
         output_path : str
             The path to save the output coming from PELE
         """
-        super().__init__()
+        super().__init__(PELE_exec, PELE_src, output_path)
 
         from offpelebenchmarktools.utils import get_data_file_path
 
