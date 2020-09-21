@@ -234,9 +234,18 @@ class PELESinglePoint(PELEBaseJob):
     to compute the energy of the current conformation of a molecule.
     """
 
-    def __init__(self):
+    def __init__(self, PELE_exec, PELE_src, output_path=None):
         """
         It initializes a PELESinglePoint job.
+
+        Parameters
+        ----------
+        PELE_exec : str
+            Path to the PELE executable
+        PELE_src : str
+            Path to PELE source folder
+        output_path : str
+            The path to save the output coming from PELE
         """
         super().__init()
 
