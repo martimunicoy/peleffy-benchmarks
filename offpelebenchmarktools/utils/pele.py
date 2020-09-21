@@ -40,6 +40,19 @@ class PELEBaseJob(object):
         """
         self._output_path = output_path
 
+    def _add_control_file(self, name, control_file_path):
+        """
+        It adds a control file path to the registry.
+
+        Parameters
+        ----------
+        name : str
+            The control file name
+        control_file_path : str
+            The control file path
+        """
+        self._CONTROL_FILES[name] = control_file_path
+
     def _select_control_file(self):
         """
         It selects the PELE's control file to run.
