@@ -112,6 +112,26 @@ class DihedralBenchmark(object):
         d.FinishDrawing()
         display(SVG(d.GetDrawingText()))
 
+    def get_dihedral_parameters(self):
+        """
+        It returns the parameters of the dihedral that is being tracked,
+        according to the OpenFF toolkit.
+
+        Returns
+        -------
+        parameters : dict
+            The dictionary with the parameters
+        """
+        from openforcefield.topology import Topology
+        from openforcefield.typing.engines.Smirnoff import ForceField
+
+        topology = Topology.from_molecules([self.molecule.off_molecule])
+        ff = ForceField(self.forcefield + '.offxml')
+        all_parameters = ff.label_molecules(topology)[0]
+        parameters = dict(all_parameters['ProperTorsions'])[self.atom_indexes]
+
+        return parameters
+
     @property
     def atom_indexes(self):
         """
