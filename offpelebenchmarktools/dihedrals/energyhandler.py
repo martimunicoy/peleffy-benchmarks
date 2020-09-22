@@ -516,15 +516,29 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
         dihedral_energies : list[float]
             The array of dihedral energies
         """
+        from simtk import unit
+
         dihedral_energies, thetas = self.get_energies(resolution,
                                                       get_thetas=True)
 
-        from simtk import unit
+        # Thetas reduction to first period
+        reduced_thetas = list()
 
-        formatted_dihedral_energies = [de.value_in_unit(
-            unit.kilocalorie / unit.mole) for de in dihedral_energies]
+        for theta in thetas:
+            if theta < 0:
+                reduced_thetas.append(theta + 360)
+            else:
+                reduced_thetas.append(theta)
 
-        return thetas, formatted_dihedral_energies
+        # Pair thetas and energies
+        theta_to_energy = dict(zip(reduced_thetas, dihedral_energies))
+
+        # Get values in order
+        ordered_thetas = sorted(theta_to_energy)
+        ordered_dihedral_energies = [theta_to_energy[t].value_in_unit(
+            unit.kilocalorie / unit.mole) for t in ordered_thetas]
+
+        return reduced_thetas, ordered_dihedral_energies
 
     @property
     def PELE_exec(self):
