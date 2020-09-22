@@ -97,8 +97,7 @@ class OpenMMEnergeticProfile(EnergeticProfileBaseCalculator):
 
     _name = 'OpenMM energetic profile'
 
-    def __init__(self, dihedral_benchmark,
-                 forcefield='openff_unconstrained-1.2.1.offxml'):
+    def __init__(self, dihedral_benchmark):
         """
         It initializes an OpenMMEnergeticProfile object.
 
@@ -107,16 +106,13 @@ class OpenMMEnergeticProfile(EnergeticProfileBaseCalculator):
         dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
-        forcefield : str
-            The OpenFF force field to employ to run OpenMM. Default is
-            'openff_unconstrained-1.2.1.offxml'
         """
         super().__init__(dihedral_benchmark)
 
         from openforcefield.typing.engines.smirnoff import ForceField
 
         mol = self.dihedral_benchmark.molecule
-        ff = ForceField('openff_unconstrained-1.2.1.offxml')
+        ff = ForceField(mol.forcefield + '.offxml')
         self._omm_top = mol.off_molecule.to_topology()
         self._omm_system = ff.create_openmm_system(self._omm_top)
 
@@ -279,8 +275,7 @@ class OpenFFEnergeticProfile(EnergeticProfileBaseCalculator):
 
     _name = 'OpenFF energetic profile'
 
-    def __init__(self, dihedral_benchmark,
-                 forcefield='openff_unconstrained-1.2.1.offxml'):
+    def __init__(self, dihedral_benchmark):
         """
         It initializes an OpenFFEnergeticProfile object.
 
@@ -289,9 +284,6 @@ class OpenFFEnergeticProfile(EnergeticProfileBaseCalculator):
         dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
-        forcefield : str
-            The OpenFF force field to employ to run OpenMM. Default is
-            'openff_unconstrained-1.2.1.offxml'
         """
         super().__init__(dihedral_benchmark)
 
@@ -300,7 +292,7 @@ class OpenFFEnergeticProfile(EnergeticProfileBaseCalculator):
 
         mol = self.dihedral_benchmark.molecule
         topology = Topology.from_molecules([mol.off_molecule])
-        ff = ForceField(forcefield)
+        ff = ForceField(mol.forcefield + '.offxml')
         parameters = ff.label_molecules(topology)[0]
         self._parameters = dict(parameters['ProperTorsions'])
 
@@ -422,9 +414,7 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
 
     _name = 'PELE energetic profile'
 
-    def __init__(self, dihedral_benchmark,
-                 PELE_exec, PELE_src,
-                 forcefield='openff_unconstrained-1.2.1.offxml'):
+    def __init__(self, dihedral_benchmark, PELE_exec, PELE_src):
         """
         It initializes an PELEEnergeticProfile object.
 
@@ -437,15 +427,11 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
             Path to the PELE executable
         PELE_src : str
             Path to PELE source folder
-        forcefield : str
-            The OpenFF force field to employ to run OpenMM. Default is
-            'openff_unconstrained-1.2.1.offxml'
         """
         super().__init__(dihedral_benchmark)
 
         self._PELE_exec = PELE_exec
         self._PELE_src = PELE_src
-        self._forcefield = forcefield
 
     def get_energies(self, resolution=30, get_thetas=False):
         """

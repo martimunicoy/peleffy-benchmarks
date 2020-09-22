@@ -21,8 +21,11 @@ class DihedralBenchmark(object):
             The offpele's Molecule object
         """
 
+        molecule.assert_parameterized()
+
         self._atom_indexes = dihedral_atom_indexes
         self._molecule = molecule
+        self._forcefield = molecule.forcefield
 
     def generate_dihedral_conformers(self, resolution):
         """
@@ -127,6 +130,19 @@ class DihedralBenchmark(object):
             The offpele's Molecule object
         """
         return self._molecule
+
+    @property
+    def forcefield(self):
+        """
+        The forcefield employed to parameterize the molecule.
+
+        Returns
+        -------
+        forcefield : an openforcefield.typing.engines.smirnoff.ForceField
+                     object
+            The forcefield employed to parameterize this Molecule object
+        """
+        return self._forcefield
 
     @property
     def rotatable_bond(self):

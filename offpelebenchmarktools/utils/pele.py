@@ -128,8 +128,8 @@ class PELEBaseJob(object):
                    link_path)
 
     def _generate_parameters(self, molecule, output_path,
-                             forcefield='openff_unconstrained-1.2.0.offxml',
-                             charges_method='am1bcc'):
+                             forcefield, charges_method,
+                             force_parameterization):
         """
         It generates the parameters of the molecule (from the input_file)
         as DataLocal in the output folder.
@@ -145,6 +145,9 @@ class PELEBaseJob(object):
             with
         charges_method : str
             The charges method to calculate the partial charges with
+        force_parameterization : bool
+            If the molecule is already parameterized, do we need to
+            force a new parameterization?
         """
         import offpele
         from offpele.template import Impact
@@ -157,22 +160,26 @@ class PELEBaseJob(object):
                                                       output=output_path,
                                                       as_datalocal=True)
 
-        # Generate its rotamer library
+        # Generate rotamer library
         rotamer_library = offpele.topology.RotamerLibrary(molecule)
         rotamer_library.to_file(rotamer_library_output_path)
 
-        # Generate its parameters and template file
-        molecule.parameterize(forcefield, charges_method=charges_method)
+        # Generate parameters
+        if force_parameterization or not molecule.parameterized:
+            molecule.parameterize(forcefield, charges_method=charges_method)
+
+        # Save template file
         impact = Impact(molecule)
         impact.write(impact_output_path)
 
-        # Generate its solvent parameters
+        # Generate solvent parameters
         solvent = OBC2(molecule)
         solvent.to_json_file(solvent_output_path)
 
     def run(self, molecule, pdb_path=None,
             forcefield='openff_unconstrained-1.2.0.offxml',
-            charges_method='am1bcc'):
+            charges_method='am1bcc',
+            force_parameterization=False):
         """
         It runs a job with PELE.
 
@@ -189,6 +196,9 @@ class PELEBaseJob(object):
         charges_method : str
             The charges method to calculate the partial charges with.
             Default is 'am1bcc'
+        force_parameterization : bool
+            If the molecule is already parameterized, do we need to
+            force a new parameterization? Default is False
 
         Returns
         -------
