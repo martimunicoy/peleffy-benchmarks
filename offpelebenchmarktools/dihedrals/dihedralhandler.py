@@ -123,7 +123,7 @@ class DihedralBenchmark(object):
             The dictionary with the parameters
         """
         from openforcefield.topology import Topology
-        from openforcefield.typing.engines.Smirnoff import ForceField
+        from openforcefield.typing.engines.smirnoff import ForceField
 
         topology = Topology.from_molecules([self.molecule.off_molecule])
         ff = ForceField(self.forcefield + '.offxml')
