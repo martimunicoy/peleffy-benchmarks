@@ -333,37 +333,37 @@ class PELEOutputParser(dict):
             for line in f:
                 if line.startswith('ENERGY BOND:'):
                     energy = unit.Quantity(
-                        value=line.strip().split()[-1],
+                        value=float(line.strip().split()[-1]),
                         unit=(unit.kilocalorie / unit.mole))
                     self['bond energy'] = energy
                 elif line.startswith('ENERGY ANGLE:'):
                     energy = unit.Quantity(
-                        value=line.strip().split()[-1],
+                        value=float(line.strip().split()[-1]),
                         unit=(unit.kilocalorie / unit.mole))
                     self['angle energy'] = energy
                 elif line.startswith('ENERGY TORSION:'):
                     energy = unit.Quantity(
-                        value=line.strip().split()[-1],
+                        value=float(line.strip().split()[-1]),
                         unit=(unit.kilocalorie / unit.mole))
                     self['torsion energy'] = energy
                 elif line.startswith('ENERGY 14:'):
                     energy = unit.Quantity(
-                        value=line.strip().split()[-1],
+                        value=float(line.strip().split()[-1]),
                         unit=(unit.kilocalorie / unit.mole))
                     self['14 energy'] = energy
                 elif line.startswith('ENERGY NBOND:'):
                     energy = unit.Quantity(
-                        value=line.strip().split()[-1],
+                        value=float(line.strip().split()[-1]),
                         unit=(unit.kilocalorie / unit.mole))
                     self['nonbonding energy'] = energy
                 elif line.startswith('ENERGY CONSTRAINTS:'):
                     energy = unit.Quantity(
-                        value=line.strip().split()[-1],
+                        value=float(line.strip().split()[-1]),
                         unit=(unit.kilocalorie / unit.mole))
                     self['constraints energy'] = energy
                 elif line.startswith('ENERGY VACUUM + CONSTRAINTS:'):
                     energy = unit.Quantity(
-                        value=line.strip().split()[-1],
+                        value=float(line.strip().split()[-1]),
                         unit=(unit.kilocalorie / unit.mole))
                     self['vacuum + constraints energy'] = energy
 
