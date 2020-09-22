@@ -62,6 +62,7 @@ class EnergeticProfileBaseCalculator(object):
         plt.plot(x, y, 'r--', marker='x', markeredgecolor='k')
         plt.xlabel('Theta angle (degrees)')
         plt.ylabel('Dihedral energy (kcal/mol)')
+        plt.xlim((0, 360))
         plt.show()
 
     @property
