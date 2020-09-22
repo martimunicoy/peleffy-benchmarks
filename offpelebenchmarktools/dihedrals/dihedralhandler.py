@@ -82,10 +82,27 @@ class DihedralBenchmark(object):
             w.write(tm)
         w.close()
 
-    def plot(self, resolution=30):
+    def display_dihedral(self):
         """
-        It plots the dihedral
+        It displays the dihedral that is being tracked
         """
+        from rdkit import Chem
+        from copy import deepcopy
+        try:
+            from IPython.display import display
+            from IPython.display import SVG
+        except ImportError:
+            raise Exception('Jupyter notebook not found')
+
+        rdk_mol = deepcopy(self.molecule.rdkit_molecule)
+
+        Chem.rdDepictor.Compute2DCoords(rdk_mol)
+
+        d = Chem.Draw.rdMolDraw2D.MolDraw2DSVG(250, 250)
+        Chem.Draw.rdMolDraw2D.PrepareAndDrawMolecule(
+            d, rdk_mol, highlightAtoms=self.atom_indexes)
+        d.FinishDrawing()
+        display(SVG(d.GetDrawingText()))
 
     @property
     def atom_indexes(self):

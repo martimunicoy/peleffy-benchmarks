@@ -495,7 +495,8 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
 
                     output_file = pele_job.run(
                         self.dihedral_benchmark.molecule,
-                        pdb_path='ligand.pdb')
+                        pdb_path='ligand.pdb',
+                        charges_method='gasteiger')
 
                     parsed_output = PELEOutputParser(output_file)
                     dihedral_energies.append(parsed_output['torsion energy'])
