@@ -216,8 +216,8 @@ class PELEBaseJob(object):
         self._link_folders(output_path)
 
         self._generate_parameters(molecule, output_path,
-                                  forcefield=forcefield,
-                                  charges_method=charges_method)
+                                  forcefield, charges_method,
+                                  force_parameterization)
 
         if pdb_path is None:
             molecule.to_pdb_file(os.path.join(output_path, 'ligand.pdb'))
