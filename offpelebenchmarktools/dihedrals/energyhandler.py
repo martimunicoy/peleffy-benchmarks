@@ -519,7 +519,12 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
         dihedral_energies, thetas = self.get_energies(resolution,
                                                       get_thetas=True)
 
-        return thetas, dihedral_energies
+        from simtk import unit
+
+        formatted_dihedral_energies = [de.value_in_unit(
+            unit.kilocalorie / unit.mole) for de in dihedral_energies]
+
+        return thetas, formatted_dihedral_energies
 
     @property
     def PELE_exec(self):
