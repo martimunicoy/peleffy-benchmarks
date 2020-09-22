@@ -21,6 +21,11 @@ class DihedralBenchmark(object):
             The offpele's Molecule object
         """
 
+        # Hide offpele output
+        from offpele.utils import Logger
+        logger = Logger()
+        logger.set_level('WARNING')
+
         molecule.assert_parameterized()
 
         self._atom_indexes = dihedral_atom_indexes
