@@ -460,21 +460,20 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
             self.dihedral_benchmark.generate_dihedral_conformers(
                 resolution)
 
-        from rdkit import Chem
         import tempfile
         from offpelebenchmarktools.utils import temporary_cd
         from offpelebenchmarktools.utils.pele import (PELESinglePoint,
                                                       PELEOutputParser)
 
+        mol = self.dihedral_benchmark.molecule
         dihedral_energies = list()
 
         with tempfile.TemporaryDirectory() as tmpdir:
             with temporary_cd(tmpdir):
                 for conf in mol_with_conformers.GetConformers():
                     # Write conformation to PDB file
-                    Chem.rdmolfiles.MolToPDBFile(mol_with_conformers,
-                                                 'ligand.pdb',
-                                                 confId=conf.GetId())
+                    mol.set_conformer(conf)
+                    mol.to_pdb_file('ligand.pdb')
 
                     pele_job = PELESinglePoint(PELE_exec=self.PELE_exec,
                                                PELE_src=self.PELE_src)
