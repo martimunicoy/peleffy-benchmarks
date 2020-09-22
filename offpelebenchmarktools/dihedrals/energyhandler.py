@@ -538,7 +538,7 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
         ordered_dihedral_energies = [theta_to_energy[t].value_in_unit(
             unit.kilocalorie / unit.mole) for t in ordered_thetas]
 
-        return reduced_thetas, ordered_dihedral_energies
+        return ordered_thetas, ordered_dihedral_energies
 
     @property
     def PELE_exec(self):
