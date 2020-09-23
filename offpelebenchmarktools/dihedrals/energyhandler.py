@@ -584,7 +584,7 @@ class OFFPELEEnergeticProfile(EnergeticProfileBaseCalculator):
     theoretical equations from OFFPELE.
     """
 
-    _name = 'OFFPELE energetic profile'
+    _name = 'OFF-PELE energetic profile'
 
     def __init__(self, dihedral_benchmark):
         """
@@ -597,13 +597,6 @@ class OFFPELEEnergeticProfile(EnergeticProfileBaseCalculator):
             energetic profile
         """
         super().__init__(dihedral_benchmark)
-
-        from openforcefield.topology import Topology
-        from openforcefield.typing.engines.smirnoff import ForceField
-
-        mol = self.dihedral_benchmark.molecule
-        topology = Topology.from_molecules([mol.off_molecule])
-        self._forcefield = ForceField(mol.forcefield + '.offxml')
 
     def get_energies(self, resolution=30, get_thetas=False):
         """
@@ -642,7 +635,7 @@ class OFFPELEEnergeticProfile(EnergeticProfileBaseCalculator):
             self.dihedral_benchmark.molecule.rdkit_molecule)
         conformer = rdkit_mol.GetConformer()
 
-        propers = self.dihedral_benchmark.propers
+        propers = self.dihedral_benchmark.molecule.propers
 
         a1, a2 = self.dihedral_benchmark.rotatable_bond
 
