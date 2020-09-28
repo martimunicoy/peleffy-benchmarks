@@ -12,7 +12,8 @@ class PELEBaseJob(object):
     _name = ''
     _CONTROL_FILES = dict()
 
-    def __init__(self, PELE_exec, PELE_src, output_path=None):
+    def __init__(self, PELE_exec, PELE_src, PELE_license,
+                 output_path=None):
         """
         It initializes a PELEBaseJob object.
 
@@ -22,11 +23,14 @@ class PELEBaseJob(object):
             Path to the PELE executable
         PELE_src : str
             Path to PELE source folder
+        PELE_license : str
+            Path to PELE license directory
         output_path : str
             The path to save the output coming from PELE
         """
         self._PELE_exec = PELE_exec
         self._PELE_src = PELE_src
+        self._PELE_license = PELE_license
         self._output_path = None
 
     def set_output_path(self, output_path):
@@ -258,11 +262,12 @@ class PELEBaseJob(object):
 
 class PELESinglePoint(PELEBaseJob):
     """
-    It represents the single point class of a PELE job which runs PELE
+    It represents the class of a PELE single point job which runs PELE
     to compute the energy of the current conformation of a molecule.
     """
 
-    def __init__(self, PELE_exec, PELE_src, output_path=None):
+    def __init__(self, PELE_exec, PELE_src, PELE_license,
+                 output_path=None):
         """
         It initializes a PELESinglePoint job.
 
@@ -272,16 +277,22 @@ class PELESinglePoint(PELEBaseJob):
             Path to the PELE executable
         PELE_src : str
             Path to PELE source folder
+        PELE_license : str
+            Path to PELE license directory
         output_path : str
             The path to save the output coming from PELE
         """
-        super().__init__(PELE_exec, PELE_src, output_path)
+        super().__init__(PELE_exec, PELE_src, PELE_license,
+                         output_path)
 
         from offpelebenchmarktools.utils import get_data_file_path
 
         single_point_cf = get_data_file_path('PELE_control/single_point.conf')
 
-        self._add_control_file('single_point', single_point_cf)
+        pele_control_file = PELEControlFile(single_point_cf,
+                                            license_dir=self._PELE_license)
+
+        self._add_control_file('single_point', pele_control_file)
 
     def _select_control_file(self):
         """
@@ -293,6 +304,109 @@ class PELESinglePoint(PELEBaseJob):
             The path to the control file
         """
         return self._CONTROL_FILES['single_point']
+
+
+class PELEMinimization(PELEBaseJob):
+    """
+    It represents the class of a PELE minimization job which runs PELE
+    to minimize the energy of the current conformation of a molecule.
+    """
+
+    def __init__(self, PELE_exec, PELE_src, PELE_license,
+                 output_path=None):
+        """
+        It initializes a PELEMinimization job.
+
+        Parameters
+        ----------
+        PELE_exec : str
+            Path to the PELE executable
+        PELE_src : str
+            Path to PELE source folder
+        PELE_license : str
+            Path to PELE license directory
+        output_path : str
+            The path to save the output coming from PELE
+        """
+        super().__init__(PELE_exec, PELE_src, PELE_license,
+                         output_path)
+
+        from offpelebenchmarktools.utils import get_data_file_path
+
+        minimization_cf = get_data_file_path('PELE_control/minimization.conf')
+
+        pele_control_file = PELEControlFile(minimization_cf,
+                                            license_dir=self._PELE_license,
+                                            pdb_output_path='minimized.pdb')
+
+        self._add_control_file('minimization', pele_control_file)
+
+    def _select_control_file(self):
+        """
+        It selects the PELE's control file to run.
+
+        Returns
+        -------
+        control_file : str
+            The path to the control file
+        """
+        return self._CONTROL_FILES['minimization']
+
+
+class PELEControlFile(object):
+    """
+    It represents a PELE control file.
+    """
+
+    def __init__(self, template, **kwargs):
+        """
+        It initializes a PELEControlFile object.
+
+        Parameters
+        ----------
+        template : str
+            The path to a PELE control file template
+        kwargs : dict
+            All the values to set to the control file template, keyed by
+            value.
+        """
+        self._template = template
+        self._settings = kwargs
+
+    def __enter__(self):
+        """
+        It defines the enter behaviour for the context manager.
+
+        Returns
+        -------
+        control_file_path : str
+            The path to the PELE control file
+        """
+        import tempfile
+        import os
+
+        self._tmpdir = tempfile.TemporaryDirectory().name
+        os.makedirs(self._tmpdir, exist_ok=True)
+
+        template_name = os.path.basename(self._template)
+        control_file_path = os.path.join(self._tmpdir, template_name)
+
+        with open(self._template) as template_file:
+            template = template_file.read()
+
+        for flag, value in self._settings.items():
+            template.replace(flag.upper(), value)
+
+        with open(control_file_path, 'w') as control_file:
+            control_file.write(template)
+
+        return control_file_path
+
+    def __exit__(self):
+        """It defines the exit behaviour for the context manager."""
+        import shutil
+
+        shutil.rmtree(self._tmpdir)
 
 
 class PELEOutputParser(dict):
