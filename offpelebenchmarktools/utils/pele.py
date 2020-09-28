@@ -403,7 +403,7 @@ class PELEControlFile(object):
 
         return control_file_path
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, exc_traceback):
         """It defines the exit behaviour for the context manager."""
         import shutil
 
