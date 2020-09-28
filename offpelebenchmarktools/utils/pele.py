@@ -63,8 +63,8 @@ class PELEBaseJob(object):
 
         Returns
         -------
-        control_file : str
-            The path to the control file
+        control_file : a PELEControlFile object
+            The selected PELE control file
         """
         raise NotImplementedError
 
@@ -213,27 +213,28 @@ class PELEBaseJob(object):
 
         control_file = self._select_control_file()
 
-        output_path = self._get_output_path(molecule)
+        with control_file as file_path:
+            output_path = self._get_output_path(molecule)
 
-        self._create_directory(output_path)
+            self._create_directory(output_path)
 
-        self._link_folders(output_path)
+            self._link_folders(output_path)
 
-        self._generate_parameters(molecule, output_path,
-                                  forcefield, charges_method,
-                                  force_parameterization)
+            self._generate_parameters(molecule, output_path,
+                                      forcefield, charges_method,
+                                      force_parameterization)
 
-        if pdb_path is None:
-            molecule.to_pdb_file(os.path.join(output_path, 'ligand.pdb'))
-        else:
-            from shutil import copyfile
-            copyfile(pdb_path, os.path.join(output_path, 'ligand.pdb'))
+            if pdb_path is None:
+                molecule.to_pdb_file(os.path.join(output_path, 'ligand.pdb'))
+            else:
+                from shutil import copyfile
+                copyfile(pdb_path, os.path.join(output_path, 'ligand.pdb'))
 
-        previous_dir = os.getcwd()
-        os.chdir(os.path.join(os.getcwd(), output_path))
-        os.system("{} {} > PELE_output.txt".format(
-            self._PELE_exec, control_file))
-        os.chdir(previous_dir)
+            previous_dir = os.getcwd()
+            os.chdir(os.path.join(os.getcwd(), output_path))
+            os.system("{} {} > PELE_output.txt".format(
+                self._PELE_exec, file_path))
+            os.chdir(previous_dir)
 
         return os.path.join(os.getcwd(), output_path, 'PELE_output.txt')
 
@@ -300,8 +301,8 @@ class PELESinglePoint(PELEBaseJob):
 
         Returns
         -------
-        control_file : str
-            The path to the control file
+        control_file : a PELEControlFile object
+            The selected PELE control file
         """
         return self._CONTROL_FILES['single_point']
 
@@ -347,8 +348,8 @@ class PELEMinimization(PELEBaseJob):
 
         Returns
         -------
-        control_file : str
-            The path to the control file
+        control_file : a PELEControlFile object
+            The selected PELE control file
         """
         return self._CONTROL_FILES['minimization']
 
