@@ -415,7 +415,8 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
 
     _name = 'PELE energetic profile'
 
-    def __init__(self, dihedral_benchmark, PELE_exec, PELE_src):
+    def __init__(self, dihedral_benchmark, PELE_exec, PELE_src,
+                 PELE_license):
         """
         It initializes an PELEEnergeticProfile object.
 
@@ -428,11 +429,14 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
             Path to the PELE executable
         PELE_src : str
             Path to PELE source folder
+        PELE_license : str
+            Path to PELE license directory
         """
         super().__init__(dihedral_benchmark)
 
         self._PELE_exec = PELE_exec
         self._PELE_src = PELE_src
+        self._PELE_license = PELE_license
 
     def get_energies(self, resolution=30, get_thetas=False):
         """
@@ -477,7 +481,8 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
                     mol.to_pdb_file('ligand.pdb')
 
                     pele_job = PELESinglePoint(PELE_exec=self.PELE_exec,
-                                               PELE_src=self.PELE_src)
+                                               PELE_src=self.PELE_src,
+                                               PELE_license=self.PELE_license)
 
                     output_file = pele_job.run(
                         self.dihedral_benchmark.molecule,
@@ -564,6 +569,18 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
             The path to the PELE source code
         """
         return self._PELE_src
+
+    @property
+    def PELE_license(self):
+        """
+        Path to PELE license directory
+
+        Returns
+        -------
+        PELE_license : str
+            The path to the PELE license directory
+        """
+        return self._PELE_license
 
     @property
     def forcefield(self):
