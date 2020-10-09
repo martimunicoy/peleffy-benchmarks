@@ -230,6 +230,9 @@ class PELEBaseJob(object):
                 from shutil import copyfile
                 copyfile(pdb_path, os.path.join(output_path, 'ligand.pdb'))
 
+            from shutil import copyfile
+            copyfile(file_path, os.path.join(output_path, 'control_file.txt'))
+
             previous_dir = os.getcwd()
             os.chdir(os.path.join(os.getcwd(), output_path))
             os.system("{} {} > PELE_output.txt".format(
@@ -396,7 +399,8 @@ class PELEControlFile(object):
             template = template_file.read()
 
         for flag, value in self._settings.items():
-            template.replace(flag.upper(), value)
+            template = template.replace('$' + flag.upper(),
+                                        '"' + value + '"')
 
         with open(control_file_path, 'w') as control_file:
             control_file.write(template)
