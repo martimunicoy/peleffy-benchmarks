@@ -657,12 +657,7 @@ class OFFPELEEnergeticProfile(EnergeticProfileBaseCalculator):
         a1, a2 = self.dihedral_benchmark.rotatable_bond
 
         for proper in propers:
-            indexes = set((proper.atom1_idx,
-                           proper.atom2_idx,
-                           proper.atom3_idx,
-                           proper.atom4_idx))
-
-            rot_bond = set(list(indexes)[1:3])
+            rot_bond = set((proper.atom2_idx, proper.atom3_idx))
 
             if a1 in rot_bond and a2 in rot_bond:
                 if proper.constant == 0:
