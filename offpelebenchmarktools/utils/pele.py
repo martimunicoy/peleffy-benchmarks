@@ -31,7 +31,7 @@ class PELEBaseJob(object):
         self._PELE_exec = PELE_exec
         self._PELE_src = PELE_src
         self._PELE_license = PELE_license
-        self._output_path = None
+        self._output_path = output_path
 
     def set_output_path(self, output_path):
         """
