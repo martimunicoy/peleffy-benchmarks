@@ -13,8 +13,7 @@ def method_OFF(output_path, compound_ids, smiles_tags,
                experimental_v, solvent, off_forcefield,
                charges_method, pele_exec, pele_src, pele_license):
     energies = list()
-    diff_list = list()
-    exp_list = list()
+
     for cid, tag, exp_v in zip(compound_ids, smiles_tags, experimental_v):
         try:
             molecule = Molecule(smiles=tag, name=cid, tag='LIG')
@@ -37,14 +36,13 @@ def method_OFF(output_path, compound_ids, smiles_tags,
             # Calculate energetic difference
             difference = compute_energies(pele_vacuum_out, pele_obc_out)[2]
             energies.append(tuple((cid, difference, exp_v)))
-            diff_list.append(difference)
-            exp_list.append(exp_v)
+
         except Exception as e:
             print('Exception found with compound {}: '.format(cid)
                   + str(e))
             continue
 
-    return energies, diff_list, exp_list
+    return energies
 
 
 def method_OPLS(output_path, compound_ids, smiles_tags, experimental_v,

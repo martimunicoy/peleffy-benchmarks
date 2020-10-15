@@ -59,6 +59,7 @@ class SolventBenchmark(object):
         self.opls_bonds_angles = opls_bonds_angles
         self.ploprottemp_src = ploprottemp_src
         self.schrodinger_src = schrodinger_src
+        self._results = dict()
 
     def _read_dataset(self):
         """
@@ -116,24 +117,36 @@ class SolventBenchmark(object):
             VACUUM_CF = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OPLS_VACUUM_minimization.conf'
             OBC_CF = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OPLS_VDGBNP_minimization.conf'
 
-            energies, differences, experimental_values = \
-                method_OFFOPLS(out_folder, compound_ids, smiles_tags,
-                               experimental_v, self.solvent,
-                               self.opls_nonbonding,
-                               self.opls_bonds_angles,
-                               self.off_openforcefield,
-                               self.pele_src)
-        return energies, differences, experimental_values
+            energies = method_OFFOPLS(out_folder, compound_ids,
+                                      smiles_tags, experimental_v,
+                                      self.solvent, self.opls_nonbonding,
+                                      self.opls_bonds_angles,
+                                      self.off_openforcefield,
+                                      self.pele_src)
+
+        self.results['cids'] = list()
+        self.results['differences'] = list()
+        self.results['experimental_values'] = list()
+
+        for cid, difference, experimental_value in energies:
+            self.results['cids'].append(cid)
+            self.results['differences'].append(difference)
+            self.results['experimental_values'].append(experimental_value)
 
     def save_output(self, out_folder, energies):
         """It saves the output results."""
         import pandas as pd
         import os
 
-        df = pd.DataFrame(energies, columns=['CID', 'Energetic Difference', 'Experimental value'])
+        df = pd.DataFrame(zip(self.results['cids'],
+                              self.results['differences'],
+                              self.results['experimental_values']),
+                          columns=['CID', 'Energetic Difference',
+                                   'Experimental value'])
         df.to_csv(os.path.join(out_folder, 'results.txt'))
 
-    def plot_results(self, energies=None, differences=None, experimental_values=None, file=None):
+    def plot_results(self, energies=None, differences=None,
+                     experimental_values=None):
         """
         It generates and histogram and a regression for the comparision
         between the experimental values and the computed for the hydration
@@ -141,17 +154,9 @@ class SolventBenchmark(object):
         """
         import matplotlib.pyplot as plt
         import numpy as np
-        import pandas as pd
 
-        if file is not None:
-            data = pd.read_csv(file, usecols=['CID',
-                                              'Energetic Difference',
-                                              'Experimental value'])
-            y = data['Energetic Difference'].to_numpy()
-            x = data['Experimental value'].to_numpy()
-        else:
-            y = np.array(differences)
-            x = np.array(experimental_values)
+        y = np.array(self.results['differences'])
+        x = np.array(self.results['experimental_values'])
 
         # Computes the fit for the regresion
         coef = np.polyfit(x, y, deg=1)
@@ -175,3 +180,8 @@ class SolventBenchmark(object):
         plt.ylabel('Energetic difference (kcal/mol)')
         plt.xlabel('Experimental value (kcal/mol)')
         plt.plot(x, y, 'yo', x, poly1d_fn(x), '--k')
+
+    @property
+    def results(self):
+        """The benchmark results."""
+        return self._results
