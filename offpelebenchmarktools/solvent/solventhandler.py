@@ -93,12 +93,11 @@ class SolventBenchmark(object):
 
         # It runs the selected method
         if self.method == 'OFF':
-            energies, differences, experimental_values = \
-                method_OFF(out_folder, compound_ids, smiles_tags,
-                           experimental_v, self.solvent,
-                           self.off_forcefield, self.charges_method,
-                           self.pele_exec, self.pele_src,
-                           self.pele_license)
+            energies = method_OFF(out_folder, compound_ids,
+                                  smiles_tags, experimental_v,
+                                  self.solvent, self.off_forcefield,
+                                  self.charges_method, self.pele_exec,
+                                  self.pele_src, self.pele_license)
 
         elif self.method == 'OPLS':
 
@@ -106,11 +105,11 @@ class SolventBenchmark(object):
             OBC_CF = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OPLS_OBC_minimization.conf'
             VDGBNP_CF = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OPLS_VDGBNP_minimization.conf'
 
-            energies, differences, experimental_values = \
-                method_OPLS(out_folder, compound_ids, smiles_tags,
-                            experimental_v, self.solvent, self.pele_exec,
-                            self.schrodinger_src, self.ploprottemp_src,
-                            self.pele_src)
+            energies = method_OPLS(out_folder, compound_ids,
+                                   smiles_tags, experimental_v,
+                                   self.solvent, self.pele_exec,
+                                   self.schrodinger_src,
+                                   self.ploprottemp_src, self.pele_src)
 
         elif self.method == 'OFFOPLS':
 
@@ -119,7 +118,8 @@ class SolventBenchmark(object):
 
             energies = method_OFFOPLS(out_folder, compound_ids,
                                       smiles_tags, experimental_v,
-                                      self.solvent, self.opls_nonbonding,
+                                      self.solvent,
+                                      self.opls_nonbonding,
                                       self.opls_bonds_angles,
                                       self.off_openforcefield,
                                       self.pele_src)
