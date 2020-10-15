@@ -39,7 +39,9 @@ def method_OFF(output_path, compound_ids, smiles_tags,
             energies.append(tuple((cid, difference, exp_v)))
             diff_list.append(difference)
             exp_list.append(exp_v)
-        except Exception:
+        except Exception as e:
+            print('Exception found with compound {}: '.format(cid)
+                  + str(e))
             continue
 
     return energies, diff_list, exp_list
