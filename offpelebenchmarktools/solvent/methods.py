@@ -25,13 +25,15 @@ def method_OFF(output_path, compound_ids, smiles_tags,
                 pele_exec, pele_src, pele_license,
                 solvent_type='VACUUM',
                 output_path=output_path)
-            pele_vacuum_out = pele_vacuum_min.run(molecule)
+            pele_vacuum_out = pele_vacuum_min.run(molecule,
+                                                  output_file='vacuum_out.txt')
 
             pele_obc_min = PELEMinimization(
                 pele_exec, pele_src, pele_license,
                 solvent_type=solvent,
                 output_path=output_path)
-            pele_obc_out = pele_obc_min.run(molecule)
+            pele_obc_out = pele_obc_min.run(molecule,
+                                            output_file='solvent_out.txt')
 
             # Calculate energetic difference
             difference = compute_energies(pele_vacuum_out, pele_obc_out)[2]

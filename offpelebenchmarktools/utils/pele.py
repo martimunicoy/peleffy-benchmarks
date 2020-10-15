@@ -183,7 +183,8 @@ class PELEBaseJob(object):
     def run(self, molecule, pdb_path=None,
             forcefield='openff_unconstrained-1.2.0.offxml',
             charges_method='am1bcc',
-            force_parameterization=False):
+            force_parameterization=False,
+            output_file='PELE_output.txt'):
         """
         It runs a job with PELE.
 
@@ -203,6 +204,9 @@ class PELEBaseJob(object):
         force_parameterization : bool
             If the molecule is already parameterized, do we need to
             force a new parameterization? Default is False
+        output_file : str
+            Name of the output file where PELE results will be saved.
+            Default is 'PELE_output.txt'
 
         Returns
         -------
@@ -235,11 +239,11 @@ class PELEBaseJob(object):
 
             previous_dir = os.getcwd()
             os.chdir(os.path.join(os.getcwd(), output_path))
-            os.system("{} {} > PELE_output.txt".format(
-                self._PELE_exec, file_path))
+            os.system("{} {} > {}".format(
+                self._PELE_exec, file_path, output_file))
             os.chdir(previous_dir)
 
-        return os.path.join(os.getcwd(), output_path, 'PELE_output.txt')
+        return os.path.join(os.getcwd(), output_path, output_file)
 
     @property
     def name(self):
