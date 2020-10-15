@@ -1,4 +1,13 @@
+"""
+This module contains classes and functions to validate the solvent
+model using PELE with different force fields.
+"""
+
+
 from offpelebenchmarktools.utils import get_data_file_path
+from offpelebenchmarktools.solvent.methods import (method_OFF,
+                                                   method_OPLS,
+                                                   method_OFFOPLS)
 
 
 FREESOLV_PATH = 'databases/FreeSolv0.52.txt'
@@ -79,8 +88,6 @@ class SolventBenchmark(object):
         return compound_ids, smiles_tags, experimental_v
 
     def run(self, out_folder):
-        from methods import method_OFF, method_OPLS, method_OFFOPLS
-
         compound_ids, smiles_tags, experimental_v = self._read_dataset()
 
         # It runs the selected method
