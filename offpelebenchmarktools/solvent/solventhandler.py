@@ -94,9 +94,10 @@ class SolventBenchmark(object):
         if self.method == 'OFF':
             energies, differences, experimental_values = \
                 method_OFF(out_folder, compound_ids, smiles_tags,
-                           experimental_v, self.off_forcefield,
-                           self.charges_method, self.pele_exec,
-                           self.pele_src, self.pele_license)
+                           experimental_v, self.solvent,
+                           self.off_forcefield, self.charges_method,
+                           self.pele_exec, self.pele_src,
+                           self.pele_license)
 
         elif self.method == 'OPLS':
 

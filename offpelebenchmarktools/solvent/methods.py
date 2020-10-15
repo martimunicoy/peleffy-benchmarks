@@ -9,9 +9,9 @@ from offpelebenchmarktools.solvent.energyhandler import compute_energies
 from offpelebenchmarktools.utils.pele import PELEMinimization
 
 
-def method_OFF(output_path, compound_ids, smiles_tags, experimental_v,
-               solvent, off_forcefield, charges_method,
-               pele_exec, pele_src, pele_license):
+def method_OFF(output_path, compound_ids, smiles_tags,
+               experimental_v, solvent, off_forcefield,
+               charges_method, pele_exec, pele_src, pele_license):
     energies = list()
     diff_list = list()
     exp_list = list()
@@ -151,8 +151,7 @@ def method_OPLS(output_path, compound_ids, smiles_tags, experimental_v,
 
 def method_OFFOPLS(output_path, compound_ids, smiles_tags, experimental_v,
                    solvent, non_bonds, bonds_angles, off_forcefield,
-                   pele_exec, pele_src, pele_license,
-                   charges_method):
+                   charges_method, pele_exec, pele_src, pele_license):
     energies = list()
     diff_list = list()
     exp_list = list()
