@@ -1,0 +1,67 @@
+{ 
+ s_m_m2io_version
+ :::
+ 2.0.0 
+} 
+
+f_m_ct { 
+ s_m_title
+ s_m_entry_id
+ s_m_entry_name
+ i_m_ct_format
+ :::
+ malonate 
+  1 
+  Structure1 
+  2
+ m_atom[10] { 
+  # First column is atom index #
+  i_m_mmod_type
+  r_m_x_coord
+  r_m_y_coord
+  r_m_z_coord
+  i_m_residue_number
+  s_m_chain_name
+  i_m_color
+  s_m_pdb_residue_name
+  s_m_pdb_atom_name
+  i_m_atomic_number
+  i_m_formal_charge
+  s_m_color_rgb
+  s_m_atom_name
+  r_m_pdb_occupancy
+  i_m_minimize_atom_index
+  i_m_pdb_convert_problem
+  i_pdb_PDB_serial
+  :::
+  1 15 2.035573 -0.367065 1.214088 1 L 70 "MAL " " O1 " 8 0 FF2E2E  O1  1 1 4 1
+  2 2 1.528209 -0.271925 0.074238 1 L 10 "MAL " " C1 " 6 0 1EE11E  C2  1 2 4 2
+  3 18 2.157223 -0.230816 -1.007234 1 L 70 "MAL " " O2 " 8 -1 FF2E2E  O3  1 3 4 3
+  4 3 0.012282 -0.449065 -0.018627 1 L 10 "MAL " " C2 " 6 0 1EE11E  C4  1 4 4 4
+  5 2 -0.723474 0.902418 0.069596 1 L 10 "MAL " " C3 " 6 0 1EE11E  C5  1 5 4 5
+  6 16 -2.058457 0.686098 -0.110992 1 L 70 "MAL " " O3 " 8 0 FF2E2E  O6  1 6 4 6
+  7 15 -0.241731 2.015983 0.276123 1 L 70 "MAL " " O4 " 8 0 FF2E2E  O7  1 7 4 7
+  8 41 -0.309476 -1.110806 0.786350 1 L 21 "MAL " " H1 " 1 0 FFFFFF  H8  1 8 4 8
+  9 41 -0.208209 -0.938301 -0.963498 1 L 21 "MAL " " H2 " 1 0 FFFFFF  H9  1 9 4 9
+  10 42 -2.190940 -0.235522 -0.245043 1 L 21 "MAL " " H3 " 1 0 FFFFFF  H10  1 10 4 10
+  :::
+ } 
+ m_bond[9] { 
+  # First column is bond index #
+  i_m_from
+  i_m_to
+  i_m_order
+  :::
+  1 1 2 2
+  2 2 3 1
+  3 2 4 1
+  4 4 5 1
+  5 4 8 1
+  6 4 9 1
+  7 5 6 1
+  8 5 7 2
+  9 6 10 1
+  :::
+ } 
+} 
+

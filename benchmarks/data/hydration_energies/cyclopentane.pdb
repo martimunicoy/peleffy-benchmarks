@@ -1,0 +1,37 @@
+REMARK   4      COMPLIES WITH FORMAT V. 3.0, 1-DEC-2006
+REMARK 888
+REMARK 888 WRITTEN BY MAESTRO (A PRODUCT OF SCHRODINGER, LLC)
+TITLE     SingleCyclopentane
+MODEL        1
+HETATM    1  C1  CYC A   1       0.808  -0.053   1.004  1.00  0.00           C  
+HETATM    2  C2  CYC A   1      -0.670  -0.458   0.995  1.00  0.00           C  
+HETATM    3  C3  CYC A   1      -1.242   0.173  -0.272  1.00  0.00           C  
+HETATM    4  C4  CYC A   1      -0.099   0.067  -1.279  1.00  0.00           C  
+HETATM    5  C5  CYC A   1       1.178   0.269  -0.454  1.00  0.00           C  
+HETATM    6  H1  CYC A   1       0.950   0.834   1.624  1.00  0.00           H  
+HETATM    7  H2  CYC A   1       1.436  -0.842   1.420  1.00  0.00           H  
+HETATM    8  H3  CYC A   1      -1.197  -0.143   1.897  1.00  0.00           H  
+HETATM    9  H4  CYC A   1      -0.751  -1.544   0.929  1.00  0.00           H  
+HETATM   10  H5  CYC A   1      -2.152  -0.321  -0.615  1.00  0.00           H  
+HETATM   11  H6  CYC A   1      -1.481   1.222  -0.089  1.00  0.00           H  
+HETATM   12  H7  CYC A   1      -0.095  -0.931  -1.720  1.00  0.00           H  
+HETATM   13  H8  CYC A   1      -0.190   0.786  -2.094  1.00  0.00           H  
+HETATM   14  H9  CYC A   1       1.516   1.304  -0.529  1.00  0.00           H  
+HETATM   15  H10 CYC A   1       1.989  -0.363  -0.818  1.00  0.00           H  
+CONECT    1    2    5    6    7
+CONECT    2    1    3    8    9
+CONECT    3    2    4   10   11
+CONECT    4    3    5   12   13
+CONECT    5    1    4   14   15
+CONECT    6    1
+CONECT    7    1
+CONECT    8    2
+CONECT    9    2
+CONECT   10    3
+CONECT   11    3
+CONECT   12    4
+CONECT   13    4
+CONECT   14    5
+CONECT   15    5
+ENDMDL
+END   

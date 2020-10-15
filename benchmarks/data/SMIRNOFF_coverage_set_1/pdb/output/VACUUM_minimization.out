@@ -1,0 +1,50 @@
+PELE version 1.6.1.${BUILD_TAG}
+PELE (Protein Energy Landscape Exploration)
+
+Copyright 2010-2020 BARCELONA SUPERCOMPUTING CENTER.
+
+See the COPYRIGHT file at the top-level directory of this distribution.
+
+Documents already created
+Data already created
+Data and Documents check completed...
+validation: PASS
+Creating macro...
+----Building Complex----
+- Building a new chain.
+----  Complex built ----
+BCI WARNING: Molecule not neutral (or neutralized):-0.0182226
+BCI WARNING: Molecule not neutral (or neutralized):-0.0182226
+BCI WARNING: Molecule not neutral (or neutralized):-0.0182226
+Running macro...
+
+ENERGY BOND: 10.6654035108837
+ENERGY ANGLE: 37.0816159394158
+ENERGY TORSION: 0.675641749630053
+ENERGY 14: 280.229354730023
+ENERGY NBOND: -103.425874098799
+ENERGY CONSTRAINTS: 0
+ENERGY VACUUM + CONSTRAINTS: 225.226141831154
+Running minimization:
+The line search converged normally and the convergence test was passed, so TN has converged!
+TN has converged!
+The line search converged normally and the convergence test was passed, so TN has converged!
+TN has converged!
+Minimization has converged in TN iteration: 2!
+Final energy = 88.90166039129
+abs(delta_E) = 0.01888097187309
+totalNewtonIterations: 2
+totalInnerLoops: 63
+totalOuterLoops: 14
+
+ENERGY BOND: 26.3506175093329
+ENERGY ANGLE: 33.8501736532804
+ENERGY TORSION: 1.78540698402353
+ENERGY 14: 138.27558898744
+ENERGY NBOND: -111.360126742792
+ENERGY CONSTRAINTS: 0
+ENERGY VACUUM + CONSTRAINTS: 88.9016603912851
+
+---------------------------------------------
+\(^o^)/ Macro ended successfully! \(^o^)/ 
+---------------------------------------------
