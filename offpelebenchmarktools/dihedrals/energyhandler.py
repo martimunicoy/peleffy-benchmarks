@@ -415,7 +415,8 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
 
     _name = 'PELE energetic profile'
 
-    def __init__(self, dihedral_benchmark, PELE_exec, PELE_src):
+    def __init__(self, dihedral_benchmark, PELE_exec, PELE_src,
+                 PELE_license):
         """
         It initializes an PELEEnergeticProfile object.
 
@@ -428,11 +429,14 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
             Path to the PELE executable
         PELE_src : str
             Path to PELE source folder
+        PELE_license : str
+            Path to PELE license directory
         """
         super().__init__(dihedral_benchmark)
 
         self._PELE_exec = PELE_exec
         self._PELE_src = PELE_src
+        self._PELE_license = PELE_license
 
     def get_energies(self, resolution=30, get_thetas=False):
         """
@@ -477,7 +481,8 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
                     mol.to_pdb_file('ligand.pdb')
 
                     pele_job = PELESinglePoint(PELE_exec=self.PELE_exec,
-                                               PELE_src=self.PELE_src)
+                                               PELE_src=self.PELE_src,
+                                               PELE_license=self.PELE_license)
 
                     output_file = pele_job.run(
                         self.dihedral_benchmark.molecule,
@@ -566,6 +571,18 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
         return self._PELE_src
 
     @property
+    def PELE_license(self):
+        """
+        Path to PELE license directory
+
+        Returns
+        -------
+        PELE_license : str
+            The path to the PELE license directory
+        """
+        return self._PELE_license
+
+    @property
     def forcefield(self):
         """
         The OpenFF force field to employ to parameterize the molecule.
@@ -576,3 +593,117 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
             The forcefield name
         """
         return self._forcefield
+
+
+class OFFPELEEnergeticProfile(EnergeticProfileBaseCalculator):
+    """
+    It represents an energetic profile calculator that employs the
+    theoretical equations from OFFPELE.
+    """
+
+    _name = 'OFF-PELE energetic profile'
+
+    def __init__(self, dihedral_benchmark):
+        """
+        It initializes an OpenFFEnergeticProfile object.
+
+        Parameters
+        ----------
+        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+            The DihedralBenchmark object that will be used to obtain the
+            energetic profile
+        """
+        super().__init__(dihedral_benchmark)
+
+    def get_energies(self, resolution=30, get_thetas=False):
+        """
+        It returns the energies of this energetic profile calculator.
+
+        Parameters
+        ----------
+        resolution : float
+            The resolution, in degrees, that is applied when rotating
+            the dihedral rotatable bond. Default is 30 degrees
+        get_thetas : bool
+            Whether to return thetas (dihedral angles) or not. Default
+            is False
+
+        Returns
+        -------
+        dihedral_energies : a simtk.unit.Quantity object
+            The array of energies represented with a simtk's Quantity
+            object
+        thetas : list[float]
+            The array of thetas, only if requested in the corresponding
+            function parameter
+        """
+
+        import numpy as np
+        from copy import deepcopy
+        from simtk import unit
+        from rdkit.Chem import rdMolTransforms
+
+        xs = unit.Quantity(np.arange(0, 360, resolution),
+                           unit=unit.degrees)
+        ys = unit.Quantity(np.zeros(len(xs)),
+                           unit=(unit.kilocalorie / unit.mole))
+
+        rdkit_mol = deepcopy(
+            self.dihedral_benchmark.molecule.rdkit_molecule)
+        conformer = rdkit_mol.GetConformer()
+
+        propers = self.dihedral_benchmark.molecule.propers
+
+        a1, a2 = self.dihedral_benchmark.rotatable_bond
+
+        for proper in propers:
+            rot_bond = set((proper.atom2_idx, proper.atom3_idx))
+
+            if a1 in rot_bond and a2 in rot_bond:
+                if proper.constant == 0:
+                    continue
+
+                constant = proper.constant
+                prefactor = proper.prefactor
+                periodicity = proper.periodicity
+                phase = proper.phase
+
+                for j, x in enumerate(xs):
+                    rdMolTransforms.SetDihedralDeg(
+                        conformer, *self.dihedral_benchmark.atom_indexes,
+                        float(x.value_in_unit(unit.degree)))
+                    theta = unit.Quantity(
+                        value=rdMolTransforms.GetDihedralDeg(conformer,
+                                                             *indexes),
+                        unit=unit.degree)
+
+                    ys[j] += constant * (1 + prefactor * np.cos(
+                        periodicity * theta.value_in_unit(unit.radian)
+                        - phase.value_in_unit(unit.radian)))
+
+        if get_thetas:
+            return ys, xs
+
+        return ys
+
+    def _get_plot_values(self, resolution=30):
+        """
+        It plots the energies of this energetic profile calculator.
+
+        Parameters
+        ----------
+        resolution : float
+            The resolution, in degrees, that is applied when rotating
+            the dihedral rotatable bond. Default is 30 degrees
+
+        Returns
+        -------
+        thetas : list[float]
+            The array of thetas
+        dihedral_energies : list[float]
+            The array of dihedral energies
+        """
+        dihedral_energies, thetas = self.get_energies(resolution,
+                                                      get_thetas=True)
+
+        return thetas, dihedral_energies

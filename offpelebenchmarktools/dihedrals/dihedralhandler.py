@@ -56,11 +56,9 @@ class DihedralBenchmark(object):
 
         conformer = rdkit_mol.GetConformer()
 
-        theta = rdMolTransforms.GetDihedralDeg(conformer, *self.atom_indexes)
-
         for angle in range(0, 360, resolution):
             rdMolTransforms.SetDihedralDeg(conformer, *self.atom_indexes,
-                                           theta + angle)
+                                           angle)
             rdkit_mol.AddConformer(conformer, assignId=True)
 
         # Remove initial conformer (which is repeated)
