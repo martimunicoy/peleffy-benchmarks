@@ -317,7 +317,8 @@ class PELEMinimization(PELEBaseJob):
     """
 
     def __init__(self, PELE_exec, PELE_src, PELE_license,
-                 output_path=None):
+                 output_path=None, solvent_type='VACUUM',
+                 forcefield='OpenForceField'):
         """
         It initializes a PELEMinimization job.
 
@@ -331,6 +332,10 @@ class PELEMinimization(PELEBaseJob):
             Path to PELE license directory
         output_path : str
             The path to save the output coming from PELE
+        solvent_type : str
+            The type of solvent to employ. Default is 'VACUUM'
+        forcefield : str
+            The forcefield to employ. Default is 'OpenForceField'
         """
         super().__init__(PELE_exec, PELE_src, PELE_license,
                          output_path)
@@ -341,7 +346,9 @@ class PELEMinimization(PELEBaseJob):
 
         pele_control_file = PELEControlFile(minimization_cf,
                                             license_dir=self._PELE_license,
-                                            pdb_output_path='minimized.pdb')
+                                            pdb_output_path='minimized.pdb',
+                                            solvent_type=solvent_type,
+                                            forcefield=forcefield)
 
         self._add_control_file('minimization', pele_control_file)
 
