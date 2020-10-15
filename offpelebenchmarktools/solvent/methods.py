@@ -3,9 +3,9 @@ from offpele.topology import Molecule, RotamerLibrary
 from offpele.template import Impact
 from offpele.solvent import OBC2
 from offpele.main import handle_output_paths
-from energyhandler import compute_energies
 from time import sleep
 import shutil
+from offpelebenchmarktools.solvent.energyhandler import compute_energies
 from offpelebenchmarktools.utils.pele import PELEMinimization
 
 
