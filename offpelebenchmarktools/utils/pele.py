@@ -87,7 +87,7 @@ class PELEBaseJob(object):
         if self.output_path is None:
             output_path = os.path.join('output', molecule.name)
         else:
-            output_path = os.path.join(output_path, molecule.name)
+            output_path = os.path.join(self.output_path, molecule.name)
 
         return output_path
 
