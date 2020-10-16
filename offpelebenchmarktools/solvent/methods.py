@@ -14,7 +14,9 @@ from multiprocessing import Pool
 
 def parallel_OFF_run(output_path, solvent, off_forcefield,
                      charges_method, pele_exec, pele_src, pele_license,
-                     cid, tag, exp_v):
+                     entry):
+    cid, tag, exp_v = entry
+
     try:
         molecule = Molecule(smiles=tag, name=cid, tag='LIG')
         molecule.parameterize(off_forcefield,
