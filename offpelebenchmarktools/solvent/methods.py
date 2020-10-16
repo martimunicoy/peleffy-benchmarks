@@ -7,42 +7,65 @@ from time import sleep
 import shutil
 from offpelebenchmarktools.solvent.energyhandler import compute_energies
 from offpelebenchmarktools.utils.pele import PELEMinimization
+from tqdm import tqdm
+from functools import partial
+from multiprocessing import Pool
+
+
+def parallel_OFF_run(output_path, solvent, off_forcefield,
+                     charges_method, pele_exec, pele_src, pele_license,
+                     cid, tag, exp_v):
+    try:
+        molecule = Molecule(smiles=tag, name=cid, tag='LIG')
+        molecule.parameterize(off_forcefield,
+                              charges_method=charges_method)
+
+        # Minimization
+        pele_vacuum_min = PELEMinimization(
+            pele_exec, pele_src, pele_license,
+            solvent_type='VACUUM',
+            output_path=output_path)
+        pele_vacuum_out = pele_vacuum_min.run(molecule,
+                                              output_file='vacuum_out.txt')
+
+        pele_obc_min = PELEMinimization(
+            pele_exec, pele_src, pele_license,
+            solvent_type=solvent,
+            output_path=output_path)
+        pele_obc_out = pele_obc_min.run(molecule,
+                                        output_file='solvent_out.txt')
+
+        # Calculate energetic difference
+        difference = compute_energies(pele_vacuum_out, pele_obc_out)[2]
+
+        return tuple(cid, difference, exp_v)
+
+    except Exception as e:
+        print('Exception found with compound {}: '.format(cid)
+              + str(e))
 
 
 def method_OFF(output_path, compound_ids, smiles_tags,
                experimental_v, solvent, off_forcefield,
-               charges_method, pele_exec, pele_src, pele_license):
+               charges_method, pele_exec, pele_src, pele_license,
+               n_proc=1):
     energies = list()
 
-    for cid, tag, exp_v in zip(compound_ids, smiles_tags, experimental_v):
-        try:
-            molecule = Molecule(smiles=tag, name=cid, tag='LIG')
-            molecule.parameterize(off_forcefield,
-                                  charges_method=charges_method)
+    parallel_runner = partial(parallel_OFF_run, output_path,
+                              solvent, off_forcefield,
+                              charges_method, pele_exec,
+                              pele_src, pele_license)
 
-            # Minimization
-            pele_vacuum_min = PELEMinimization(
-                pele_exec, pele_src, pele_license,
-                solvent_type='VACUUM',
-                output_path=output_path)
-            pele_vacuum_out = pele_vacuum_min.run(molecule,
-                                                  output_file='vacuum_out.txt')
+    with Pool(n_proc) as p:
+        listed_data = list(tqdm(p.imap(parallel_runner,
+                                       zip(compound_ids, smiles_tags,
+                                           experimental_v)),
+                                total=len(compound_ids)))
 
-            pele_obc_min = PELEMinimization(
-                pele_exec, pele_src, pele_license,
-                solvent_type=solvent,
-                output_path=output_path)
-            pele_obc_out = pele_obc_min.run(molecule,
-                                            output_file='solvent_out.txt')
-
-            # Calculate energetic difference
-            difference = compute_energies(pele_vacuum_out, pele_obc_out)[2]
-            energies.append(tuple((cid, difference, exp_v)))
-
-        except Exception as e:
-            print('Exception found with compound {}: '.format(cid)
-                  + str(e))
+    for entry in listed_data:
+        if entry is None:
             continue
+        energies.append(entry)
 
     return energies
 

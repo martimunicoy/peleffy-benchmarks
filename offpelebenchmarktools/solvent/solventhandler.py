@@ -19,7 +19,8 @@ class SolventBenchmark(object):
                  ploprottemp_src, schrodinger_src,
                  off_forcefield='openff_unconstrained-1.2.0.offxml',
                  charges_method='am1bcc', solvent='OBC',
-                 opls_nonbonding=False, opls_bonds_angles=False):
+                 opls_nonbonding=False, opls_bonds_angles=False,
+                 n_proc=1):
         """
         It initialized an SolventBenchmark object.
 
@@ -47,6 +48,8 @@ class SolventBenchmark(object):
             Whether to use OPLS2005 to parameterize nonbonding terms or not
         opls_bonds_angles : bool
             Whether to use OPLS2005 to paramterize bonds and angles or not
+        n_proc : int
+            Number of parallel computing processors to employ. Default is 1
         """
         self.pele_exec = pele_exec
         self.pele_src = pele_src
@@ -59,6 +62,7 @@ class SolventBenchmark(object):
         self.opls_bonds_angles = opls_bonds_angles
         self.ploprottemp_src = ploprottemp_src
         self.schrodinger_src = schrodinger_src
+        self._n_proc = n_proc
         self._results = dict()
 
     def _read_dataset(self):
@@ -97,7 +101,8 @@ class SolventBenchmark(object):
                                   smiles_tags, experimental_v,
                                   self.solvent, self.off_forcefield,
                                   self.charges_method, self.pele_exec,
-                                  self.pele_src, self.pele_license)
+                                  self.pele_src, self.pele_license,
+                                  n_proc=self._n_proc)
 
         elif self.method == 'OPLS':
 
