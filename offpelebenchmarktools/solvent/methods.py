@@ -40,7 +40,7 @@ def parallel_OFF_run(output_path, solvent, off_forcefield,
         # Calculate energetic difference
         difference = compute_energies(pele_vacuum_out, pele_obc_out)[2]
 
-        return tuple(cid, difference, exp_v)
+        return tuple((cid, difference, exp_v))
 
     except Exception as e:
         print('Exception found with compound {}: '.format(cid)
