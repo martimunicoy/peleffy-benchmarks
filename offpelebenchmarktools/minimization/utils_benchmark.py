@@ -4,10 +4,13 @@ from minimize import Minimizer
 from offpelebenchmarktools.utils.pele import PELEBaseJob, PELEMinimization
 from offpele.topology import Molecule
 
+
 # External imports
 import argparse
 import os 
 import pandas as pd 
+import glob
+import re
 
 class MinimizationBenchmark(object): 
     def __init__(self, dataset, out_folder):
@@ -62,6 +65,7 @@ class MinimizationBenchmark(object):
                 - It the structure employs one of the OpenFF dihedrals with a non null phase constant: return True.
                 - Else: return False
         """
+
         # Filter out all non interesting molecules
         from offpele.topology import Molecule
         from simtk import unit
@@ -116,13 +120,11 @@ class MinimizationBenchmark(object):
             It generates the folders for the optimized with QM structures to PDB files and these PDBs minnimized with PELE.
         """
         import shutil 
-        import glob
-        import re
 
         # Obtain the dataset  
         self._get_dataset_structures(filter_angles = filter_structures)
 
-        # Gets the number of files to minimize
+        # Gets all the PDB files from the set
         pdb_files = glob.glob(os.path.join(os.path.join(self.out_folder, 'QM'), "*pdb"))
 
         # Loads the molecules from the Dataset and runs a PELEMinimization
@@ -131,7 +133,7 @@ class MinimizationBenchmark(object):
             index = re.sub('.pdb','',index)
             self._get_molecule_minimized(index = int(index))
 
-        # Creates the output folder
+        # Moves the output folder(created by the PELEMinimization) to the desired output folder
         shutil.move(os.path.join(os.getcwd(),'output'), os.path.join(os.getcwd(), self.out_folder, 'PELE'))
 
     def compute_RMSD(self):
@@ -144,8 +146,7 @@ class MinimizationBenchmark(object):
         from rdkit.Chem import rdmolfiles
 
         import matplotlib.pyplot as plt
-        import re 
-        import glob
+
 
         # Computes the RMSD between ∫PELE and QM minimized structures
         pdb_files = glob.glob(os.path.join(os.path.join(self.out_folder, 'QM'), "*pdb"))
@@ -175,6 +176,48 @@ class MinimizationBenchmark(object):
         plt.xlabel('RMSD')
         plt.ylabel('Frequency')
         plt.savefig(os.path.join(self.out_folder,'rmsd.png'))
+
+    def compute_RMSD2(self):
+        """
+            For a collection of structures, 
+            it saves a CSV file with a dictionary of the RMSD comparison between PELE and QM minimized structures.
+            It generats an histogram of the computed RMSD values. 
+        """
+
+        import mdtraj as md
+        import matplotlib.pyplot as plt
+
+        # Gets all the structures from the output folder
+        pdb_files = glob.glob(os.path.join(os.path.join(self.out_folder, 'QM'), "*pdb"))
+
+        # Computes the RMSD between PELE and QM minimized structures
+        d = {}
+        rmsd_results = []
+        for pdb_file in pdb_files: 
+            _ ,index = os.path.split(pdb_file)
+            index = re.sub('.pdb','',index)
+            try:
+                molQM = md.load_pdb(os.path.join(self.out_folder, 'QM/{}.pdb'.format(index)))
+                molPELE = md.load_pdb(os.path.join(self.out_folder, 'PELE/{}/minimized.pdb'.format(index)))
+                rsmd = md.rmsd(molQM, molPELE)[0]
+                #print('Ligand: {} \t RMSD: {}'.format(index, rsmd))
+                d.update({index :rsmd})
+                rmsd_results.append(rsmd)
+            except Exception as e: 
+                print('Skipping ligand {}. {}'.format(index,e))
+
+
+        # Writes out a CSV file with the dictionary of the RMSD results.
+        df = pd.DataFrame(d.items(), columns=['Ligand ID', 'RMSD'])
+        df.to_csv(os.path.join(self.out_folder,'rmsd.csv'))
+
+        #Plots an histogram of the computed RMSD values
+        plt.figure(figsize=(10, 7))
+        plt.hist(rmsd_results, bins = 10, rwidth = 0.8, align ='mid', range = (0,1), color = 'gray')
+        plt.xlabel('RMSD')
+        plt.ylabel('Frequency')
+        plt.savefig(os.path.join(self.out_folder,'rmsd.png'))
+
 
 
 
