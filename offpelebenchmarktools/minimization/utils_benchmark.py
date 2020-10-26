@@ -33,6 +33,7 @@ class MinimizationBenchmark(object):
                 dataset = 'Kinase Inhibitors: WBO Distributions', 
                 out_folder = 'SET1')
         >>> benchmark.run()
+
         """
         self.dataset = dataset
         self.out_folder = out_folder
@@ -42,7 +43,7 @@ class MinimizationBenchmark(object):
             It minimized the molecule using PELE's minimization. 
         """
         
-        #Load  and parameterize the molecule 
+        #Load and parameterize the molecule 
         try: 
             mol = Molecule(os.path.join(os.getcwd(), self.out_folder,'QM/' '{}.pdb'.format(index + 1)))
             mol.parameterize('openff_unconstrained-1.2.1.offxml',
@@ -76,7 +77,6 @@ class MinimizationBenchmark(object):
             mol.parameterize('openff_unconstrained-1.2.1.offxml',
                             charges_method='gasteiger')
             for p in mol.propers:
-                print('PHASE', p.phase)
                 if p.phase not in (unit.Quantity(0, unit.degree),
                                 unit.Quantity(180, unit.degree)):
                     var = True
