@@ -11,6 +11,7 @@ import os
 import pandas as pd 
 import glob
 import re
+import matplotlib.pyplot as plt
 
 class MinimizationBenchmark(object): 
     def __init__(self, dataset, out_folder):
@@ -47,8 +48,8 @@ class MinimizationBenchmark(object):
         try: 
             mol = Molecule(os.path.join(os.getcwd(), self.out_folder,'QM/' '{}.pdb'.format(index + 1)))
             mol.parameterize('openff_unconstrained-1.2.1.offxml',
-                 charges_method='gasteiger')
-        
+                charges_method='gasteiger')
+            
             # Runs a PELE Minimization
             pele_minimization = PELEMinimization(
                 PELE_exec='/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6',
@@ -57,6 +58,24 @@ class MinimizationBenchmark(object):
             pele_minimization.run(mol)
         except: 
             print('Skipping minimization for molecule {}'.format(index))
+
+
+    def _parse_output_file(self, file):
+        """
+        Parsing the date from an output file after a PELEJob.
+        """
+        import re
+
+        with open(file, 'r') as f:
+            data = list()
+            group = dict()
+            for key, value in re.findall(r'(.*):\s*([\dE+-.]+)', f.read()):
+                if key in group:
+                    data.append(group)
+                    group = dict()
+                group[key] = value
+            data.append(group)
+        return data
 
     def _filter_structures(self, smiles_tag):
         """
@@ -136,48 +155,8 @@ class MinimizationBenchmark(object):
         # Moves the output folder(created by the PELEMinimization) to the desired output folder
         shutil.move(os.path.join(os.getcwd(),'output'), os.path.join(os.getcwd(), self.out_folder, 'PELE'))
 
+
     def compute_RMSD(self):
-        """
-            For a collection of structures, 
-            it saves a CSV file with a dictionary of the RMSD comparison between PELE and QM minimized structures.
-        """
-
-        from rdkit.Chem import rdMolAlign
-        from rdkit.Chem import rdmolfiles
-
-        import matplotlib.pyplot as plt
-
-
-        # Computes the RMSD between ∫PELE and QM minimized structures
-        pdb_files = glob.glob(os.path.join(os.path.join(self.out_folder, 'QM'), "*pdb"))
-        d = {}
-        rmsd_results = []
-        for pdb_file in pdb_files: 
-            _ ,index = os.path.split(pdb_file)
-            index = re.sub('.pdb','',index)
-            try:
-                molQM = rdmolfiles.MolFromPDBFile(os.path.join(self.out_folder, 'QM/{}.pdb'.format(index)))
-                molPELE = rdmolfiles.MolFromPDBFile(os.path.join(self.out_folder, 'PELE/{}/minimized.pdb'.format(index)))
-                rsmd = rdMolAlign.AlignMol(molQM, molPELE)
-                print(index, rsmd)
-                d.update({index :rsmd})
-                rmsd_results.append(rsmd)
-            except Exception as e: 
-                print('Skipping ligand {}. {}'.format(index,e))
-
-        
-        # Writes out a CSV file with the dictionary of the RMSD results.
-        df = pd.DataFrame(d.items(), columns=['Ligand ID', 'RMSD'])
-        df.to_csv(os.path.join(self.out_folder,'rmsd.csv'))
-
-        #Plots an histogram of the computed RMSD values
-        plt.figure(figsize=(10, 7))
-        plt.hist(rmsd_results, rwidth = 0.8, align ='mid', color = 'green')
-        plt.xlabel('RMSD')
-        plt.ylabel('Frequency')
-        plt.savefig(os.path.join(self.out_folder,'rmsd.png'))
-
-    def compute_RMSD2(self):
         """
             For a collection of structures, 
             it saves a CSV file with a dictionary of the RMSD comparison between PELE and QM minimized structures.
@@ -185,7 +164,6 @@ class MinimizationBenchmark(object):
         """
 
         import mdtraj as md
-        import matplotlib.pyplot as plt
 
         # Gets all the structures from the output folder
         pdb_files = glob.glob(os.path.join(os.path.join(self.out_folder, 'QM'), "*pdb"))
@@ -200,13 +178,11 @@ class MinimizationBenchmark(object):
                 molQM = md.load_pdb(os.path.join(self.out_folder, 'QM/{}.pdb'.format(index)))
                 molPELE = md.load_pdb(os.path.join(self.out_folder, 'PELE/{}/minimized.pdb'.format(index)))
                 rsmd = md.rmsd(molQM, molPELE)[0]
-                #print('Ligand: {} \t RMSD: {}'.format(index, rsmd))
                 d.update({index :rsmd})
                 rmsd_results.append(rsmd)
-            except Exception as e: 
-                print('Skipping ligand {}. {}'.format(index,e))
-
-
+            except: 
+                pass
+ 
         # Writes out a CSV file with the dictionary of the RMSD results.
         df = pd.DataFrame(d.items(), columns=['Ligand ID', 'RMSD'])
         df.to_csv(os.path.join(self.out_folder,'rmsd.csv'))
@@ -216,9 +192,47 @@ class MinimizationBenchmark(object):
         plt.hist(rmsd_results, bins = 10, rwidth = 0.8, align ='mid', range = (0,1), color = 'gray')
         plt.xlabel('RMSD')
         plt.ylabel('Frequency')
+        plt.title('Structural Histogram')
         plt.savefig(os.path.join(self.out_folder,'rmsd.png'))
 
+    def energetic_difference(self): 
+        """
+            For a ollection of structures, gets the energy before and after the minimization and computes its difference. 
+            It generates a file with the energies and an energetic histogram. 
+        """
 
+
+        # Gets all the structures from the output folder
+        pdb_files = glob.glob(os.path.join(os.path.join(self.out_folder, 'QM'), "*pdb"))
+
+        # Computes the energetic difference between PELE and QM minimized structures
+        d = {}
+        energetic_diff =  []
+        for pdb_file in pdb_files: 
+            _ ,index = os.path.split(pdb_file)
+            index = re.sub('.pdb','',index)
+            try:
+                file_path = os.path.join(self.out_folder, 'PELE/{}/PELE_output.txt'.format(index))
+                data = self._parse_output_file(file = file_path)
+                e_ini = data[-1].get('ENERGY VACUUM + CONSTRAINTS')
+                e_fin = data[-2].get('ENERGY VACUUM + CONSTRAINTS')
+                e_diff = float(e_fin) - float(e_ini)
+                energetic_diff.append(e_diff)
+                d.update({index: tuple((e_ini, e_fin, e_diff))})
+            except: 
+                pass
+
+        # Writes out a CSV file with the dictionary of the energies results.
+        df = pd.DataFrame(d.items(), columns=['Ligand ID', 'Energies'])
+        df.to_csv(os.path.join(self.out_folder,'energies.csv'))
+
+       #Plots an energetic histogram
+        plt.figure(figsize=(10, 7))
+        plt.hist(energetic_diff, bins = 10, rwidth = 0.8, align ='mid', color = 'green')
+        plt.xlabel('Energetic difference (kcal/mol)')
+        plt.ylabel('Frequency')
+        plt.title('Energetic Histogram')       
+        plt.savefig(os.path.join(self.out_folder,'energies.png'))
 
 
 
