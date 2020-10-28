@@ -5,17 +5,14 @@ model using PELE with different force fields.
 
 
 from offpelebenchmarktools.utils import get_data_file_path
-from offpelebenchmarktools.solvent.methods import (method_OFF,
-                                                   method_OPLS,
-                                                   method_OFFOPLS)
+from offpelebenchmarktools.solvent.hydfreeenergycalculator import runner
 
 
 FREESOLV_PATH = 'databases/FreeSolv0.52.txt'
 
 
 class SolventBenchmark(object):
-    def __init__(self, method,
-                 pele_exec, pele_src, pele_license,
+    def __init__(self, pele_exec, pele_src, pele_license,
                  ploprottemp_src, schrodinger_src,
                  off_forcefield='openff_unconstrained-1.2.0.offxml',
                  charges_method='am1bcc', solvent='OBC',
@@ -26,8 +23,6 @@ class SolventBenchmark(object):
 
         Parameters
         ----------
-        method : an offpelebenchmarktools.solvent.method object
-            The Method object that will be used to run the benchmark
         PELE_exec : str
             Path to the PELE executable
         PELE_src : str
@@ -54,7 +49,6 @@ class SolventBenchmark(object):
         self.pele_exec = pele_exec
         self.pele_src = pele_src
         self.pele_license = pele_license
-        self.method = method
         self.off_forcefield = off_forcefield
         self.charges_method = charges_method
         self.solvent = solvent
@@ -96,38 +90,12 @@ class SolventBenchmark(object):
         compound_ids, smiles_tags, experimental_v = self._read_dataset()
 
         # It runs the selected method
-        if self.method == 'OFF':
-            energies = method_OFF(out_folder, compound_ids,
-                                  smiles_tags, experimental_v,
-                                  self.solvent, self.off_forcefield,
-                                  self.charges_method, self.pele_exec,
-                                  self.pele_src, self.pele_license,
-                                  n_proc=self._n_proc)
-
-        elif self.method == 'OPLS':
-
-            VACUUM_CF = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OPLS_VACUUM_minimization.conf'
-            OBC_CF = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OPLS_OBC_minimization.conf'
-            VDGBNP_CF = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OPLS_VDGBNP_minimization.conf'
-
-            energies = method_OPLS(out_folder, compound_ids,
-                                   smiles_tags, experimental_v,
-                                   self.solvent, self.pele_exec,
-                                   self.schrodinger_src,
-                                   self.ploprottemp_src, self.pele_src)
-
-        elif self.method == 'OFFOPLS':
-
-            VACUUM_CF = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OPLS_VACUUM_minimization.conf'
-            OBC_CF = '/home/lauramalo/repos/offpele-benchmarks/benchmarks/solvent/Conf/OPLS_VDGBNP_minimization.conf'
-
-            energies = method_OFFOPLS(out_folder, compound_ids,
-                                      smiles_tags, experimental_v,
-                                      self.solvent,
-                                      self.opls_nonbonding,
-                                      self.opls_bonds_angles,
-                                      self.off_openforcefield,
-                                      self.pele_src)
+        energies = runner(out_folder, compound_ids,
+                          smiles_tags, experimental_v,
+                          self.solvent, self.off_forcefield,
+                          self.charges_method, self.pele_exec,
+                          self.pele_src, self.pele_license,
+                          n_proc=self._n_proc)
 
         self.results['cids'] = list()
         self.results['differences'] = list()
