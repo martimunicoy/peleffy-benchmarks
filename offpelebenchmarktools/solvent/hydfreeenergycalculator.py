@@ -99,8 +99,11 @@ def get_energy(file):
     after the minimization.
     """
     data = parse_file(file)
-    energies_minimized = data[-1]
-    label = list(energies_minimized.keys())[-1]
+    try:
+        energies_minimized = data[-1]
+        label = list(energies_minimized.keys())[-1]
+    except IndexError:
+        raise Exception('An invalid PELE output file has been found')
     return (energies_minimized.get(label))
 
 
