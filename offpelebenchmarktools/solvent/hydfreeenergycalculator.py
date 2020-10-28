@@ -21,7 +21,7 @@ def parallel_run(output_path, solvent, forcefield_name,
     try:
         molecule = Molecule(smiles=tag, name=cid, tag='LIG')
         molecule.parameterize(forcefield_name,
-                              charges_method=charges_method)
+                              charge_method=charges_method)
 
         # Minimization
         pele_vacuum_min = PELEMinimization(
