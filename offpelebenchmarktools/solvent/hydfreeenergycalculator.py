@@ -4,6 +4,7 @@ outputs the energetic difference (hydration free energy).
 """
 
 
+import os
 from offpele.topology import Molecule
 from offpelebenchmarktools.utils.pele import PELEMinimization
 from tqdm import tqdm
@@ -17,6 +18,7 @@ def parallel_run(output_path, solvent, forcefield_name,
     """Parallel runner."""
 
     cid, tag, exp_v = entry
+    output_path = os.path.join(output_path, cid)
 
     try:
         molecule = Molecule(smiles=tag, name=cid, tag='LIG')

@@ -59,6 +59,15 @@ class SolventBenchmark(object):
         self._n_proc = n_proc
         self._results = dict()
 
+        # Deactivate offpele output
+        from offpele.utils import Logger
+        logger = Logger()
+        logger.set_level('WARNING')
+
+        # Supress OpenForceField toolkit warnings
+        import logging
+        logging.getLogger().setLevel(logging.ERROR)
+
     def _read_dataset(self):
         """
         It reads the FreeSolv database and returns the lists of the needed
