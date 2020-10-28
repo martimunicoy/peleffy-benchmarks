@@ -156,13 +156,15 @@ class PELEBaseJob(object):
         import offpele
         from offpele.template import Impact
         from offpele.solvent import OBC2
-        from offpele.main import handle_output_paths
+        from offpele.utils import OutputPathHandler
+
+        output_handler = OutputPathHandler(molecule, output_path=output_path,
+                                           as_datalocal=True)
 
         # Saving paths
-        rotamer_library_output_path, impact_output_path, \
-            solvent_output_path = handle_output_paths(molecule=molecule,
-                                                      output=output_path,
-                                                      as_datalocal=True)
+        rotamer_library_output_path = output_handler.get_rotamer_library_path()
+        impact_output_path = output_handler.get_impact_template_path()
+        solvent_output_path = output_handler.get_solvent_template_path()
 
         # Generate rotamer library
         rotamer_library = offpele.topology.RotamerLibrary(molecule)
