@@ -15,7 +15,7 @@ class SolventBenchmark(object):
     def __init__(self, pele_exec, pele_src, pele_license,
                  ploprottemp_src, schrodinger_src,
                  off_forcefield='openff_unconstrained-1.2.0.offxml',
-                 charges_method='am1bcc', solvent='OBC',
+                 charge_method='am1bcc', solvent='OBC',
                  opls_nonbonding=False, opls_bonds_angles=False,
                  n_proc=1):
         """
@@ -35,7 +35,7 @@ class SolventBenchmark(object):
             Path to Schrodinger source code
         off_forcefield : str
             The OpenFF force field
-        charges_method : str
+        charge_method : str
             The method to calculate partial charges
         solvent : str
             The solvent model to employ
@@ -50,7 +50,7 @@ class SolventBenchmark(object):
         self.pele_src = pele_src
         self.pele_license = pele_license
         self.off_forcefield = off_forcefield
-        self.charges_method = charges_method
+        self.charge_method = charge_method
         self.solvent = solvent
         self.opls_nonbonding = opls_nonbonding
         self.opls_bonds_angles = opls_bonds_angles
@@ -102,7 +102,7 @@ class SolventBenchmark(object):
         energies = runner(out_folder, compound_ids,
                           smiles_tags, experimental_v,
                           self.solvent, self.off_forcefield,
-                          self.charges_method, self.pele_exec,
+                          self.charge_method, self.pele_exec,
                           self.pele_src, self.pele_license,
                           n_proc=self._n_proc)
 

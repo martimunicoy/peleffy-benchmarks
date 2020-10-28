@@ -5,6 +5,7 @@ outputs the energetic difference (hydration free energy).
 
 
 import os
+import shutil
 from offpele.topology import Molecule
 from offpelebenchmarktools.utils.pele import PELEMinimization
 from tqdm import tqdm
@@ -13,30 +14,58 @@ from multiprocessing import Pool
 
 
 def parallel_run(output_path, solvent, forcefield_name,
-                 charges_method, pele_exec, pele_src, pele_license,
+                 charge_method, pele_exec, pele_src, pele_license,
                  entry):
     """Parallel runner."""
 
     cid, tag, exp_v = entry
-    output_path = os.path.join(output_path, cid)
 
     try:
         molecule = Molecule(smiles=tag, name=cid, tag='LIG')
         molecule.parameterize(forcefield_name,
-                              charge_method=charges_method)
+                              charge_method=charge_method)
+
+        if molecule.forcefield.type == 'OPLS2005':
+            if solvent == 'OBC':
+                # Generate OBC parameters for OPLS2005
+                from offpele.template import Impact
+
+                os.makedirs(os.path.join(output_path, cid), exist_ok=True)
+
+                impact = Impact(molecule)
+                impact.write(os.path.join(output_path, cid, 'ligz'))
+
+                os.makedirs(os.path.join(output_path, cid, 'DataLocal/OBC/'),
+                            exist_ok=True)
+                os.system('python2 {}scripts/solventOBCParamsGenerator.py '.format(pele_src)
+                          + os.path.join(output_path, cid, 'ligz') + ' >> /dev/null')
+                shutil.copy('{}Data/OBC/solventParamsHCTOBC.txt'.format(pele_src),
+                            os.path.join(output_path, cid, 'DataLocal/OBC/'))
+                os.system('cat ' + os.path.join(output_path, cid, 'ligz_OBCParams.txt >> '
+                          + os.path.join(output_path, cid,
+                                         'DataLocal/OBC/solventParamsHCTOBC.txt')))
+
+                os.remove(os.path.join(output_path, cid, 'ligz'))
+                os.remove(os.path.join(output_path, cid, 'ligz_OBCParams.txt'))
+
+            forcefield_tag = 'OPLS2005'
+        else:
+            forcefield_tag = 'OpenForceField'
 
         # Minimization
         pele_vacuum_min = PELEMinimization(
             pele_exec, pele_src, pele_license,
             solvent_type='VACUUM',
-            output_path=output_path)
+            output_path=output_path,
+            forcefield=forcefield_tag)
         pele_vacuum_out = pele_vacuum_min.run(molecule,
                                               output_file='vacuum_out.txt')
 
         pele_obc_min = PELEMinimization(
             pele_exec, pele_src, pele_license,
             solvent_type=solvent,
-            output_path=output_path)
+            output_path=output_path,
+            forcefield=forcefield_tag)
         pele_obc_out = pele_obc_min.run(molecule,
                                         output_file='solvent_out.txt')
 
