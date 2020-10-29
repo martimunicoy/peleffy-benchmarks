@@ -171,3 +171,24 @@ class SolventBenchmark(object):
     def results(self):
         """The benchmark results."""
         return self._results
+
+    def display_outlayers_above(self, threshold):
+        """Displays the molecules that overcome the given threshold."""
+
+        from offpele.topology import Molecule
+        from IPython.display import display
+
+        compound_ids, smiles_tags, _ = self._read_dataset()
+        cid_to_smiles = dict()
+
+        for cid, smiles_tag in zip(compound_ids, smiles_tags):
+            cid_to_smiles[cid] = smiles_tag
+
+        for cid, diff, expv in zip(self.results['cids'],
+                                   self.results['differences'],
+                                   self.results['experimental_values']):
+            if abs(diff - expv) > 10:
+                smiles = cid_to_smiles[cid]
+                mol = Molecule(smiles=smiles)
+                print(cid, diff, expv)
+                display(mol)
