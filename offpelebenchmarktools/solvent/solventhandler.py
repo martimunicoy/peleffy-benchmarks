@@ -33,8 +33,6 @@ class SolventBenchmark(object):
             Path to PlopRotTemp source code
         schrodinger_src : str
             Path to Schrodinger source code
-        off_forcefield : str
-            The OpenFF force field
         charge_method : str
             The method to calculate partial charges
         solvent : str
@@ -45,6 +43,10 @@ class SolventBenchmark(object):
             Whether to use OPLS2005 to paramterize bonds and angles or not
         n_proc : int
             Number of parallel computing processors to employ. Default is 1
+        off_forcefield : str
+            The force field name to employ. Default is None
+        forcefield : an offpele.forcefield._BaseForceField
+            The forcefield representation to employ. Default is None
         """
         self.pele_exec = pele_exec
         self.pele_src = pele_src
@@ -101,10 +103,12 @@ class SolventBenchmark(object):
         # It runs the selected method
         energies = runner(out_folder, compound_ids,
                           smiles_tags, experimental_v,
-                          self.solvent, self.off_forcefield,
-                          self.charge_method, self.pele_exec,
-                          self.pele_src, self.pele_license,
-                          n_proc=self._n_proc)
+                          self.solvent, self.charge_method,
+                          self.pele_exec, self.pele_src,
+                          self.pele_license,
+                          n_proc=self._n_proc,
+                          forcefield_name=self.off_forcefield,
+                          forcefield=self.forcefield)
 
         self.results['cids'] = list()
         self.results['differences'] = list()

@@ -15,7 +15,7 @@ from multiprocessing import Pool
 
 def parallel_run(output_path, solvent, charge_method,
                  pele_exec, pele_src, pele_license,
-                 entry, forcefield_name=None, forcefield=None):
+                 forcefield_name, forcefield, entry):
     """Parallel runner."""
 
     cid, tag, exp_v = entry
@@ -46,8 +46,8 @@ def parallel_run(output_path, solvent, charge_method,
                 shutil.copy('{}Data/OBC/solventParamsHCTOBC.txt'.format(pele_src),
                             os.path.join(output_path, cid, 'DataLocal/OBC/'))
                 os.system('cat ' + os.path.join(output_path, cid, 'ligz_OBCParams.txt >> '
-                          + os.path.join(output_path, cid,
-                                         'DataLocal/OBC/solventParamsHCTOBC.txt')))
+                                                + os.path.join(output_path, cid,
+                                                               'DataLocal/OBC/solventParamsHCTOBC.txt')))
 
                 os.remove(os.path.join(output_path, cid, 'ligz'))
                 os.remove(os.path.join(output_path, cid, 'ligz_OBCParams.txt'))
@@ -84,16 +84,20 @@ def parallel_run(output_path, solvent, charge_method,
 
 
 def runner(output_path, compound_ids, smiles_tags,
-           experimental_v, solvent, forcefield_name,
-           charges_method, pele_exec, pele_src, pele_license,
-           n_proc=1):
+           experimental_v, solvent, charges_method,
+           pele_exec, pele_src, pele_license,
+           n_proc=1, forcefield_name=None, forcefield=None):
     """Main runner."""
+    if forcefield_name is None and forcefield is None:
+        raise Exception('Either a forcefield_name or a forcefield object '
+                        + 'is required')
+
     energies = list()
 
     parallel_runner = partial(parallel_run, output_path,
-                              solvent, forcefield_name,
-                              charges_method, pele_exec,
-                              pele_src, pele_license)
+                              solvent, charges_method,
+                              pele_exec, pele_src, pele_license,
+                              forcefield_name, forcefield)
 
     with Pool(n_proc) as p:
         listed_data = list(tqdm(p.imap(parallel_runner,
