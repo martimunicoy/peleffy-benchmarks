@@ -13,17 +13,21 @@ from functools import partial
 from multiprocessing import Pool
 
 
-def parallel_run(output_path, solvent, forcefield_name,
-                 charge_method, pele_exec, pele_src, pele_license,
-                 entry):
+def parallel_run(output_path, solvent, charge_method,
+                 pele_exec, pele_src, pele_license,
+                 entry, forcefield_name=None, forcefield=None):
     """Parallel runner."""
 
     cid, tag, exp_v = entry
 
     try:
         molecule = Molecule(smiles=tag, name=cid, tag='LIG')
-        molecule.parameterize(forcefield_name,
-                              charge_method=charge_method)
+        if forcefield_name is not None:
+            molecule.parameterize(forcefield_name,
+                                  charge_method=charge_method)
+        elif forcefield is not None:
+            molecule.set_forcefield(forcefield)
+            molecule.parameterize(charge_method=charge_method)
 
         if molecule.forcefield.type == 'OPLS2005':
             if solvent == 'OBC':
