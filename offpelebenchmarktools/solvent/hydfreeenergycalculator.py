@@ -84,7 +84,7 @@ def parallel_run(output_path, solvent, charge_method,
 
 
 def runner(output_path, compound_ids, smiles_tags,
-           experimental_v, solvent, charges_method,
+           experimental_v, solvent, charge_method,
            pele_exec, pele_src, pele_license,
            n_proc=1, forcefield_name=None, forcefield=None):
     """Main runner."""
@@ -95,7 +95,7 @@ def runner(output_path, compound_ids, smiles_tags,
     energies = list()
 
     parallel_runner = partial(parallel_run, output_path,
-                              solvent, charges_method,
+                              solvent, charge_method,
                               pele_exec, pele_src, pele_license,
                               forcefield_name, forcefield)
 
