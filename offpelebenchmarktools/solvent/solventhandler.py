@@ -14,10 +14,9 @@ FREESOLV_PATH = 'databases/FreeSolv0.52.txt'
 class SolventBenchmark(object):
     def __init__(self, pele_exec, pele_src, pele_license,
                  ploprottemp_src, schrodinger_src,
-                 off_forcefield='openff_unconstrained-1.2.0.offxml',
                  charge_method='am1bcc', solvent='OBC',
                  opls_nonbonding=False, opls_bonds_angles=False,
-                 n_proc=1):
+                 n_proc=1, forcefield_name=None, forcefield=None):
         """
         It initialized an SolventBenchmark object.
 
@@ -43,7 +42,7 @@ class SolventBenchmark(object):
             Whether to use OPLS2005 to paramterize bonds and angles or not
         n_proc : int
             Number of parallel computing processors to employ. Default is 1
-        off_forcefield : str
+        forcefield_name : str
             The force field name to employ. Default is None
         forcefield : an offpele.forcefield._BaseForceField
             The forcefield representation to employ. Default is None
@@ -51,7 +50,6 @@ class SolventBenchmark(object):
         self.pele_exec = pele_exec
         self.pele_src = pele_src
         self.pele_license = pele_license
-        self.off_forcefield = off_forcefield
         self.charge_method = charge_method
         self.solvent = solvent
         self.opls_nonbonding = opls_nonbonding
@@ -59,6 +57,8 @@ class SolventBenchmark(object):
         self.ploprottemp_src = ploprottemp_src
         self.schrodinger_src = schrodinger_src
         self._n_proc = n_proc
+        self.forcefield_name = forcefield_name
+        self.forcefield = forcefield
         self._results = dict()
 
         # Deactivate offpele output
@@ -107,7 +107,7 @@ class SolventBenchmark(object):
                           self.pele_exec, self.pele_src,
                           self.pele_license,
                           n_proc=self._n_proc,
-                          forcefield_name=self.off_forcefield,
+                          forcefield_name=self.forcefield_name,
                           forcefield=self.forcefield)
 
         self.results['cids'] = list()
