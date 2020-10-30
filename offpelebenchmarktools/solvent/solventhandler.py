@@ -134,7 +134,10 @@ class SolventBenchmark(object):
         """It loads the results from a csv file."""
         import pandas as pd
 
-        self._results = pd.read_csv(path_to_load).to_dict()
+        df = pd.read_csv(path_to_load)
+        df = df.loc[:, ~df.columns.str.contains('^Unnamed')]  # Remove unnnamed
+
+        self._results = df.to_dict()
 
     def plot_results(self, energies=None, differences=None,
                      experimental_values=None):
