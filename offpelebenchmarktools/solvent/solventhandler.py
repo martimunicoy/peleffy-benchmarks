@@ -195,14 +195,14 @@ class SolventBenchmark(object):
                                    self.results['experimental_values']):
             if abs(diff - expv) > 10:
                 smiles = cid_to_smiles[cid]
-                print('-' * (len(cid) + len(smiles) + 3))
+                print('-' * max((len(cid) + len(smiles) + 3), 47))
                 print(cid, '-', smiles)
-                print('-' * (len(cid) + len(smiles) + 3))
+                print('-' * max((len(cid) + len(smiles) + 3), 47))
                 mol = Molecule(smiles=smiles)
                 print(' - Experimental difference: '
                       + '{: 10.1f} kcal/mol'.format(expv))
-                print(' - Predicted difference: '
+                print(' - Predicted difference:    '
                       + '{: 10.1f} kcal/mol'.format(diff))
-                print(' - Absolute error: '
+                print(' - Absolute error:          '
                       + '{: 10.1f} kcal/mol'.format(abs(diff - expv)))
                 display(mol)
