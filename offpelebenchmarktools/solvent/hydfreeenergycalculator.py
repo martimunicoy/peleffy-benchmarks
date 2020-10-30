@@ -29,7 +29,9 @@ def parallel_run(output_path, solvent, charge_method,
             molecule.set_forcefield(forcefield)
             molecule.parameterize(charge_method=charge_method)
 
-        if molecule.forcefield.type == 'OPLS2005':
+        if ((molecule.forcefield.type == 'OPLS2005')
+            or (molecule.forcefield.type == 'OpenFF + OPLS2005'
+                and molecule.forcefield._nonbonding == 'opls2005')):
             if solvent == 'OBC':
                 # Generate OBC parameters for OPLS2005
                 from offpele.template import Impact
@@ -52,9 +54,6 @@ def parallel_run(output_path, solvent, charge_method,
                 os.remove(os.path.join(output_path, cid, 'ligz'))
                 os.remove(os.path.join(output_path, cid, 'ligz_OBCParams.txt'))
 
-            forcefield_tag = 'OPLS2005'
-        elif (molecule.forcefield.type == 'OpenFF + OPLS2005'
-              and molecule.forcefield._nonbonding == 'opls2005'):
             forcefield_tag = 'OPLS2005'
         else:
             forcefield_tag = 'OpenForceField'
