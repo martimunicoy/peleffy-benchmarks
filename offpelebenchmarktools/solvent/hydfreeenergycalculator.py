@@ -53,6 +53,9 @@ def parallel_run(output_path, solvent, charge_method,
                 os.remove(os.path.join(output_path, cid, 'ligz_OBCParams.txt'))
 
             forcefield_tag = 'OPLS2005'
+        elif (molecule.forcefield.type == 'OpenFF + OPLS2005'
+              and molecule.forcefield._nonbonding == 'opls2005'):
+            forcefield_tag = 'OPLS2005'
         else:
             forcefield_tag = 'OpenForceField'
 
