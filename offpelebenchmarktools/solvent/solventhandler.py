@@ -119,8 +119,8 @@ class SolventBenchmark(object):
             self.results['differences'].append(difference)
             self.results['experimental_values'].append(experimental_value)
 
-    def save_output(self, out_folder, energies):
-        """It saves the output results."""
+    def to_csv(self, out_folder):
+        """It saves the output results as a csv file."""
         import pandas as pd
         import os
 
@@ -130,6 +130,12 @@ class SolventBenchmark(object):
                           columns=['CID', 'Energetic Difference',
                                    'Experimental value'])
         df.to_csv(os.path.join(out_folder, 'results.txt'))
+
+    def from_csv(self, path_to_load):
+        """It loads the results from a csv file."""
+        import pandas as pd
+
+        self.results = pd.read_csv(path_to_load).to_dict()
 
     def plot_results(self, energies=None, differences=None,
                      experimental_values=None):
