@@ -122,14 +122,13 @@ class SolventBenchmark(object):
     def to_csv(self, out_folder):
         """It saves the output results as a csv file."""
         import pandas as pd
-        import os
 
         df = pd.DataFrame(zip(self.results['cids'],
                               self.results['differences'],
                               self.results['experimental_values']),
-                          columns=['CID', 'Energetic Difference',
-                                   'Experimental value'])
-        df.to_csv(os.path.join(out_folder))
+                          columns=['cids', 'differences',
+                                   'experimental_values'])
+        df.to_csv(out_folder, index=False)
 
     def from_csv(self, path_to_load):
         """It loads the results from a csv file."""
