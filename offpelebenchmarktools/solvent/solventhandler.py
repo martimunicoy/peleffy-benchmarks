@@ -129,13 +129,13 @@ class SolventBenchmark(object):
                               self.results['experimental_values']),
                           columns=['CID', 'Energetic Difference',
                                    'Experimental value'])
-        df.to_csv(os.path.join(out_folder, 'results.txt'))
+        df.to_csv(os.path.join(out_folder))
 
     def from_csv(self, path_to_load):
         """It loads the results from a csv file."""
         import pandas as pd
 
-        self.results = pd.read_csv(path_to_load).to_dict()
+        self._results = pd.read_csv(path_to_load).to_dict()
 
     def plot_results(self, energies=None, differences=None,
                      experimental_values=None):
@@ -195,6 +195,14 @@ class SolventBenchmark(object):
                                    self.results['experimental_values']):
             if abs(diff - expv) > 10:
                 smiles = cid_to_smiles[cid]
+                print('-' * (len(cid) + len(smiles) + 3))
+                print(cid, '-', smiles)
+                print('-' * (len(cid) + len(smiles) + 3))
                 mol = Molecule(smiles=smiles)
-                print(cid, diff, expv)
+                print(' - Experimental difference: '
+                      + '{: 10.1f} kcal/mol'.format(expv))
+                print(' - Predicted difference: '
+                      + '{: 10.1f} kcal/mol'.format(diff))
+                print(' - Absolute error: '
+                      + '{: 10.1f} kcal/mol'.format(abs(diff - expv)))
                 display(mol)
