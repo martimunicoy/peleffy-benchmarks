@@ -31,7 +31,7 @@ class PELEBaseJob(object):
         self._PELE_exec = PELE_exec
         self._PELE_src = PELE_src
         self._PELE_license = PELE_license
-        self._output_path = None
+        self._output_path = output_path
 
     def set_output_path(self, output_path):
         """
@@ -87,7 +87,7 @@ class PELEBaseJob(object):
         if self.output_path is None:
             output_path = os.path.join('output', molecule.name)
         else:
-            output_path = os.path.join(output_path, molecule.name)
+            output_path = os.path.join(self.output_path, molecule.name)
 
         return output_path
 
@@ -156,13 +156,15 @@ class PELEBaseJob(object):
         import offpele
         from offpele.template import Impact
         from offpele.solvent import OBC2
-        from offpele.main import handle_output_paths
+        from offpele.utils import OutputPathHandler
+
+        output_handler = OutputPathHandler(molecule, output_path=output_path,
+                                           as_datalocal=True)
 
         # Saving paths
-        rotamer_library_output_path, impact_output_path, \
-            solvent_output_path = handle_output_paths(molecule=molecule,
-                                                      output=output_path,
-                                                      as_datalocal=True)
+        rotamer_library_output_path = output_handler.get_rotamer_library_path()
+        impact_output_path = output_handler.get_impact_template_path()
+        solvent_output_path = output_handler.get_solvent_template_path()
 
         # Generate rotamer library
         rotamer_library = offpele.topology.RotamerLibrary(molecule)
@@ -183,7 +185,8 @@ class PELEBaseJob(object):
     def run(self, molecule, pdb_path=None,
             forcefield='openff_unconstrained-1.2.0.offxml',
             charges_method='am1bcc',
-            force_parameterization=False):
+            force_parameterization=False,
+            output_file='PELE_output.txt'):
         """
         It runs a job with PELE.
 
@@ -203,6 +206,9 @@ class PELEBaseJob(object):
         force_parameterization : bool
             If the molecule is already parameterized, do we need to
             force a new parameterization? Default is False
+        output_file : str
+            Name of the output file where PELE results will be saved.
+            Default is 'PELE_output.txt'
 
         Returns
         -------
@@ -235,11 +241,11 @@ class PELEBaseJob(object):
 
             previous_dir = os.getcwd()
             os.chdir(os.path.join(os.getcwd(), output_path))
-            os.system("{} {} > PELE_output.txt".format(
-                self._PELE_exec, file_path))
+            os.system("{} {} > {}".format(
+                self._PELE_exec, file_path, output_file))
             os.chdir(previous_dir)
 
-        return os.path.join(os.getcwd(), output_path, 'PELE_output.txt')
+        return os.path.join(os.getcwd(), output_path, output_file)
 
     @property
     def name(self):
@@ -317,7 +323,8 @@ class PELEMinimization(PELEBaseJob):
     """
 
     def __init__(self, PELE_exec, PELE_src, PELE_license,
-                 output_path=None):
+                 output_path=None, solvent_type='VACUUM',
+                 forcefield='OpenForceField'):
         """
         It initializes a PELEMinimization job.
 
@@ -331,6 +338,10 @@ class PELEMinimization(PELEBaseJob):
             Path to PELE license directory
         output_path : str
             The path to save the output coming from PELE
+        solvent_type : str
+            The type of solvent to employ. Default is 'VACUUM'
+        forcefield : str
+            The forcefield to employ. Default is 'OpenForceField'
         """
         super().__init__(PELE_exec, PELE_src, PELE_license,
                          output_path)
@@ -341,7 +352,9 @@ class PELEMinimization(PELEBaseJob):
 
         pele_control_file = PELEControlFile(minimization_cf,
                                             license_dir=self._PELE_license,
-                                            pdb_output_path='minimized.pdb')
+                                            pdb_output_path='minimized.pdb',
+                                            solvent_type=solvent_type,
+                                            forcefield=forcefield)
 
         self._add_control_file('minimization', pele_control_file)
 
