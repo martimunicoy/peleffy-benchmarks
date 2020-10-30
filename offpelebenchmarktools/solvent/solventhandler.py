@@ -137,7 +137,19 @@ class SolventBenchmark(object):
         df = pd.read_csv(path_to_load)
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]  # Remove unnnamed
 
-        self._results = df.to_dict()
+        self.results['cids'] = list()
+        self.results['differences'] = list()
+        self.results['experimental_values'] = list()
+
+        pd_dict = df.to_dict()
+        length = len(pd_dict['cids'])
+        for cid in [pd_dict['cids'][i] for i in range(0, length)]:
+            self._results['cids'].append(cid)
+        for cid in [pd_dict['differences'][i] for i in range(0, length)]:
+            self._results['differences'].append(cid)
+        for cid in [pd_dict['experimental_values'][i]
+                    for i in range(0, length)]:
+            self._results['experimental_values'].append(cid)
 
     def plot_results(self, energies=None, differences=None,
                      experimental_values=None):
