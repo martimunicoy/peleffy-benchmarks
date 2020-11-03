@@ -305,10 +305,8 @@ class MinimizationBenchmark(object):
         Parameters:
         ----------
         dataset: name of the collection you want to extract from QCPortal
-
         out_folder: str
                     name for the output folder
-
 
         Examples:
         ----------
@@ -319,6 +317,11 @@ class MinimizationBenchmark(object):
         >>> benchmark.run()
 
         """
+        # Supress INFO messages from peleffy
+        from peleffy.utils import Logger
+        log = Logger()
+        log.set_level('WARNING')
+
         self.dataset = dataset
         self.out_folder = out_folder
 
