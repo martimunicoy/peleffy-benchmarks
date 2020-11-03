@@ -1,7 +1,7 @@
 
 """
 This module is designed in order to run the different test for the rotamers libraries between using
-PlopRotTemp and offpele. 
+PlopRotTemp and peleffy.
 """
 import argparse
 from .test_rotamers import TestRotamers
@@ -14,7 +14,7 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description="Compute Statistics for the merged files")
     parser.add_argument("rotamer_schrodinguer", type=str, help="File obtained by PELE with Schodinguer")
-    parser.add_argument("rotamer_offpele", type=str, help="File obtained by PELE with offpele")
+    parser.add_argument("rotamer_peleffy", type=str, help="File obtained by PELE with peleffy")
     parser.add_argument("-test" "--test_type", type=str, default="bonds", help= "Type of test to perform with the rotamers libreries")
     parser.add_argument("-o", "--output_path", type=str, default="", help="Path where to write the results")
     parser.add_argument("-of", "--output_file", type=str, default="diff.csv", help="File with differences in the two files, if there are")
@@ -24,13 +24,13 @@ def parse_args():
 
 def perform_test(test_type, mae_input_file, pdb_input_file)
     rotamers = TestRotamers(mae_input_file, pdb_input_file)
-    if test_type == bonds: 
+    if test_type == bonds:
         rotamers.test_bonds()
 
-    if test_type == groups: 
+    if test_type == groups:
         rotamers.test_groups()
 
-    if test_type == resolution: 
+    if test_type == resolution:
         rotamers.test_resolution()
 
 

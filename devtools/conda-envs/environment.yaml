@@ -1,4 +1,4 @@
-name: offpele_bm
+name: peleffy_bm
 
 channels:
   - martimunicoy
@@ -20,4 +20,4 @@ dependencies:
   - qcportal
 
     # Standard dependencies
-  - offpele 
+  - peleffy

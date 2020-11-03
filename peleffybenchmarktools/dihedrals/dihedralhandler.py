@@ -17,12 +17,12 @@ class DihedralBenchmark(object):
         ----------
         dihedral_atom_indexes : tuple[int]
             The indexes of atoms involved in the dihedral
-        molecule : an offpele.topology.Molecule
-            The offpele's Molecule object
+        molecule : an peleffy.topology.Molecule
+            The peleffy's Molecule object
         """
 
-        # Hide offpele output
-        from offpele.utils import Logger
+        # Hide peleffy output
+        from peleffy.utils import Logger
         logger = Logger()
         logger.set_level('WARNING')
 
@@ -56,11 +56,9 @@ class DihedralBenchmark(object):
 
         conformer = rdkit_mol.GetConformer()
 
-        theta = rdMolTransforms.GetDihedralDeg(conformer, *self.atom_indexes)
-
         for angle in range(0, 360, resolution):
             rdMolTransforms.SetDihedralDeg(conformer, *self.atom_indexes,
-                                           theta + angle)
+                                           angle)
             rdkit_mol.AddConformer(conformer, assignId=True)
 
         # Remove initial conformer (which is repeated)
@@ -151,8 +149,8 @@ class DihedralBenchmark(object):
 
         Returns
         -------
-        molecule : an offpele.topology.Molecule
-            The offpele's Molecule object
+        molecule : an peleffy.topology.Molecule
+            The peleffy's Molecule object
         """
         return self._molecule
 

@@ -17,7 +17,7 @@ class EnergeticProfileBaseCalculator(object):
 
         Parameters
         ----------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
         """
@@ -73,7 +73,7 @@ class EnergeticProfileBaseCalculator(object):
 
         Returns
         -------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object
         """
         return self._dihedral_benchmark
@@ -104,7 +104,7 @@ class OpenMMEnergeticProfile(EnergeticProfileBaseCalculator):
 
         Parameters
         ----------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
         """
@@ -282,7 +282,7 @@ class OpenFFEnergeticProfile(EnergeticProfileBaseCalculator):
 
         Parameters
         ----------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
         """
@@ -415,24 +415,28 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
 
     _name = 'PELE energetic profile'
 
-    def __init__(self, dihedral_benchmark, PELE_exec, PELE_src):
+    def __init__(self, dihedral_benchmark, PELE_exec, PELE_src,
+                 PELE_license):
         """
         It initializes an PELEEnergeticProfile object.
 
         Parameters
         ----------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
         PELE_exec : str
             Path to the PELE executable
         PELE_src : str
             Path to PELE source folder
+        PELE_license : str
+            Path to PELE license directory
         """
         super().__init__(dihedral_benchmark)
 
         self._PELE_exec = PELE_exec
         self._PELE_src = PELE_src
+        self._PELE_license = PELE_license
 
     def get_energies(self, resolution=30, get_thetas=False):
         """
@@ -462,8 +466,8 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
                 resolution)
 
         import tempfile
-        from offpelebenchmarktools.utils import temporary_cd
-        from offpelebenchmarktools.utils.pele import (PELESinglePoint,
+        from peleffybenchmarktools.utils import temporary_cd
+        from peleffybenchmarktools.utils.pele import (PELESinglePoint,
                                                       PELEOutputParser)
 
         mol = self.dihedral_benchmark.molecule
@@ -477,7 +481,8 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
                     mol.to_pdb_file('ligand.pdb')
 
                     pele_job = PELESinglePoint(PELE_exec=self.PELE_exec,
-                                               PELE_src=self.PELE_src)
+                                               PELE_src=self.PELE_src,
+                                               PELE_license=self.PELE_license)
 
                     output_file = pele_job.run(
                         self.dihedral_benchmark.molecule,
@@ -566,6 +571,18 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
         return self._PELE_src
 
     @property
+    def PELE_license(self):
+        """
+        Path to PELE license directory
+
+        Returns
+        -------
+        PELE_license : str
+            The path to the PELE license directory
+        """
+        return self._PELE_license
+
+    @property
     def forcefield(self):
         """
         The OpenFF force field to employ to parameterize the molecule.
@@ -592,7 +609,7 @@ class OFFPELEEnergeticProfile(EnergeticProfileBaseCalculator):
 
         Parameters
         ----------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
         """
@@ -640,12 +657,7 @@ class OFFPELEEnergeticProfile(EnergeticProfileBaseCalculator):
         a1, a2 = self.dihedral_benchmark.rotatable_bond
 
         for proper in propers:
-            indexes = set((proper.atom1_idx,
-                           proper.atom2_idx,
-                           proper.atom3_idx,
-                           proper.atom4_idx))
-
-            rot_bond = set(list(indexes)[1:3])
+            rot_bond = set((proper.atom2_idx, proper.atom3_idx))
 
             if a1 in rot_bond and a2 in rot_bond:
                 if proper.constant == 0:

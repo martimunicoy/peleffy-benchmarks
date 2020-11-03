@@ -17,16 +17,16 @@ def find_package_data(data_root, package_root):
 
 
 setup(
-    name="offpelebenchmarktools",
+    name="peleffybenchmarktools",
     author="Martí Municoy",
     author_email="martimunicoy@gmail.com",
-    description=("Benchmark tools for offpele"),
+    description=("Benchmark tools for peleffy"),
     license="MIT",
     keywords="molecular mechanics, forcefield, potential energy",
-    url="https://github.com/martimunicoy/offpele-benchmarks",
+    url="https://github.com/martimunicoy/peleffy-benchmarks",
     packages=[
-        'offpelebenchmarktools',
-        'offpelebenchmarktools/dihedrals'
+        'peleffybenchmarktools',
+        'peleffybenchmarktools/dihedrals'
     ],
     long_description=read('README.md'),
     classifiers=[

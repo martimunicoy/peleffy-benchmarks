@@ -1,2 +1,2 @@
 include versioneer.py
-include offpelebenchmarktools/_version.py
+include peleffybenchmarktools/_version.py
