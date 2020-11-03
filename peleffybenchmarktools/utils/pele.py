@@ -74,7 +74,7 @@ class PELEBaseJob(object):
 
         Parameters
         ----------
-        molecule : an offpele.topology.Molecule object
+        molecule : an peleffy.topology.Molecule object
             The molecule to run the PELE workflow on
 
         Returns
@@ -140,7 +140,7 @@ class PELEBaseJob(object):
 
         Parameters
         ----------
-        molecule : an offpele.topology.Molecule object
+        molecule : an peleffy.topology.Molecule object
             The molecule to run the PELE workflow on
         output_path : str
             The output path where results will be saved
@@ -153,10 +153,10 @@ class PELEBaseJob(object):
             If the molecule is already parameterized, do we need to
             force a new parameterization?
         """
-        import offpele
-        from offpele.template import Impact
-        from offpele.solvent import OBC2
-        from offpele.utils import OutputPathHandler
+        import peleffy
+        from peleffy.template import Impact
+        from peleffy.solvent import OBC2
+        from peleffy.utils import OutputPathHandler
 
         output_handler = OutputPathHandler(molecule, output_path=output_path,
                                            as_datalocal=True)
@@ -167,7 +167,7 @@ class PELEBaseJob(object):
         solvent_output_path = output_handler.get_solvent_template_path()
 
         # Generate rotamer library
-        rotamer_library = offpele.topology.RotamerLibrary(molecule)
+        rotamer_library = peleffy.topology.RotamerLibrary(molecule)
         rotamer_library.to_file(rotamer_library_output_path)
 
         # Generate parameters
@@ -192,7 +192,7 @@ class PELEBaseJob(object):
 
         Parameters
         ----------
-        molecule : an offpele.topology.Molecule object
+        molecule : an peleffy.topology.Molecule object
             The molecule to run the PELE workflow on
         pdb_path : str
             The path to the PDB file to use as the input structure for
@@ -295,7 +295,7 @@ class PELESinglePoint(PELEBaseJob):
         super().__init__(PELE_exec, PELE_src, PELE_license,
                          output_path)
 
-        from offpelebenchmarktools.utils import get_data_file_path
+        from peleffybenchmarktools.utils import get_data_file_path
 
         single_point_cf = get_data_file_path('PELE_control/single_point.conf')
 
@@ -346,7 +346,7 @@ class PELEMinimization(PELEBaseJob):
         super().__init__(PELE_exec, PELE_src, PELE_license,
                          output_path)
 
-        from offpelebenchmarktools.utils import get_data_file_path
+        from peleffybenchmarktools.utils import get_data_file_path
 
         minimization_cf = get_data_file_path('PELE_control/minimization.conf')
 

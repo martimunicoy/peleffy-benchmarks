@@ -1,5 +1,5 @@
 """
-It takes to offpele's molecule representations, aligns them and calculates
+It takes to peleffy's molecule representations, aligns them and calculates
 the RMSD using RDKit.
 """
 

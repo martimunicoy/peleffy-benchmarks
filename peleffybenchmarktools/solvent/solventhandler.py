@@ -4,8 +4,8 @@ model using PELE with different force fields.
 """
 
 
-from offpelebenchmarktools.utils import get_data_file_path
-from offpelebenchmarktools.solvent.hydfreeenergycalculator import runner
+from peleffybenchmarktools.utils import get_data_file_path
+from peleffybenchmarktools.solvent.hydfreeenergycalculator import runner
 
 
 FREESOLV_PATH = 'databases/FreeSolv0.52.txt'
@@ -44,7 +44,7 @@ class SolventBenchmark(object):
             Number of parallel computing processors to employ. Default is 1
         forcefield_name : str
             The force field name to employ. Default is None
-        forcefield : an offpele.forcefield._BaseForceField
+        forcefield : an peleffy.forcefield._BaseForceField
             The forcefield representation to employ. Default is None
         """
         self.pele_exec = pele_exec
@@ -61,8 +61,8 @@ class SolventBenchmark(object):
         self.forcefield = forcefield
         self._results = dict()
 
-        # Deactivate offpele output
-        from offpele.utils import Logger
+        # Deactivate peleffy output
+        from peleffy.utils import Logger
         logger = Logger()
         logger.set_level('WARNING')
 
@@ -195,7 +195,7 @@ class SolventBenchmark(object):
     def display_outlayers_above(self, threshold):
         """Displays the molecules that overcome the given threshold."""
 
-        from offpele.topology import Molecule
+        from peleffy.topology import Molecule
         from IPython.display import display
 
         compound_ids, smiles_tags, _ = self._read_dataset()

@@ -42,8 +42,8 @@ def get_config():
     cfg.VCS = "git"
     cfg.style = "pep440"
     cfg.tag_prefix = ""
-    cfg.parentdir_prefix = "offpelebenchmarktools-"
-    cfg.versionfile_source = "offpelebenchmarktools/_version.py"
+    cfg.parentdir_prefix = "peleffybenchmarktools-"
+    cfg.versionfile_source = "peleffybenchmarktools/_version.py"
     cfg.verbose = False
     return cfg
 
