@@ -1,14 +1,14 @@
 # Local imports
 from getter import QCPortal
 from minimize import Minimizer
-from offpelebenchmarktools.utils.pele import PELEBaseJob, PELEMinimization
-from offpele.topology import Molecule
+from peleffybenchmarktools.utils.pele import PELEBaseJob, PELEMinimization
+from peleffy.topology import Molecule
 from utils_benchmark import MinimizationBenchmark
 # External imports
 import argparse
-import os 
+import os
 
-benchmark = MinimizationBenchmark( 
+benchmark = MinimizationBenchmark(
         dataset = 'SMIRNOFF Coverage Set 1',
         out_folder = 'SET3')
 #benchmark.run(filter_structures = True)
