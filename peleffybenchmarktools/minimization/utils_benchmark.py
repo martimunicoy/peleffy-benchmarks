@@ -1,12 +1,11 @@
 # Local imports
 from getter import QCPortal
 from minimize import Minimizer
-from peleffybenchmarktools.utils.pele import PELEBaseJob, PELEMinimization
+from peleffybenchmarktools.utils.pele import PELEMinimization
 from peleffy.topology import Molecule
 
 
 # External imports
-import argparse
 import os
 import pandas as pd
 import glob
@@ -98,7 +97,7 @@ class MinimizationBenchmark(object):
                 if p.phase not in (unit.Quantity(0, unit.degree),
                                    unit.Quantity(180, unit.degree)):
                     var = True
-        except:
+        except Exception:
             var = False
         return var
 
@@ -177,7 +176,7 @@ class MinimizationBenchmark(object):
                 rsmd = md.rmsd(molQM, molPELE)[0]
                 d.update({index: rsmd})
                 rmsd_results.append(rsmd)
-            except:
+            except Exception:
                 pass
 
         # Writes out a CSV file with the dictionary of the RMSD results.
@@ -215,14 +214,14 @@ class MinimizationBenchmark(object):
                 e_diff = float(e_fin) - float(e_ini)
                 energetic_diff.append(e_diff)
                 d.update({index: tuple((e_ini, e_fin, e_diff))})
-            except:
+            except Exception:
                 pass
 
         # Writes out a CSV file with the dictionary of the energies results.
         df = pd.DataFrame(d.items(), columns=['Ligand ID', 'Energies'])
         df.to_csv(os.path.join(self.out_folder, 'energies.csv'))
 
-       # Plots an energetic histogram
+        # Plots an energetic histogram
         plt.figure(figsize=(10, 7))
         plt.hist(energetic_diff, bins=10, rwidth=0.8, align='mid', color='green')
         plt.xlabel('Energetic difference (kcal/mol)')

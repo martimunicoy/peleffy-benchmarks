@@ -1,5 +1,5 @@
 """
-It prepares the system files and runs a PELE minimization.
+It handles queries to the QCPortal.
 """
 
 
