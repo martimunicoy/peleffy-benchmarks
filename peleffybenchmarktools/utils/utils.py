@@ -25,7 +25,7 @@ def get_data_file_path(relative_path):
     output_path : str
         The path in the package's data location, if found
     """
-    output_path = resource_filename('offpelebenchmarktools', os.path.join(
+    output_path = resource_filename('peleffybenchmarktools', os.path.join(
         'data', relative_path))
 
     if not os.path.exists(output_path):

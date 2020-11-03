@@ -6,8 +6,8 @@ outputs the energetic difference (hydration free energy).
 
 import os
 import shutil
-from offpele.topology import Molecule
-from offpelebenchmarktools.utils.pele import PELEMinimization
+from peleffy.topology import Molecule
+from peleffybenchmarktools.utils.pele import PELEMinimization
 from tqdm import tqdm
 from functools import partial
 from multiprocessing import Pool
@@ -34,7 +34,7 @@ def parallel_run(output_path, solvent, charge_method,
                 and molecule.forcefield._nonbonding == 'opls2005')):
             if solvent == 'OBC':
                 # Generate OBC parameters for OPLS2005
-                from offpele.template import Impact
+                from peleffy.template import Impact
 
                 os.makedirs(os.path.join(output_path, cid), exist_ok=True)
 

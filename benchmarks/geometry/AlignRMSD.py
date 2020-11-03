@@ -2,19 +2,19 @@
 
 Example:
 -------------
-python AlignRMSD.py /home/lauramalo/repos/offpele-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/pdb/5.pdb /home/lauramalo/repos/offpele-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/pdb/pdbs_to_smarts.json /home/lauramalo/repos/offpele-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/QM/ids_to_smarts.json
+python AlignRMSD.py /home/lauramalo/repos/peleffy-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/pdb/5.pdb /home/lauramalo/repos/peleffy-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/pdb/pdbs_to_smarts.json /home/lauramalo/repos/peleffy-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/QM/ids_to_smarts.json
 
 """
 
 
-import os 
+import os
 import argparse
 import re
 import json
 from pathlib import Path
 import subprocess
 
-from rdkit import Chem 
+from rdkit import Chem
 import rdkit.Chem.rdmolfiles
 
 import link_structures as LinkStructures
@@ -28,7 +28,7 @@ def parse_args():
         :returns: object -- Object containing command line options
     """
     parser = argparse.ArgumentParser(description="Align and compute RMSD")
-    parser.add_argument("pdb_input_file", type=str, help="Original pdb file.")    
+    parser.add_argument("pdb_input_file", type=str, help="Original pdb file.")
     parser.add_argument("pdb_to_smarts", type=str, help="JSON file connecting pdbs to SMARTS")
     parser.add_argument("ids_to_smarts", type=str, help="JSON file connecting ids to SMARTS.")
     parser.add_argument("-o", "--output_path", type=str, default="./output/", help="Path where to write the results")
@@ -41,7 +41,7 @@ def parse_args():
 def get_xyz_from_pdb(pdbfile):
     """
         It generates a coordinates file (.xyz) from a PDB file. The coordinates file will be saved as molecule.xyz.
-        The function returns the path of the new generated coordinates file. 
+        The function returns the path of the new generated coordinates file.
     """
     p = Path(pdbfile)
     path = p.parents[0]
@@ -51,7 +51,7 @@ def get_xyz_from_pdb(pdbfile):
 
 def get_comformations(inputpdb, pdb_to_smarts, ids_to_smarts):
     """
-        It gets all the corformations from the /QM/ database corresponding to the inputpdb molecule.  
+        It gets all the corformations from the /QM/ database corresponding to the inputpdb molecule.
     """
     p = Path(inputpdb)
     name_mol = p.name
@@ -59,14 +59,14 @@ def get_comformations(inputpdb, pdb_to_smarts, ids_to_smarts):
 
 def get_molecule_minimized(mol_pdb, solvent):
     """
-        It minimized the molecule using PELE's minimization. 
-        Depending on the solvent parameter it returns the path to the PDB of the minimized molecule. 
+        It minimized the molecule using PELE's minimization.
+        Depending on the solvent parameter it returns the path to the PDB of the minimized molecule.
     """
     new_molecule = MM.MoleculeMinimized(mol_pdb, '/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6')
     new_molecule.minimize(input_file = mol_pdb, PELE_version = '/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6')
     p = Path(mol_pdb)
     file, folder = p.name, p.parents[0]
-    name_folder = os.path.splitext(file)[0] 
+    name_folder = os.path.splitext(file)[0]
     if solvent == False:
         path = os.path.join(os.getcwd(),name_folder,'VACUUM_minimized.pdb')
     if solvent == True:
@@ -75,7 +75,7 @@ def get_molecule_minimized(mol_pdb, solvent):
 
 def compute_rmsd(mol1,mol2):
     """
-        It aligns the to molecules and computes RMSD. Returns the RMSD value. 
+        It aligns the to molecules and computes RMSD. Returns the RMSD value.
         Documentation: https://github.com/charnley/rmsd
         (This implementation could be done importing the package rmsd.)
     """
@@ -109,7 +109,7 @@ def main(pdb_input_file,pdb_to_smarts, ids_to_smarts, out_path, out_file):
     min_val = min(dic.values())
     a = ([k for k,v in dic.items() if v == min_val])
 
-    #Writes out the obtained results. 
+    #Writes out the obtained results.
     print('The minimum RMSD is %s for the %s conformation.' %(str(min_val), a[0]))
 
 

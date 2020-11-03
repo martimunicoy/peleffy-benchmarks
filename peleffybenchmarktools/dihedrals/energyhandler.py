@@ -17,7 +17,7 @@ class EnergeticProfileBaseCalculator(object):
 
         Parameters
         ----------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
         """
@@ -73,7 +73,7 @@ class EnergeticProfileBaseCalculator(object):
 
         Returns
         -------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object
         """
         return self._dihedral_benchmark
@@ -104,7 +104,7 @@ class OpenMMEnergeticProfile(EnergeticProfileBaseCalculator):
 
         Parameters
         ----------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
         """
@@ -282,7 +282,7 @@ class OpenFFEnergeticProfile(EnergeticProfileBaseCalculator):
 
         Parameters
         ----------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
         """
@@ -422,7 +422,7 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
 
         Parameters
         ----------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
         PELE_exec : str
@@ -466,8 +466,8 @@ class PELEEnergeticProfile(EnergeticProfileBaseCalculator):
                 resolution)
 
         import tempfile
-        from offpelebenchmarktools.utils import temporary_cd
-        from offpelebenchmarktools.utils.pele import (PELESinglePoint,
+        from peleffybenchmarktools.utils import temporary_cd
+        from peleffybenchmarktools.utils.pele import (PELESinglePoint,
                                                       PELEOutputParser)
 
         mol = self.dihedral_benchmark.molecule
@@ -609,7 +609,7 @@ class OFFPELEEnergeticProfile(EnergeticProfileBaseCalculator):
 
         Parameters
         ----------
-        dihedral_benchmark : an offpelebenchmarktools.dihedrals.DihedralBenchmark object
+        dihedral_benchmark : an peleffybenchmarktools.dihedrals.DihedralBenchmark object
             The DihedralBenchmark object that will be used to obtain the
             energetic profile
         """

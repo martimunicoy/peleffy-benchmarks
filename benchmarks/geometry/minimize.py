@@ -23,8 +23,8 @@ class MultiMinimizer(object):
         n_proc : int
             The number of processors to employ to gather and parse data
         """
-        # Supress INFO messages from offpele
-        from offpele.utils import Logger
+        # Supress INFO messages from peleffy
+        from peleffy.utils import Logger
         log = Logger()
         log.set_level('WARNING')
 
@@ -241,11 +241,11 @@ class Minimizer(object):
         charges_method : str
             The charges method to calculate the partial charges with
         """
-        import offpele
-        from offpele.topology import Molecule
-        from offpele.template import Impact
-        from offpele.solvent import OBC2
-        from offpele.main import handle_output_paths
+        import peleffy
+        from peleffy.topology import Molecule
+        from peleffy.template import Impact
+        from peleffy.solvent import OBC2
+        from peleffy.main import handle_output_paths
         import os
 
         # Create representation of a particular molecule
@@ -261,7 +261,7 @@ class Minimizer(object):
                                                       as_datalocal=True)
 
         # Generate its rotamer library
-        rotamer_library = offpele.topology.RotamerLibrary(molecule)
+        rotamer_library = peleffy.topology.RotamerLibrary(molecule)
         rotamer_library.to_file(rotamer_library_output_path)
 
         # Generate its parameters and template file

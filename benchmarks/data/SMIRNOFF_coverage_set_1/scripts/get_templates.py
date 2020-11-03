@@ -4,7 +4,7 @@ It creates the PELE templates of all ligands defined as PDB files.
 
 import os
 from glob import glob
-from offpele.main import run_offpele
+from peleffy.main import run_peleffy
 
 
 INPUT_FOLDER = "pdb"
@@ -19,7 +19,7 @@ for pdb_file in glob("../{}/*.pdb".format(INPUT_FOLDER)):
     pdb_name = os.path.splitext(pdb_name)[0]
     os.makedirs("../{}/{}/".format(OUTPUT_FOLDER, pdb_name), exist_ok=True)
     try:
-        run_offpele(pdb_file, forcefield=FORCEFIELD, resolution=RESOLUTION,
+        run_peleffy(pdb_file, forcefield=FORCEFIELD, resolution=RESOLUTION,
                     charges_method=CHARGES_METHOD,
                     output="../{}/{}/".format(OUTPUT_FOLDER, pdb_name))
     except:

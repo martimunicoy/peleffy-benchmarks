@@ -1,6 +1,6 @@
 """
-Script that links PDB ligant structure which all the corresponding QM conformations of the minimized ligand in the 
-SMIRNOFF database. 
+Script that links PDB ligant structure which all the corresponding QM conformations of the minimized ligand in the
+SMIRNOFF database.
 """
 import argparse
 import os
@@ -14,7 +14,7 @@ def parse_args():
         :returns: object -- Object containing command line options
     """
     parser = argparse.ArgumentParser(description="Link each minimized structure with the corresponding QM conformations")
-    parser.add_argument("pdb_input_file", type=str, help="Original pdb file to be linked.")    
+    parser.add_argument("pdb_input_file", type=str, help="Original pdb file to be linked.")
     parser.add_argument("pdb_to_smarts", type=str, help="JSON file connecting pdbs to SMARTS")
     parser.add_argument("ids_to_smarts", type=str, help="JSON file connecting ids to SMARTS.")
     args = parser.parse_args()
@@ -31,7 +31,7 @@ def parse_json_file(file):
 
 def get_ids(mydict,smarts_label):
 	"""
-	Given a dictionary and a value for an item returns all the keys with that value. 
+	Given a dictionary and a value for an item returns all the keys with that value.
 	"""
 	items = mydict.items()
 	ids_list = []
@@ -41,12 +41,12 @@ def get_ids(mydict,smarts_label):
 
 def get_path(ids):
 	"""
-	Returns a list of the paths of the corresponding conformations in /QM/ of the given ligand. 
+	Returns a list of the paths of the corresponding conformations in /QM/ of the given ligand.
 	"""
 	PATH_FOLDER = 'QM'
 	path_list = []
 	for id in ids:
-		path = os.path.join('/home/lauramalo/repos/offpele-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1',PATH_FOLDER, id + '.xyz')
+		path = os.path.join('/home/lauramalo/repos/peleffy-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1',PATH_FOLDER, id + '.xyz')
 		path_list.append(path)
 	return path_list
 
@@ -58,13 +58,13 @@ def main(pdb_file, pdb_to_smarts, ids_to_smarts):
 
 	Example:
 	----------
-	>>> python link_structures.py 2.pdb pdbs_to_smarts.json ids_to_smarts.json 
+	>>> python link_structures.py 2.pdb pdbs_to_smarts.json ids_to_smarts.json
 
-	PATH of the json files: 
+	PATH of the json files:
 	----------
-	pdbs_to_smarts.json -> /home/lauramalo/repos/offpele-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/pdb/pdbs_to_smarts.json
+	pdbs_to_smarts.json -> /home/lauramalo/repos/peleffy-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/pdb/pdbs_to_smarts.json
 
-	ids_to_smarts.json -> /home/lauramalo/repos/offpele-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/ids/ids_to_smarts.json
+	ids_to_smarts.json -> /home/lauramalo/repos/peleffy-benchmarks/benchmarks/data/SMIRNOFF_coverage_set_1/ids/ids_to_smarts.json
 
 	"""
 	args = parse_args()
