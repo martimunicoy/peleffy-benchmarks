@@ -117,7 +117,7 @@ class Minimizer(object):
 
     def minimize(self, smiles, mol_id, solvent='vacuum',
                  forcefield='openff_unconstrained-1.2.0.offxml',
-                 charges_method='am1bcc', output_path=None):
+                 charge_method='am1bcc', output_path=None):
         """
         Given an input PDB file, it runs a minimization with PELE.
 
@@ -132,8 +132,8 @@ class Minimizer(object):
         forcefield : str
             The Open Force Field force field to generate the parameters
             with
-        charges_method : str
-            The charges method to calculate the partial charges with
+        charge_method : str
+            The charge method to calculate the partial charges with
         output_path : str
             The output path where results will be saved
         """
@@ -150,7 +150,7 @@ class Minimizer(object):
 
         self._generate_parameters(smiles, mol_id, output_path,
                                   forcefield=forcefield,
-                                  charges_method=charges_method)
+                                  charge_method=charge_method)
 
         self._run_PELE_minimization(solvent, output_path)
 
@@ -221,7 +221,7 @@ class Minimizer(object):
 
     def _generate_parameters(self, smiles, mol_id, output_path,
                              forcefield='openff_unconstrained-1.2.0.offxml',
-                             charges_method='am1bcc'):
+                             charge_method='am1bcc'):
         """
         It generates the parameters of the molecule (from the input_file)
         as DataLocal in the output folder.
@@ -237,8 +237,8 @@ class Minimizer(object):
         forcefield : str
             The Open Force Field force field to generate the parameters
             with
-        charges_method : str
-            The charges method to calculate the partial charges with
+        charge_method : str
+            The charge method to calculate the partial charges with
         """
         import peleffy
         from peleffy.topology import Molecule
@@ -264,7 +264,7 @@ class Minimizer(object):
         rotamer_library.to_file(rotamer_library_output_path)
 
         # Generate its parameters and template file
-        molecule.parameterize(forcefield, charges_method=charges_method)
+        molecule.parameterize(forcefield, charge_method=charge_method)
         impact = Impact(molecule)
         impact.write(impact_output_path)
 
@@ -336,7 +336,7 @@ class MinimizationBenchmark(object):
                                         self.out_folder,
                                         'QM/' '{}.pdb'.format(index + 1)))
             mol.parameterize('openff_unconstrained-1.2.1.offxml',
-                             charges_method='gasteiger')
+                             charge_method='gasteiger')
 
             # Runs a PELE Minimization
             pele_minimization = PELEMinimization(
@@ -385,7 +385,7 @@ class MinimizationBenchmark(object):
         try:
             mol = Molecule(smiles=smiles_tag)
             mol.parameterize('openff_unconstrained-1.2.1.offxml',
-                             charges_method='gasteiger')
+                             charge_method='gasteiger')
             for p in mol.propers:
                 if p.phase not in (unit.Quantity(0, unit.degree),
                                    unit.Quantity(180, unit.degree)):
