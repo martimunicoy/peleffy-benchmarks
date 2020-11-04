@@ -256,3 +256,35 @@ class QCPortal(object):
         geometry = unit.Quantity(np.array(geometry, np.float), unit.bohr)
 
         return geometry
+
+    def _get_initial_geometry(self, ds, record):
+        """
+        It obtains the initial geometry of an Optimization Dataset record.
+
+        Parameters
+        ----------
+        ds : a qcportal.collections.optimization_dataset.OptimizationDataset
+            The optimization dataset the record belongs to
+        record : a qcportal.collections.optimization_dataset.OptEntry
+            The optimization entry whose optimized geometry is requested
+
+        Returns
+        -------
+        geometry : a simtk.unit.Quantity object
+            The array of 3D coordinates that define the initial geometry
+            of the record's molecule. Note that the order of the atoms
+            matches with the mapped smiles
+        """
+        from simtk import unit
+        import numpy as np
+
+        optimization_record = ds.get_record(record.dict()['name'],
+                                            specification='default')
+        try:
+            geometry = optimization_record.get_initial_molecule().geometry
+        except TypeError:
+            return None
+
+        geometry = unit.Quantity(np.array(geometry, np.float), unit.bohr)
+
+        return geometry
