@@ -315,23 +315,21 @@ class MinimizationBenchmark(object):
         self.out_folder = out_folder
         self.n_proc = n_proc
 
-    def _get_molecule_minimized(self, mol_idx):
+    def _get_molecule_minimized(self, pdb_path):
         """
         It minimized the molecule using PELE's minimization.
 
         Parameters
         ----------
-        mol_idx : int
-            The index of the molecule to minimize
+        pdb_path : str
+            The path to the PDB of the molecule to minimize
         """
         from peleffy.topology import Molecule
         from peleffybenchmarktools.utils.pele import PELEMinimization
 
         # Load and parameterize the molecule
         try:
-            mol = Molecule(os.path.join(os.getcwd(),
-                                        self.out_folder,
-                                        'QM/' '{}.pdb'.format(mol_idx + 1)))
+            mol = Molecule(pdb_path)
             mol.parameterize('openff_unconstrained-1.2.1.offxml',
                              charge_method='gasteiger')
 
@@ -342,8 +340,9 @@ class MinimizationBenchmark(object):
                 PELE_license='/home/municoy/builds/PELE/license')
             pele_minimization.run(mol)
 
-        except Exception:
-            print('Skipping minimization for molecule {}'.format(mol_idx))
+        except Exception as e:
+            print('Skipping minimization for molecule {}: '.format(pdb_path)
+                  + str(e))
 
     def _parse_output_file(self, file):
         """
@@ -466,7 +465,8 @@ class MinimizationBenchmark(object):
         """
         import shutil
         import glob
-        import re
+
+        # Delete output folder, if it already exists
 
         # Obtain the dataset
         self._get_dataset_structures(filter_dihedrals=filter_dihedrals)
@@ -477,9 +477,7 @@ class MinimizationBenchmark(object):
 
         # Loads the molecules from the Dataset and runs a PELEMinimization
         for pdb_file in pdb_files:
-            _, mol_idx = os.path.split(pdb_file)
-            mol_idx = int(re.sub('.pdb', '', mol_idx))
-            self._get_molecule_minimized(mol_idx=mol_idx)
+            self._get_molecule_minimized(pdb_file)
 
         # Moves the output folder(created by the PELEMinimization) to the desired output folder
         shutil.move(os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), self.out_folder, 'PELE'))
