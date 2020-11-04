@@ -478,6 +478,7 @@ class MinimizationBenchmark(object):
             os.path.join(os.path.join(self.out_folder, 'QM'), "*pdb"))
 
         # Loads the molecules from the Dataset and runs a PELEMinimization
+        print(' - Minimizing molecules')
         with Pool(self.n_proc) as p:
             list(tqdm(p.imap(self._get_molecule_minimized,
                              pdb_files),
