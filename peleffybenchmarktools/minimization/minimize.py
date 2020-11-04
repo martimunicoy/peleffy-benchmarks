@@ -313,6 +313,7 @@ class MinimizationBenchmark(object):
 
         self.dataset_name = dataset_name
         self.out_folder = out_folder
+        self.nproc = n_proc
 
     def _get_molecule_minimized(self, mol_idx):
         """
