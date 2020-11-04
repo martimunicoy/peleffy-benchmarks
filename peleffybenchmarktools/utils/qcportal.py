@@ -145,7 +145,8 @@ class QCPortal(object):
             os.path.join(output_path, '{}.pdb'.format(index + 1)))
 
     def get_structures(self, collection_name, output_path='out',
-                       collection_type='OptimizationDataset', ):
+                       collection_type='OptimizationDataset',
+                       filter_out_standard_dihedrals=False):
         """
         It writes down the optimized structures from the QCPortal.
 
@@ -157,6 +158,9 @@ class QCPortal(object):
             The output path where structures will be saved
         collection_type : str
             Type of collection to retrieve
+        filter_out_standard_dihedrals : bool
+            Whether to filter out standard dihedrals to only keep
+            non-standard ones, or not
         """
         import os
         import qcportal as ptl

@@ -33,60 +33,46 @@ class MultiMinimizer(object):
         self._output_path = None
         self.n_proc = n_proc
 
-    def run(self, data, output_path='output'):
+    def run(self, pdb_paths, output_path='output'):
         """
         It runs a bunch of minimizations.
 
         Parameters
         ----------
-        data : dict[dict]
-            Parsed data containing all the records and their attributes
-            from the retrieved dataset. All of them will be minimized
+        pdb_paths : list[str]
+            List of PDB paths that contain the molecules to minimize
         output_path : str
             The output path where results will be saved
         """
         from multiprocessing import Pool
-        import json
         from tqdm import tqdm
 
         self._output_path = output_path
 
-        index_to_name = dict()
-
         with Pool(self.n_proc) as p:
             list(tqdm(p.imap(self._parallel_minimizer,
-                             enumerate(data.items())),
-                      total=len(data.items())))
+                             enumerate(pdb_paths)),
+                      total=len(pdb_paths)))
 
-        for index, name in enumerate(data.keys()):
-            index_to_name[index] = name
-
-        json_output = json.dumps(index_to_name)
-
-        with open(os.path.join(self._output_path,
-                               'index_to_name.json'), "w") as f:
-            f.write(json_output)
-
-    def _parallel_minimizer(self, iteration_data):
+    def _parallel_minimizer(self, mol_ids):
         """
         It runs a minimization in parallel.
 
         Parameters
         ----------
-        iteration_data : tuple[int, tuple[str, list[str]]]
-            It contains the data for a certain minimization iteration
+        mol_ids : tuple([int, str])
+            The identifiers ot he molecule to minimize
         """
+        mol_id, mol_path = mol_ids
         minimizer = Minimizer(PELE_exec=self._PELE_exec,
                               PELE_src=self._PELE_src)
 
-        index, (name, attributes) = iteration_data
-
-        smiles = attributes['canonical_isomeric_explicit_hydrogen_smiles']
         try:
-            minimizer.minimize(smiles, str(index),
+            minimizer.minimize(mol_path, mol_id,
                                output_path=self._output_path)
         except Exception as e:
-            print('Exception found for molecule {} {}'.format(name, smiles)
+            print('Exception found for molecule '
+                  + '{} in {}'.format(mol_id, mol_path)
                   + ': ' + str(e))
 
 
@@ -298,15 +284,18 @@ class MinimizationBenchmark(object):
     It defines a MinimizationBenchmark object.
     """
 
-    def __init__(self, dataset, out_folder):
+    def __init__(self, dataset_name, out_folder, n_proc=1):
         """
         It initializes a MinimizationBenchmark object.
 
         Parameters:
         ----------
-        dataset: name of the collection you want to extract from QCPortal
+        dataset_name: str
+            The name of the collection you want to extract from QCPortal
         out_folder: str
-                    name for the output folder
+            The name for the output folder
+        n_proc : int
+            The number of processors to employ
 
         Examples:
         ----------
@@ -322,14 +311,18 @@ class MinimizationBenchmark(object):
         log = Logger()
         log.set_level('WARNING')
 
-        self.dataset = dataset
+        self.dataset_name = dataset_name
         self.out_folder = out_folder
 
-    def _get_molecule_minimized(self, index):
+    def _get_molecule_minimized(self, mol_idx):
         """
         It minimized the molecule using PELE's minimization.
-        """
 
+        Parameters
+        ----------
+        mol_idx : int
+            The index of the molecule to minimize
+        """
         from peleffy.topology import Molecule
         from peleffybenchmarktools.minimization import PELEMinimization
 
@@ -337,7 +330,7 @@ class MinimizationBenchmark(object):
         try:
             mol = Molecule(os.path.join(os.getcwd(),
                                         self.out_folder,
-                                        'QM/' '{}.pdb'.format(index + 1)))
+                                        'QM/' '{}.pdb'.format(mol_idx + 1)))
             mol.parameterize('openff_unconstrained-1.2.1.offxml',
                              charge_method='gasteiger')
 
@@ -349,7 +342,7 @@ class MinimizationBenchmark(object):
             pele_minimization.run(mol)
 
         except Exception:
-            print('Skipping minimization for molecule {}'.format(index))
+            print('Skipping minimization for molecule {}'.format(mol_idx))
 
     def _parse_output_file(self, file):
         """
@@ -368,41 +361,56 @@ class MinimizationBenchmark(object):
             data.append(group)
         return data
 
-    def _filter_structures(self, smiles_tag):
+    def _has_nonstandard_dihedral(self, smiles_tag):
         """
-        It filter structures to keep only those that employ one of the
-        OpenFF dihedrals with a non null phase constant.
+        It parameterizes the molecule belonging to the smiles tag supplied
+        to determine whether it contains any non-standard dihedral or not.
+        A non-standard dihedral is a dihedral with a phase constant
+        different from 0 and 180 degrees.
 
-        Output
-        ------
-        - It the structure employs one of the OpenFF dihedrals with a
-          non null phase constant: return True.
-        - Else: return False
+        Parameters
+        ----------
+        smiles_tag : str
+            The smiles tag to construct the molecule with
+
+        Returns
+        -------
+        answer : bool
+            True if smiles' Molecule has a non-standard dihedral, False
+            otherwise
         """
-
-        # Filter out all non interesting molecules
         from peleffy.topology import Molecule
         from simtk import unit
+        from contextlib import suppress
 
-        var = False
-        try:
+        with suppress(Exception):
             mol = Molecule(smiles=smiles_tag)
             mol.parameterize('openff_unconstrained-1.2.1.offxml',
                              charge_method='gasteiger')
             for p in mol.propers:
                 if p.phase not in (unit.Quantity(0, unit.degree),
                                    unit.Quantity(180, unit.degree)):
-                    var = True
-        except Exception:
-            var = False
-        return var
+                    return True
+        return False
 
-    def _get_dataset_structures(self, filter_angles):
+    def _get_dataset_structures(self, filter_dihedrals, n_proc):
         """
-            It gets the Dataset from the QCPortal and saves in a folder the optimized molecules as PDB.
+        It gets the Dataset from the QCPortal and saves in a folder
+        the optimized molecules as PDB.
+
+        Parameters
+        ----------
+        filter_dihedrals : bool
+            Whether to filter entries to keep only non-standard dihedrals
+            or use them all
+        n_proc : int
+            The number of processors to employ
         """
         from peleffybenchmarktools.utils import QCPortal
         import qcportal as ptl
+        from functools import partial
+        from multiprocessing import Pool
+        from tqdm import tqdm
 
         # Get the optimization dataset
         client = ptl.FractalClient()
@@ -413,40 +421,50 @@ class MinimizationBenchmark(object):
         qc_portal = QCPortal(n_proc=4)
 
         # Handles output paths
-        os.mkdir(os.path.join(os.getcwd(), self.out_folder))
         set_folder = os.path.join(os.getcwd(), self.out_folder, 'QM')
-        os.mkdir(set_folder)
+        os.makedirs(set_folder, exist_ok=True)
 
-        # Build the optimized molecule and save it as a PDB
-        for index in range(nmols):
-            if (index % 50) == 0:
-                print('{}/{} optimized molecules built'.format(index + 1, nmols))
-            entry = ds.get_entry(ds.df.index[index])
-            if filter_angles:
-                if self._filter_structures(smiles_tag=entry.attributes.get('canonical_smiles')):
-                    qc_portal._parallel_struct_getter(ds, set_folder, index)
-            else:
-                qc_portal._parallel_struct_getter(ds, set_folder, index)
+        filtered_indexes = list()
+        if filter_dihedrals:
+            for index in range(nmols):
+                entry = ds.get_entry(ds.df.index[index])
+                smiles_tag = entry.attributes.get('canonical_smiles')
+                if self._has_nonstandard_dihedral(smiles_tag=smiles_tag):
+                    filtered_indexes.append(index)
+        else:
+            filtered_indexes = [idx for idx in range(nmols)]
+
+        parallel_function = partial(qc_portal._parallel_struct_getter,
+                                    ds, set_folder)
+
+        # Build optimized molecules and save them as a PDB
+        with Pool(self.n_proc) as p:
+            list(tqdm(p.imap(parallel_function,
+                             range(0, len(filtered_indexes))),
+                      total=len(ds.data.records.items())))
 
     def run(self, filter_structures=False):
         """
-            It generates the folders for the optimized with QM structures to PDB files and these PDBs minnimized with PELE.
+        It generates the folders for the optimized with QM structures
+        to PDB files and these PDBs minnimized with PELE.
         """
         import shutil
         import glob
         import re
 
         # Obtain the dataset
-        self._get_dataset_structures(filter_angles=filter_structures)
+        self._get_dataset_structures(filter_angles=filter_structures,
+                                     n_proc=self.n_proc)
 
         # Gets all the PDB files from the set
-        pdb_files = glob.glob(os.path.join(os.path.join(self.out_folder, 'QM'), "*pdb"))
+        pdb_files = glob.glob(
+            os.path.join(os.path.join(self.out_folder, 'QM'), "*pdb"))
 
         # Loads the molecules from the Dataset and runs a PELEMinimization
         for pdb_file in pdb_files:
-            _, index = os.path.split(pdb_file)
-            index = re.sub('.pdb', '', index)
-            self._get_molecule_minimized(index=int(index))
+            _, mol_idx = os.path.split(pdb_file)
+            mol_idx = int(re.sub('.pdb', '', mol_idx))
+            self._get_molecule_minimized(mol_idx=mol_idx)
 
         # Moves the output folder(created by the PELEMinimization) to the desired output folder
         shutil.move(os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), self.out_folder, 'PELE'))
