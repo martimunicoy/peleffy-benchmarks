@@ -313,7 +313,7 @@ class MinimizationBenchmark(object):
 
         self.dataset_name = dataset_name
         self.out_folder = out_folder
-        self.nproc = n_proc
+        self.n_proc = n_proc
 
     def _get_molecule_minimized(self, mol_idx):
         """
@@ -394,7 +394,7 @@ class MinimizationBenchmark(object):
                     return True
         return False
 
-    def _get_dataset_structures(self, filter_dihedrals, n_proc):
+    def _get_dataset_structures(self, filter_dihedrals):
         """
         It gets the Dataset from the QCPortal and saves in a folder
         the optimized molecules as PDB.
@@ -404,8 +404,6 @@ class MinimizationBenchmark(object):
         filter_dihedrals : bool
             Whether to filter entries to keep only non-standard dihedrals
             or use them all
-        n_proc : int
-            The number of processors to employ
         """
         from peleffybenchmarktools.utils import QCPortal
         import qcportal as ptl
@@ -460,8 +458,7 @@ class MinimizationBenchmark(object):
         import re
 
         # Obtain the dataset
-        self._get_dataset_structures(filter_dihedrals=filter_dihedrals,
-                                     n_proc=self.n_proc)
+        self._get_dataset_structures(filter_dihedrals=filter_dihedrals)
 
         # Gets all the PDB files from the set
         pdb_files = glob.glob(
