@@ -95,7 +95,8 @@ class QCPortal(object):
 
         return data
 
-    def _parallel_struct_getter(self, ds, output_path, index):
+    def _parallel_struct_getter(self, ds, output_path, geometry_selection,
+                                index):
         """
         It builds the optimized molecule from an Optimization Dataset
         record and saves it to a PDB file.
@@ -106,6 +107,9 @@ class QCPortal(object):
             The optimization dataset the record belongs to
         output_path : str
             The output path where the PDB file will be saved
+        geometry_selection : str
+            The geometry to feed to the molecule. One of
+            ['initial', 'optimized']
         index : int
             The index of the record name to extract. It belongs to the
             index of the list: list(ds.data.records.keys())
@@ -114,6 +118,10 @@ class QCPortal(object):
         from simtk import unit
         from rdkit import Chem
         import os
+
+        # Check supplied geometry selection string
+        if geometry_selection.lower() not in ['initial', 'optimized']:
+            raise NameError('The supplied geometry selection is not valid')
 
         # Get records and record names
         records = ds.data.records
@@ -124,10 +132,13 @@ class QCPortal(object):
 
         # Get the corresponding mapped smiles and the optimized geometry
         mapped_smiles = self._get_mapped_smiles(record)
-        geometry = self._get_optimized_geometry(ds, record)
+        if geometry_selection.lower() == 'initial':
+            geometry = self._get_initial_geometry(ds, record)
+        else:
+            geometry = self._get_optimized_geometry(ds, record)
 
         if geometry is None:
-            print('Warning: final geometry of '
+            print('Warning: the {} geometry of '.format(geometry_selection)
                   + '{}-{} '.format(record_names[index], mapped_smiles)
                   + 'could not be retrieved')
             return

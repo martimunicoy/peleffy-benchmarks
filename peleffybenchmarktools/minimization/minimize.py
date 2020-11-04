@@ -284,7 +284,8 @@ class MinimizationBenchmark(object):
     It defines a MinimizationBenchmark object.
     """
 
-    def __init__(self, dataset_name, out_folder, n_proc=1):
+    def __init__(self, dataset_name, out_folder, n_proc=1,
+                 geometry_selection='optimized'):
         """
         It initializes a MinimizationBenchmark object.
 
@@ -296,6 +297,9 @@ class MinimizationBenchmark(object):
             The name for the output folder
         n_proc : int
             The number of processors to employ
+        geometry_selection : str
+            The geometry to feed to the molecule. One of
+            ['initial', 'optimized']
 
         Examples:
         ----------
@@ -319,6 +323,7 @@ class MinimizationBenchmark(object):
         self.dataset_name = dataset_name
         self.out_folder = out_folder
         self.n_proc = n_proc
+        self.geometry_selection = geometry_selection
 
     def _get_molecule_minimized(self, pdb_path):
         """
@@ -448,7 +453,7 @@ class MinimizationBenchmark(object):
             filtered_indexes = [idx for idx in range(nmols)]
 
         parallel_function = partial(qc_portal._parallel_struct_getter,
-                                    ds, set_folder)
+                                    ds, set_folder, self.geometry_selection)
 
         # Build optimized molecules and save them as a PDB
         print(' - Generating optimized molecules')
