@@ -465,6 +465,8 @@ class MinimizationBenchmark(object):
         """
         import shutil
         import glob
+        from multiprocessing import Pool
+        from tqdm import tqdm
 
         # Delete output folder, if it already exists
 
@@ -476,8 +478,10 @@ class MinimizationBenchmark(object):
             os.path.join(os.path.join(self.out_folder, 'QM'), "*pdb"))
 
         # Loads the molecules from the Dataset and runs a PELEMinimization
-        for pdb_file in pdb_files:
-            self._get_molecule_minimized(pdb_file)
+        with Pool(self.n_proc) as p:
+            list(tqdm(p.imap(self._get_molecule_minimized,
+                             pdb_files),
+                      total=len(pdb_files)))
 
         # Moves the output folder(created by the PELEMinimization) to the desired output folder
         shutil.move(os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), self.out_folder, 'PELE'))
