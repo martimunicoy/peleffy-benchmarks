@@ -413,11 +413,11 @@ class MinimizationBenchmark(object):
 
         # Get the optimization dataset
         client = ptl.FractalClient()
-        ds = client.get_collection('OptimizationDataset', self.dataset)
+        ds = client.get_collection('OptimizationDataset', self.dataset_name)
         nmols = len(list(ds.data.records.keys()))
 
         # Initializes the QCPortal class
-        qc_portal = QCPortal(n_proc=4)
+        qc_portal = QCPortal()
 
         # Handles output paths
         set_folder = os.path.join(os.getcwd(), self.out_folder, 'QM')
@@ -425,11 +425,21 @@ class MinimizationBenchmark(object):
 
         filtered_indexes = list()
         if filter_dihedrals:
-            for index in range(nmols):
-                entry = ds.get_entry(ds.df.index[index])
-                smiles_tag = entry.attributes.get('canonical_smiles')
-                if self._has_nonstandard_dihedral(smiles_tag=smiles_tag):
-                    filtered_indexes.append(index)
+            print(' - Filtering non-standard dihedrals')
+            smiles_tags = \
+                [ds.get_entry(ds.df.index[index]).attributes.get(
+                    'canonical_smiles') for index in range(nmols)]
+            with Pool(self.n_proc) as p:
+                contains_nonstandard_dihedral = \
+                    list(tqdm(p.imap(self._has_nonstandard_dihedral,
+                                     smiles_tags),
+                              total=len(smiles_tags)))
+
+            for idx, nonstandard_dihedral_inside in \
+                    enumerate(contains_nonstandard_dihedral):
+                if nonstandard_dihedral_inside:
+                    filtered_indexes.append(idx)
+
         else:
             filtered_indexes = [idx for idx in range(nmols)]
 
@@ -437,6 +447,7 @@ class MinimizationBenchmark(object):
                                     ds, set_folder)
 
         # Build optimized molecules and save them as a PDB
+        print(' - Generating optimized molecules')
         with Pool(self.n_proc) as p:
             list(tqdm(p.imap(parallel_function,
                              range(0, len(filtered_indexes))),
