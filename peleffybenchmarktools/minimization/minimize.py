@@ -444,17 +444,23 @@ class MinimizationBenchmark(object):
                              range(0, len(filtered_indexes))),
                       total=len(ds.data.records.items())))
 
-    def run(self, filter_structures=False):
+    def run(self, filter_dihedrals=False):
         """
         It generates the folders for the optimized with QM structures
         to PDB files and these PDBs minnimized with PELE.
+
+        Parameters
+        ----------
+        filter_dihedrals : bool
+            Whether to filter entries to keep only non-standard dihedrals
+            or use them all
         """
         import shutil
         import glob
         import re
 
         # Obtain the dataset
-        self._get_dataset_structures(filter_angles=filter_structures,
+        self._get_dataset_structures(filter_dihedrals=filter_dihedrals,
                                      n_proc=self.n_proc)
 
         # Gets all the PDB files from the set
