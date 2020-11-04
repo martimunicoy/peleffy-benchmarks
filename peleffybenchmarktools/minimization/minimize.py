@@ -306,6 +306,11 @@ class MinimizationBenchmark(object):
         >>> benchmark.run()
 
         """
+        # Preload matplotlib to prevent Jupyter Notebook from hiding
+        # the first plot
+        import matplotlib.pyplot as plt
+        plt.__name__
+
         # Supress INFO messages from peleffy
         from peleffy.utils import Logger
         log = Logger()
@@ -537,7 +542,7 @@ class MinimizationBenchmark(object):
         import glob
         import re
         import pandas as pd
-        import maplotlib.pyplot as plt
+        import matplotlib.pyplot as plt
 
         # Gets all the structures from the output folder
         pdb_files = glob.glob(os.path.join(os.path.join(self.out_folder, 'QM'), "*pdb"))
