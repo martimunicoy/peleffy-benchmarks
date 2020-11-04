@@ -325,7 +325,7 @@ class MinimizationBenchmark(object):
             The index of the molecule to minimize
         """
         from peleffy.topology import Molecule
-        from peleffybenchmarktools.minimization import PELEMinimization
+        from peleffybenchmarktools.utils.pele import PELEMinimization
 
         # Load and parameterize the molecule
         try:
@@ -450,8 +450,8 @@ class MinimizationBenchmark(object):
         print(' - Generating optimized molecules')
         with Pool(self.n_proc) as p:
             list(tqdm(p.imap(parallel_function,
-                             range(0, len(filtered_indexes))),
-                      total=len(ds.data.records.items())))
+                             filtered_indexes),
+                      total=len(filtered_indexes)))
 
     def run(self, filter_dihedrals=False):
         """
