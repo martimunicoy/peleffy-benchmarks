@@ -4,6 +4,14 @@ of PELE workflows.
 """
 
 
+class PELERunException(Exception):
+    """
+    It defines a PELERunException which inherits from the general
+    Python Exception class.
+    """
+    pass
+
+
 class PELEBaseJob(object):
     """
     It represents the base class of a PELE job.
@@ -216,6 +224,7 @@ class PELEBaseJob(object):
             Path to the PELE output file
         """
         import os
+        import subprocess
 
         control_file = self._select_control_file()
 
@@ -241,8 +250,13 @@ class PELEBaseJob(object):
 
             previous_dir = os.getcwd()
             os.chdir(os.path.join(os.getcwd(), output_path))
-            os.system("{} {} > {}".format(
-                self._PELE_exec, file_path, output_file))
+
+            try:
+                subprocess.check_call(["{} {} > {}".format(
+                    self._PELE_exec, file_path, output_file)])
+            except subprocess.CalledProcessError:
+                raise PELERunException('PELE exited with non-zero code')
+
             os.chdir(previous_dir)
 
         return os.path.join(os.getcwd(), output_path, output_file)
