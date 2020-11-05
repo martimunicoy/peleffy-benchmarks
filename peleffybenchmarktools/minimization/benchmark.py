@@ -361,7 +361,8 @@ class MinimizationBenchmark(object):
         return links
 
     def compute_RMSD(self, paths_set1, paths_set2,
-                     labeling1='file', labeling2='file'):
+                     labeling1='file', labeling2='file',
+                     output_name='rmsd'):
         """
         For a collection of structures stored in two sets, it saves a
         CSV file with a dictionary of the RMSD comparison between
@@ -378,6 +379,8 @@ class MinimizationBenchmark(object):
             Labeling criteria for the first set. One of ['file', 'folder']
         labeling2 : str
             Labeling criteria for the first set. One of ['file', 'folder']
+        output_name : str
+            The name to use with the output files. Default is 'rmsd'
         """
         import os
         import mdtraj as md
@@ -405,7 +408,8 @@ class MinimizationBenchmark(object):
 
         # Writes out a CSV file with the dictionary of the RMSD results.
         df = pd.DataFrame(d.items(), columns=['Ligand ID', 'RMSD'])
-        df.to_csv(os.path.join(self.output_path, 'rmsd.csv'))
+        df.to_csv(os.path.join(self.output_path,
+                               '{}.csv'.format(output_name)))
 
         # Plots an histogram of the computed RMSD values
         plt.figure(figsize=(7, 5))
@@ -414,9 +418,11 @@ class MinimizationBenchmark(object):
         plt.xlabel('RMSD')
         plt.ylabel('Frequency')
         plt.title('Structural Histogram')
-        plt.savefig(os.path.join(self.output_path, 'rmsd.png'))
+        plt.savefig(os.path.join(self.output_path,
+                                 '{}.png'.format(output_name)))
 
-    def energetic_difference(self, minimized_pdb_paths):
+    def energetic_difference(self, minimized_pdb_paths,
+                             output_name='energies'):
         """
         For a collection of structures stored in two sets, it computes
         and displays the distribution of energetic differences in an
@@ -426,6 +432,8 @@ class MinimizationBenchmark(object):
         ----------
         minimized_pdb_paths : list[str]
             The list of minimized PDB paths
+        output_name : str
+            The name to use with the output files. Default is 'energies'
         """
         import os
         import pandas as pd
@@ -453,7 +461,7 @@ class MinimizationBenchmark(object):
 
         # Writes out a CSV file with the dictionary of the energies results.
         df = pd.DataFrame(d.items(), columns=['Ligand ID', 'Energies'])
-        df.to_csv(os.path.join(self.output_path, 'energies.csv'))
+        df.to_csv(os.path.join(self.output_path, '{}.csv'.format(output_name)))
 
         # Plots an energetic histogram
         plt.figure(figsize=(7, 5))
@@ -461,4 +469,4 @@ class MinimizationBenchmark(object):
         plt.xlabel('Energetic difference (kcal/mol)')
         plt.ylabel('Frequency')
         plt.title('Energetic Histogram')
-        plt.savefig(os.path.join(self.output_path, 'energies.png'))
+        plt.savefig(os.path.join(self.output_path, '{}.png'.format(output_name)))
