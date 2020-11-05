@@ -271,7 +271,7 @@ class MinimizationBenchmark(object):
             The list containing the minimized PDB files.
         """
         import os
-        from multiprocessing import Pool
+        from multiprocessing.pool import ThreadPool
         from tqdm import tqdm
         from functools import partial
 
@@ -284,9 +284,13 @@ class MinimizationBenchmark(object):
 
         # Loads the molecules from the Dataset and runs a PELEMinimization
         print(' - Minimizing molecules')
-        with Pool(self.n_proc) as p:
+        with ThreadPool(self.n_proc) as tp:
+            tp.apply_async(parallel_function, pdb_paths)
+
+            """
             pdb_paths = list(tqdm(p.imap(parallel_function, pdb_paths),
                                   total=len(pdb_paths)))
+            """
 
         # Filter out None pdb paths that belong to failing builds
         pdb_paths = [p for p in pdb_paths if p is not None]
@@ -401,7 +405,7 @@ class MinimizationBenchmark(object):
 
         # Writes out a CSV file with the dictionary of the RMSD results.
         df = pd.DataFrame(d.items(), columns=['Ligand ID', 'RMSD'])
-        df.to_csv(os.path.join(self.out_folder, 'rmsd.csv'))
+        df.to_csv(os.path.join(self.output_path, 'rmsd.csv'))
 
         # Plots an histogram of the computed RMSD values
         plt.figure(figsize=(7, 5))
@@ -410,7 +414,7 @@ class MinimizationBenchmark(object):
         plt.xlabel('RMSD')
         plt.ylabel('Frequency')
         plt.title('Structural Histogram')
-        plt.savefig(os.path.join(self.out_folder, 'rmsd.png'))
+        plt.savefig(os.path.join(self.output_path, 'rmsd.png'))
 
     def energetic_difference(self, minimized_pdb_paths):
         """
@@ -449,7 +453,7 @@ class MinimizationBenchmark(object):
 
         # Writes out a CSV file with the dictionary of the energies results.
         df = pd.DataFrame(d.items(), columns=['Ligand ID', 'Energies'])
-        df.to_csv(os.path.join(self.out_folder, 'energies.csv'))
+        df.to_csv(os.path.join(self.output_path, 'energies.csv'))
 
         # Plots an energetic histogram
         plt.figure(figsize=(7, 5))
@@ -457,4 +461,4 @@ class MinimizationBenchmark(object):
         plt.xlabel('Energetic difference (kcal/mol)')
         plt.ylabel('Frequency')
         plt.title('Energetic Histogram')
-        plt.savefig(os.path.join(self.out_folder, 'energies.png'))
+        plt.savefig(os.path.join(self.output_path, 'energies.png'))
