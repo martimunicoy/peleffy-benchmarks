@@ -12,7 +12,9 @@ class MinimizationBenchmark(object):
     def __init__(self, dataset_name, output_path,
                  PELE_exec, PELE_src, PELE_license,
                  geometry_selection='optimized',
-                 n_proc=1,):
+                 n_proc=1,
+                 forcefield='openff_unconstrained-1.3.0.offxml',
+                 charge_method=None):
         """
         It initializes a MinimizationBenchmark object.
 
@@ -33,6 +35,12 @@ class MinimizationBenchmark(object):
             Path to PELE source folder
         PELE_license : str
             Path to PELE license directory
+        forcefield : str
+            The force field to employ in the parameterization job. Defaut is
+            'openff_unconstrained-1.3.0.offxml'
+        charge_method : str
+            The charge method to employ in the parameterization job. Default
+            is None
 
         Examples:
         ----------
@@ -64,6 +72,8 @@ class MinimizationBenchmark(object):
         self.PELE_exec = PELE_exec
         self.PELE_src = PELE_src
         self.PELE_license = PELE_license
+        self.forcefield = forcefield
+        self.charge_method = charge_method
 
     def _get_molecule_minimized(self, output_path, pdb_path):
         """
@@ -89,8 +99,8 @@ class MinimizationBenchmark(object):
         # Load and parameterize the molecule
         try:
             mol = Molecule(pdb_path)
-            mol.parameterize('openff_unconstrained-1.2.1.offxml',
-                             charge_method='gasteiger')
+            mol.parameterize(self.forcefield,
+                             charge_method=self.charge_method)
 
             # Runs a PELE Minimization
             pele_minimization = PELEMinimization(
@@ -290,7 +300,8 @@ class MinimizationBenchmark(object):
         print(' - Minimizing molecules')
         jobs = list()
         with Pool(self.n_proc) as pool:
-            min_pdb_paths = list(tqdm(pool.imap(parallel_function, pdb_paths), total=len(pdb_paths)))
+            min_pdb_paths = list(tqdm(pool.imap(parallel_function, pdb_paths),
+                                      total=len(pdb_paths)))
 
         # Filter out None pdb paths that belong to failing builds
         min_pdb_paths = [p for p in min_pdb_paths if p is not None]
