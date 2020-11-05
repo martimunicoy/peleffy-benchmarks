@@ -1,1 +1,2 @@
-from .minimize import MinimizationBenchmark
+from .benchmark import MinimizationBenchmark
+from .minimize import Minimizer, MultiMinimizer
