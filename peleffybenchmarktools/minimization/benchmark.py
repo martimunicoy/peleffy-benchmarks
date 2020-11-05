@@ -61,16 +61,16 @@ class MinimizationBenchmark(object):
         self.PELE_src = PELE_src
         self.PELE_license = PELE_license
 
-    def _get_molecule_minimized(self, pdb_path, output_path):
+    def _get_molecule_minimized(self, output_path, pdb_path):
         """
         It minimized the molecule using PELE's minimization.
 
         Parameters
         ----------
-        pdb_path : str
-            The path to the PDB of the molecule to minimize
         output_path : str
             The path where to run the PELE simulation and save the output
+        pdb_path : str
+            The path to the PDB of the molecule to minimize
 
         Returns
         -------
