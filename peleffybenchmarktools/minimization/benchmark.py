@@ -53,6 +53,10 @@ class MinimizationBenchmark(object):
         log = Logger()
         log.set_level('WARNING')
 
+        # Supress OpenForceField toolkit warnings
+        import logging
+        logging.getLogger().setLevel(logging.ERROR)
+
         self.dataset_name = dataset_name
         self.output_path = output_path
         self.n_proc = n_proc
@@ -271,7 +275,7 @@ class MinimizationBenchmark(object):
             The list containing the minimized PDB files.
         """
         import os
-        from multiprocessing.pool import ThreadPool
+        from multiprocessing import Pool
         from tqdm import tqdm
         from functools import partial
 
@@ -284,18 +288,14 @@ class MinimizationBenchmark(object):
 
         # Loads the molecules from the Dataset and runs a PELEMinimization
         print(' - Minimizing molecules')
-        with ThreadPool(self.n_proc) as tp:
-            tp.apply_async(parallel_function, pdb_paths)
-
-            """
-            pdb_paths = list(tqdm(p.imap(parallel_function, pdb_paths),
-                                  total=len(pdb_paths)))
-            """
+        jobs = list()
+        with Pool(self.n_proc) as pool:
+            min_pdb_paths = list(tqdm(pool.imap(parallel_function, pdb_paths), total=len(pdb_paths)))
 
         # Filter out None pdb paths that belong to failing builds
-        pdb_paths = [p for p in pdb_paths if p is not None]
+        min_pdb_paths = [p for p in min_pdb_paths if p is not None]
 
-        return pdb_paths
+        return min_pdb_paths
 
     def _link_pdb_paths(self, paths_set1, paths_set2, labeling1, labeling2):
         """
@@ -337,15 +337,15 @@ class MinimizationBenchmark(object):
         # Note that they are linked by either filename or folder
         while(len(set1) != 0):
             pdb_file1 = set1.pop()
-            if labeling1 == 'file':
+            if labeling1 == 'folder':
                 name1 = os.path.basename(os.path.dirname(pdb_file1))
             else:
-                name1 = os.path.basename(pdb_file1)
+                name1 = os.path.splitext(os.path.basename(pdb_file1))[0]
             for pdb_file2 in set2:
-                if labeling2 == 'file':
+                if labeling2 == 'folder':
                     name2 = os.path.basename(os.path.dirname(pdb_file2))
                 else:
-                    name2 = os.path.basename(pdb_file2)
+                    name2 = os.path.splitext(os.path.basename(pdb_file2))[0]
                 if name1 == name2:
                     links[name1] = (pdb_file1, pdb_file2)
                     set2.remove(pdb_file2)
