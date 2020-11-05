@@ -308,6 +308,31 @@ class MinimizationBenchmark(object):
 
         return min_pdb_paths
 
+    def load_pdbs_from(self, search_path):
+        """
+        Given a path, it loads all the PDB files that it finds in it.
+
+        Parameters
+        ----------
+        search_path : str
+            The path where the PDB files will be searched at
+
+        Returns
+        -------
+        pdb_paths : list[str]
+            The list of paths pointing to the PDB files that are found
+        """
+        from glob import glob
+
+        pdb_paths = list()
+        for pdb_path in glob(search_path + '/*.pdb'):
+            pdb_paths.append(pdb_path)
+
+        if len(pdb_paths) == 0:
+            print(' - Warning: no PDB file found at ' + search_path)
+
+        return pdb_paths
+
     def _link_pdb_paths(self, paths_set1, paths_set2, labeling1, labeling2):
         """
         Given two sets of PDB paths, it links them based on the
