@@ -252,8 +252,8 @@ class PELEBaseJob(object):
             os.chdir(os.path.join(os.getcwd(), output_path))
 
             try:
-                subprocess.check_call(["{} {} > {}".format(
-                    self._PELE_exec, file_path, output_file)])
+                subprocess.check_output(["{} {} > {}".format(
+                    self._PELE_exec, file_path, output_file)], shell=True)
             except subprocess.CalledProcessError:
                 raise PELERunException('PELE exited with non-zero code')
 
