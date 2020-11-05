@@ -9,9 +9,10 @@ class MinimizationBenchmark(object):
     It defines a MinimizationBenchmark object.
     """
 
-    def __init__(self, dataset_name, output_path, n_proc=1,
+    def __init__(self, dataset_name, output_path,
                  PELE_exec, PELE_src, PELE_license,
-                 geometry_selection='optimized'):
+                 geometry_selection='optimized',
+                 n_proc=1,):
         """
         It initializes a MinimizationBenchmark object.
 
@@ -21,11 +22,17 @@ class MinimizationBenchmark(object):
             The name of the collection you want to extract from QCPortal
         output_path: str
             The name for the output folder
-        n_proc : int
-            The number of processors to employ
         geometry_selection : str
             The geometry to feed to the molecule. One of
             ['initial', 'optimized']
+        n_proc : int
+            The number of processors to employ. Default is 1
+        PELE_exec : str
+            Path to the PELE executable
+        PELE_src : str
+            Path to PELE source folder
+        PELE_license : str
+            Path to PELE license directory
 
         Examples:
         ----------
