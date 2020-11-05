@@ -10,6 +10,7 @@ class MinimizationBenchmark(object):
     """
 
     def __init__(self, dataset_name, output_path, n_proc=1,
+                 PELE_exec, PELE_src, PELE_license,
                  geometry_selection='optimized'):
         """
         It initializes a MinimizationBenchmark object.
@@ -49,6 +50,9 @@ class MinimizationBenchmark(object):
         self.output_path = output_path
         self.n_proc = n_proc
         self.geometry_selection = geometry_selection
+        self.PELE_exec = PELE_exec
+        self.PELE_src = PELE_src
+        self.PELE_license = PELE_license
 
     def _get_molecule_minimized(self, pdb_path, output_path):
         """
@@ -79,12 +83,12 @@ class MinimizationBenchmark(object):
 
             # Runs a PELE Minimization
             pele_minimization = PELEMinimization(
-                PELE_exec='/home/municoy/builds/PELE/PELE-repo_serial/PELE-1.6',
-                PELE_src='/home/municoy/repos/PELE-repo/',
-                PELE_license='/home/municoy/builds/PELE/license',
-                output_path=output_path,
-                output_file='PELE_output.txt')
-            output_file = pele_minimization.run(mol)
+                PELE_exec=self.PELE_exec,
+                PELE_src=self.PELE_src,
+                PELE_license=self.PELE_license,
+                output_path=output_path)
+            output_file = pele_minimization.run(mol,
+                                                output_file='PELE_output.txt')
 
             # Return not the path to the PELE output file but the path to
             # the PELE minimized PDB file
