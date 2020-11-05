@@ -113,6 +113,12 @@ class QCPortal(object):
         index : int
             The index of the record name to extract. It belongs to the
             index of the list: list(ds.data.records.keys())
+
+        Returns
+        -------
+        pdb_path : str
+            The path to the PDB that has been generated. It is None if the
+            PDB creation fails at any point
         """
         from openforcefield.topology import Molecule
         from simtk import unit
@@ -141,7 +147,7 @@ class QCPortal(object):
             print('Warning: the {} geometry of '.format(geometry_selection)
                   + '{}-{} '.format(record_names[index], mapped_smiles)
                   + 'could not be retrieved')
-            return
+            return None
 
         # Obtain a molecule from mapped smiles
         off_mol = Molecule.from_mapped_smiles(mapped_smiles)
@@ -149,11 +155,14 @@ class QCPortal(object):
         # Add a conformer with the optimized geometry
         off_mol.add_conformer(geometry.in_units_of(unit.angstrom))
 
+        # Establish PDB path
+        pdb_path = os.path.join(output_path, '{}.pdb'.format(index + 1))
+
         # Convert it to an RDKit representation and save it to a PDB file
         rdkit_mol = off_mol.to_rdkit()
-        Chem.rdmolfiles.MolToPDBFile(
-            rdkit_mol,
-            os.path.join(output_path, '{}.pdb'.format(index + 1)))
+        Chem.rdmolfiles.MolToPDBFile(rdkit_mol, pdb_path)
+
+        return pdb_path
 
     def get_structures(self, collection_name, output_path='out',
                        collection_type='OptimizationDataset',
