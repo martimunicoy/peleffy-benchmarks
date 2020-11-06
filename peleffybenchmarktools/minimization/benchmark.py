@@ -530,13 +530,19 @@ class MinimizationBenchmark(object):
             can be used to distort dihedral angles of the structure
         seed : int
             Seed for the pseudo-random generator
+
+        Returns
+        -------
+        output_files : list[str]
+            The list of paths to the resulting PDB files with distorted
+            structures
         """
         import os
         from tqdm import tqdm
         from multiprocessing import Pool
         from functools import partial
 
-        output_path = 'distorted_test/distorted/'
+        output_path = os.path.join(self.output_path, 'distorted')
         os.makedirs(output_path, exist_ok=True)
 
         parallel_function = partial(self._distort_structure,
@@ -547,8 +553,10 @@ class MinimizationBenchmark(object):
                                     seed)
 
         with Pool(self.n_proc) as p:
-            list(tqdm(p.imap(parallel_function, pdb_paths),
-                      total=len(pdb_paths)))
+            output_files = list(tqdm(p.imap(parallel_function, pdb_paths),
+                                     total=len(pdb_paths)))
+
+        return output_files
 
     def _distort_structure(self, output_path,
                            bond_distortion_range,
@@ -577,6 +585,12 @@ class MinimizationBenchmark(object):
             Seed for the pseudo-random generator
         pdb_to_distort : str
             The path to the PDB to distort
+
+        Returns
+        -------
+        output_file : str
+            The path to the resulting PDB file with the distorted
+            structure
         """
         import os
         from peleffy.topology import Molecule
@@ -607,6 +621,9 @@ class MinimizationBenchmark(object):
             distorted_mol = distort.randomly(
                 range=dihedral_distortion_range)
 
-        Chem.rdmolfiles.MolToPDBFile(
-            distorted_mol,
-            os.path.join(output_path, 'distorted_{}.pdb'.format(idx)))
+        output_file = os.path.join(output_path,
+                                   'distorted_{}.pdb'.format(idx))
+
+        Chem.rdmolfiles.MolToPDBFile(distorted_mol, output_file)
+
+        return output_file
