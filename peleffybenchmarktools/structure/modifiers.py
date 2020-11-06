@@ -4,7 +4,7 @@ molecule.
 """
 
 
-def _DistortionWrapper(object):
+class _DistortionWrapper(object):
     """
     A wrapper for any structural distortion.
     """
@@ -24,7 +24,7 @@ def _DistortionWrapper(object):
         self._original_mol = molecule
 
 
-def DistortBonds(_DistortionWrapper):
+class DistortBonds(_DistortionWrapper):
     """
     It defines a class that distorts a set of bonds. Note that bonds
     belonging to a ring will not be modified.
@@ -112,7 +112,7 @@ def DistortBonds(_DistortionWrapper):
         return rdkit_mol
 
 
-def DistortAngles(_DistortionWrapper):
+class DistortAngles(_DistortionWrapper):
     """
     It defines a class that distorts a set of angles. Note that angles
     belonging to a ring will not be modified.
@@ -208,7 +208,7 @@ def DistortAngles(_DistortionWrapper):
         return rdkit_mol
 
 
-def DistortDihedrals(_DistortionWrapper):
+class DistortDihedrals(_DistortionWrapper):
     """
     It defines a class that distorts a set of dihedrals. Note that
     dihedrals belonging to a ring will not be modified.
