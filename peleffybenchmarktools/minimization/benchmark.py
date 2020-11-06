@@ -298,7 +298,6 @@ class MinimizationBenchmark(object):
 
         # Loads the molecules from the Dataset and runs a PELEMinimization
         print(' - Minimizing molecules')
-        jobs = list()
         with Pool(self.n_proc) as pool:
             min_pdb_paths = list(tqdm(pool.imap(parallel_function, pdb_paths),
                                       total=len(pdb_paths)))
@@ -506,3 +505,108 @@ class MinimizationBenchmark(object):
         plt.ylabel('Frequency')
         plt.title('Energetic Histogram')
         plt.savefig(os.path.join(self.output_path, '{}.png'.format(output_name)))
+
+    def distort_structures(self, pdb_paths,
+                           bond_distortion_range=0,
+                           angle_distortion_range=0,
+                           dihedral_distortion_range=0,
+                           seed=None):
+        """
+        Given a set of PDB files and distortion ranges, it applies
+        structural distortions and saves the obtained results.
+
+        Parameters
+        ----------
+        pdb_paths : list[str]
+            The list of paths to the PDB files to distort
+        bond_distortion_range : float
+            The upper limit that defines the range of values that
+            can be used to distort bond lengths of the structure
+        angle_distortion_range : float
+            The upper limit that defines the range of values that
+            can be used to distort torsional angles of the structure
+        dihedral_distortion_range : float
+            The upper limit that defines the range of values that
+            can be used to distort dihedral angles of the structure
+        seed : int
+            Seed for the pseudo-random generator
+        """
+        import os
+        from tqdm import tqdm
+        from multiprocessing import Pool
+        from functools import partial
+
+        output_path = 'distorted_test/distorted/'
+        os.makedirs(output_path, exist_ok=True)
+
+        parallel_function = partial(self._distort_structure,
+                                    output_path,
+                                    bond_distortion_range,
+                                    angle_distortion_range,
+                                    dihedral_distortion_range,
+                                    seed)
+
+        with Pool(self.n_proc) as p:
+            list(tqdm(p.imap(parallel_function, pdb_paths),
+                      total=len(pdb_paths)))
+
+    def _distort_structure(self, output_path,
+                           bond_distortion_range,
+                           angle_distortion_range,
+                           dihedral_distortion_range,
+                           seed,
+                           pdb_to_distort):
+        """
+        Given a set of distortion ranges, it distorts a PDB structure
+        and saves the result to the supplied output path.
+
+        Parameters
+        ----------
+        output_path : str
+            The path where to save the resulting distorted structure
+        bond_distortion_range : float
+            The upper limit that defines the range of values that
+            can be used to distort bond lengths of the structure
+        angle_distortion_range : float
+            The upper limit that defines the range of values that
+            can be used to distort torsional angles of the structure
+        dihedral_distortion_range : float
+            The upper limit that defines the range of values that
+            can be used to distort dihedral angles of the structure
+        seed : int
+            Seed for the pseudo-random generator
+        pdb_to_distort : str
+            The path to the PDB to distort
+        """
+        import os
+        from peleffy.topology import Molecule
+        from rdkit import Chem
+        from peleffybenchmarktools.structure import (DistortBonds,
+                                                     DistortAngles,
+                                                     DistortDihedrals)
+
+        idx = os.path.splitext(os.path.basename(pdb_to_distort))[0]
+        molecule = Molecule(pdb_to_distort)
+        molecule.parameterize('openff_unconstrained-1.2.0.offxml',
+                              charge_method='gasteiger')
+
+        if bond_distortion_range > 0:
+            distort = DistortBonds(molecule, seed)
+            distorted_mol = distort.randomly(
+                range=bond_distortion_range)
+            molecule._rdkit_molecule = distorted_mol
+
+        if angle_distortion_range > 0:
+            distort = DistortAngles(molecule, seed + 1)
+            distorted_mol = distort.randomly(
+                range=angle_distortion_range)
+            molecule._rdkit_molecule = distorted_mol
+
+        if dihedral_distortion_range > 0:
+            distort = DistortDihedrals(molecule, seed + 2)
+            distorted_mol = distort.randomly(
+                range=dihedral_distortion_range)
+
+        Chem.rdmolfiles.MolToPDBFile(
+            distorted_mol,
+            os.path.join(output_path, 'distorted_{}.pdb'.format(idx)))
