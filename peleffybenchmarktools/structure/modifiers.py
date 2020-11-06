@@ -9,7 +9,7 @@ class _DistortionWrapper(object):
     A wrapper for any structural distortion.
     """
 
-    def __init__(self, molecule):
+    def __init__(self, molecule, seed=None):
         """
         It initializes a distortion wrapper object.
 
@@ -18,10 +18,15 @@ class _DistortionWrapper(object):
         molecule : an peleffy.topology.Molecule
             The peleffy's Molecule object. It needs to be previously
             parameterized
+        seed : int
+            Seed for the pseudo-random generator
         """
         molecule.assert_parameterized()
 
         self._original_mol = molecule
+
+        import random
+        random.seed(seed)
 
 
 class DistortBonds(_DistortionWrapper):
