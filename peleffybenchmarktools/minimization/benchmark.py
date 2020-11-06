@@ -622,7 +622,7 @@ class MinimizationBenchmark(object):
                 range=dihedral_distortion_range)
 
         output_file = os.path.join(output_path,
-                                   'distorted_{}.pdb'.format(idx))
+                                   '{}.pdb'.format(idx))
 
         Chem.rdmolfiles.MolToPDBFile(distorted_mol, output_file)
 
