@@ -152,6 +152,7 @@ class MinimizationBenchmark(object):
 
         from rdkit import Chem
         import os
+        os.makedirs(os.path.join(self.output_path, mol.name), exist_ok=True)
         output_file = os.path.join(self.output_path, mol.name,
                                    'perturbed.pdb')
         Chem.rdmolfiles.MolToPDBFile(distorted_mol, output_file)
