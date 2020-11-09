@@ -15,9 +15,10 @@ class MinimizationBenchmark(object):
                  n_proc=1,
                  forcefield='openff_unconstrained-1.3.0.offxml',
                  charge_method=None,
-                 distort_bonds=False, range_for_bonds=0.5,
-                 distort_torsions=False, range_for_torsions=20,
-                 distort_dihedrals=False, range_for_dihedrals=20):
+                 distort_bonds=False, distort_value_for_bonds=0.5,
+                 distort_torsions=False, distort_value_for_torsions=20,
+                 distort_dihedrals=False, distort_value_for_dihedrals=20,
+                 random_distort=False):
         """
         It initializes a MinimizationBenchmark object.
 
@@ -50,15 +51,18 @@ class MinimizationBenchmark(object):
             Whether to distort structural torsions or not. Default is False
         distort_dihedrals : bool
             Whether to distort structural dihedrals or not. Default is False
-        range_for_bonds : float
-            The value range to find distortion lenghts for bonds, in
+        distort_value_for_bonds : float
+            The value to find distortion lenghts for bonds, in
             angstroms. Default is 0.5
-        range_for_torsions : float
-            The value range to find distortion angles for torsions, in
+        distort_value_for_torsions : float
+            The value to find distortion angles for torsions, in
             degrees. Default is 20
-        range_for_dihedrals : float
-            The value range to find distortion angles for dihedrals, in
+        distort_value_for_dihedrals : float
+            The value to find distortion angles for dihedrals, in
             degrees. Default is 20
+        random_distort : bool
+            Whether to apply a random distort or a fixed one. Default is
+            False
 
 
         Examples:
@@ -96,9 +100,10 @@ class MinimizationBenchmark(object):
         self.distort_bonds = distort_bonds
         self.distort_torsions = distort_torsions
         self.distort_dihedrals = distort_dihedrals
-        self.range_for_bonds = range_for_bonds
-        self.range_for_torsions = range_for_torsions
-        self.range_for_dihedrals = range_for_dihedrals
+        self.distort_value_for_bonds = distort_value_for_bonds
+        self.distort_value_for_torsions = distort_value_for_torsions
+        self.distort_value_for_dihedrals = distort_value_for_dihedrals
+        self.random_distort = random_distort
 
     def _distort_molecule(self, molecule_to_distort, output_path,
                           seed):
@@ -130,7 +135,12 @@ class MinimizationBenchmark(object):
             from peleffybenchmarktools.structure import DistortBonds
 
             distorter = DistortBonds(mol, seed)
-            distorted_mol = distorter.randomly(self.range_for_bonds)
+            if self.random_distort:
+                distorted_mol = distorter.randomly(
+                    self.distort_value_for_bonds)
+            else:
+                distorted_mol = distorter.fixed(
+                    self.distort_value_for_bonds)
             mol._rdkit_molecule = distorted_mol
 
         if self.distort_torsions:
@@ -139,7 +149,12 @@ class MinimizationBenchmark(object):
             if seed is not None:
                 seed += 1
             distorter = DistortAngles(mol, seed)
-            distorted_mol = distorter.randomly(self.range_for_torsions)
+            if self.random_distort:
+                distorted_mol = distorter.randomly(
+                    self.distort_value_for_torsions)
+            else:
+                distorted_mol = distorter.fixed(
+                    self.distort_value_for_torsions)
             mol._rdkit_molecule = distorted_mol
 
         if self.distort_dihedrals:
@@ -148,7 +163,12 @@ class MinimizationBenchmark(object):
             if seed is not None:
                 seed += 1
             distorter = DistortDihedrals(mol, seed)
-            distorted_mol = distorter.randomly(self.range_for_dihedrals)
+            if self.random_distort:
+                distorted_mol = distorter.randomly(
+                    self.distort_value_for_dihedrals)
+            else:
+                distorted_mol = distorter.fixed(
+                    self.distort_value_for_dihedrals)
 
         from rdkit import Chem
         import os
