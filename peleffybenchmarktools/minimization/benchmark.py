@@ -607,8 +607,9 @@ class MinimizationBenchmark(object):
             rdkit_mol1 = mol1.rdkit_molecule
             conformer1 = rdkit_mol1.GetConformer()
 
-            conformer2 = \
-                Chem.rdmolfiles.MolFromPDBFile(pdb_file2).GetConformer()
+            conformer2 = Chem.rdmolfiles.MolFromPDBFile(
+                pdb_file2, proximityBonding=False,
+                removeHs=False).GetConformer()
 
             bond_differences = []
 
