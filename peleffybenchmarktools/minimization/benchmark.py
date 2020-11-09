@@ -14,7 +14,10 @@ class MinimizationBenchmark(object):
                  geometry_selection='optimized',
                  n_proc=1,
                  forcefield='openff_unconstrained-1.3.0.offxml',
-                 charge_method=None):
+                 charge_method=None,
+                 distort_bonds=False, range_for_bonds=0.5,
+                 distort_angles=False, range_for_angles=20,
+                 distort_dihedrals=False, range_for_dihedrals=20):
         """
         It initializes a MinimizationBenchmark object.
 
@@ -41,6 +44,22 @@ class MinimizationBenchmark(object):
         charge_method : str
             The charge method to employ in the parameterization job. Default
             is None
+        distort_bonds : bool
+            Whether to distort structural bonds or not. Default is False
+        distort_torsions : bool
+            Whether to distort structural torsions or not. Default is False
+        distort_dihedrals : bool
+            Whether to distort structural dihedrals or not. Default is False
+        range_for_bonds : float
+            The value range to find distortion lenghts for bonds, in
+            angstroms. Default is 0.5
+        range_for_torsions : float
+            The value range to find distortion angles for torsions, in
+            degrees. Default is 20
+        range_for_dihedrals : float
+            The value range to find distortion angles for dihedrals, in
+            degrees. Default is 20
+
 
         Examples:
         ----------
@@ -74,6 +93,63 @@ class MinimizationBenchmark(object):
         self.PELE_license = PELE_license
         self.forcefield = forcefield
         self.charge_method = charge_method
+        self.distort_bonds = distort_bonds
+        self.distort_angles = distort_angles
+        self.distort_dihedrals = distort_dihedrals
+        self.range_for_bonds = range_for_bonds
+        self.range_for_angles = range_for_angles
+        self.range_for_dihedrals = range_for_dihedrals
+
+    def _distort_molecule(self, molecule_to_distort, output_path):
+        """
+        It distorts the input molecule, according to the supplied
+        distortion settings.
+
+        Parameters
+        ----------
+        molecule_to_distort : an peleffy.topology.Molecule object
+            The molecule to distort
+        output_path : str
+            The path used as output in the benchmark
+
+        Returns
+        -------
+        output_file : str
+            The path to the resulting PDB file with the distorted
+            molecule
+        """
+        from copy import deepcopy
+
+        # Make a copy of the input molecule
+        mol = deepcopy(molecule_to_distort)
+
+        if self.distort_bonds:
+            from peleffybenchmarktools.structure import DistortBonds
+
+            distorter = DistortBonds(mol)
+            distorted_mol = distorter.randomly(self.range_for_bonds)
+            mol.rdkit_molecule = distorted_mol
+
+        if self.distort_torsions:
+            from peleffybenchmarktools.structure import DistortAngles
+
+            distorter = DistortAngles(mol)
+            distorted_mol = distorter.randomly(self.range_for_torsions)
+            mol.rdkit_molecule = distorted_mol
+
+        if self.distort_dihedrals:
+            from peleffybenchmarktools.structure import DistortDihedrals
+
+            distorter = DistortDihedrals(mol)
+            distorted_mol = distorter.randomly(self.range_for_dihedrals)
+
+        from rdkit import Chem
+        import os
+        output_file = os.path.join(self.output_path, mol.name,
+                                   'perturbed.pdb')
+        Chem.rdmolfiles.MolToPDBFile(distorted_mol, output_file)
+
+        return output_file
 
     def _get_molecule_minimized(self, output_path, pdb_path):
         """
@@ -102,14 +178,22 @@ class MinimizationBenchmark(object):
             mol.parameterize(self.forcefield,
                              charge_method=self.charge_method)
 
+            # Distort molecule, if it is the case
+            distorted_molecule_path = None
+            if (self.distort_bonds or self.distort_angles
+                    or self.distort_dihedrals):
+                distorted_molecule_path = self._distort_molecule(mol,
+                                                                 output_path)
+
             # Runs a PELE Minimization
             pele_minimization = PELEMinimization(
                 PELE_exec=self.PELE_exec,
                 PELE_src=self.PELE_src,
                 PELE_license=self.PELE_license,
                 output_path=output_path)
-            output_file = pele_minimization.run(mol,
-                                                output_file='PELE_output.txt')
+            output_file = pele_minimization.run(
+                mol, output_file='PELE_output.txt',
+                pdb_path=distorted_molecule_path)
 
             # Return not the path to the PELE output file but the path to
             # the PELE minimized PDB file
@@ -611,13 +695,13 @@ class MinimizationBenchmark(object):
             molecule._rdkit_molecule = distorted_mol
 
         if angle_distortion_range > 0:
-            distort = DistortAngles(molecule, seed + 1)
+            distort = DistortAngles(molecule, seed)
             distorted_mol = distort.randomly(
                 range=angle_distortion_range)
             molecule._rdkit_molecule = distorted_mol
 
         if dihedral_distortion_range > 0:
-            distort = DistortDihedrals(molecule, seed + 2)
+            distort = DistortDihedrals(molecule, seed)
             distorted_mol = distort.randomly(
                 range=dihedral_distortion_range)
 
