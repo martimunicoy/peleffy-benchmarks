@@ -628,7 +628,10 @@ class MinimizationBenchmark(object):
 
                 bond_differences.append(abs(bond1 - bond2))
 
-            mean_difference = np.mean(bond_differences)
+            if len(bond_differences) > 0:
+                mean_difference = np.mean(bond_differences)
+            else:
+                mean_difference = None
 
             return mean_difference
 
@@ -696,7 +699,7 @@ class MinimizationBenchmark(object):
         # Plots an histogram of the computed RMSD values
         plt.figure(figsize=(7, 5))
         plt.hist(bond_difference_means, bins=10, rwidth=0.8, align='mid',
-                 range=(0, 0.5), color='gray')
+                 color='gray')
         plt.xlabel('Mean bond length difference (Å)')
         plt.ylabel('Frequency')
         plt.title('Structural Histogram')
@@ -711,7 +714,7 @@ class MinimizationBenchmark(object):
         Parameters
         ----------
         data : tuple[int, tuple[str, str]]
-            The data to compute the bond differences of a linked pair
+            The data to compute the torsion differences of a linked pair
 
         Returns
         -------
@@ -758,7 +761,10 @@ class MinimizationBenchmark(object):
 
                 torsion_differences.append(abs(angle1 - angle2))
 
-            mean_difference = np.mean(torsion_differences)
+            if len(torsion_differences) > 0:
+                mean_difference = np.mean(torsion_differences)
+            else:
+                mean_difference = None
 
             return mean_difference
 
@@ -826,8 +832,141 @@ class MinimizationBenchmark(object):
         # Plots an histogram of the computed RMSD values
         plt.figure(figsize=(7, 5))
         plt.hist(torsion_difference_means, bins=10, rwidth=0.8, align='mid',
-                 range=(0, 0.5), color='gray')
-        plt.xlabel('Mean bond length difference (Å)')
+                 color='gray')
+        plt.xlabel('Mean torsion angle difference (degrees)')
+        plt.ylabel('Frequency')
+        plt.title('Structural Histogram')
+        plt.savefig(os.path.join(self.output_path,
+                                 '{}.png'.format(output_name)))
+
+    def _get_dihedral_differences(self, data):
+        """
+        It calculates the mean dihedral differences of each linked pair of
+        PDB files.
+
+        Parameters
+        ----------
+        data : tuple[int, tuple[str, str]]
+            The data to compute the dihedral differences of a linked pair
+
+        Returns
+        -------
+        mean_difference : float
+            The mean difference of dihedral angles for the current linked
+            pair of PDB files
+        """
+        import numpy as np
+        from peleffy.topology import Molecule
+        from rdkit.Chem import rdMolTransforms
+        from rdkit import Chem
+
+        idx, (pdb_file1, pdb_file2) = data
+
+        try:
+            mol1 = Molecule(pdb_file1)
+            mol1.parameterize('openff_unconstrained-1.2.1.offxml',
+                              charge_method='gasteiger')
+            rdkit_mol1 = mol1.rdkit_molecule
+            conformer1 = rdkit_mol1.GetConformer()
+
+            conformer2 = Chem.rdmolfiles.MolFromPDBFile(
+                pdb_file2, proximityBonding=False,
+                removeHs=False).GetConformer()
+
+            dihedral_differences = []
+
+            for dihedral in mol1.propers:
+                idx1 = dihedral.atom1_idx
+                idx2 = dihedral.atom2_idx
+                idx3 = dihedral.atom3_idx
+                idx4 = dihedral.atom3_idx
+
+                if rdkit_mol1.GetBondBetweenAtoms(idx2, idx3).IsInRing():
+                    continue
+
+                dihedral1 = rdMolTransforms.GetDihedralDeg(conformer1,
+                                                           idx1, idx2,
+                                                           idx3, idx4)
+
+                dihedral2 = rdMolTransforms.GetDihedralDeg(conformer2,
+                                                           idx1, idx2,
+                                                           idx3, idx4)
+
+                dihedral_differences.append(abs(dihedral1 - dihedral2))
+
+            if len(dihedral_differences) > 0:
+                mean_difference = np.mean(dihedral_differences)
+            else:
+                mean_difference = None
+
+            return mean_difference
+
+        except Exception as e:
+            print('Skipping mean dihedral computation between \''
+                  + pdb_file1 + '\' \'' + pdb_file2 + '\': '
+                  + str(e))
+
+            return None
+
+    def compute_dihedral_differences(self, paths_set1, paths_set2,
+                                     labeling1='file', labeling2='file',
+                                     output_name='dihedral_differences'):
+        """
+        For a collection of structures stored in two sets, it saves a
+        CSV file with a dictionary of the dihedral comparison between
+        PELE and QM minimized structures. It also generates an histogram
+        of the computed differences.
+
+        Parameters
+        ----------
+        paths_set1 : list[str]
+            The first set of PDB paths
+        paths_set2 : list[str]
+            The second set of PDB paths
+        labeling1 : str
+            Labeling criteria for the first set. One of ['file', 'folder']
+        labeling2 : str
+            Labeling criteria for the first set. One of ['file', 'folder']
+        output_name : str
+            The name to use with the output files. Default is
+            'dihedral_differences'
+        """
+        import os
+        import pandas as pd
+        import matplotlib.pyplot as plt
+        from multiprocessing import Pool
+        from tqdm import tqdm
+
+        # Find links between the PDB paths from each set
+        links = self._link_pdb_paths(paths_set1, paths_set2, labeling1,
+                                     labeling2)
+
+        # Computes the RMSD between PELE and QM minimized structures
+        d = {}
+        dihedral_difference_means = []
+        with Pool(self.n_proc) as pool:
+            results = list(tqdm(pool.imap(self._get_dihedral_differences,
+                                          links.items()),
+                                total=len(links)))
+
+        for idx, mean_difference in zip(links, results):
+            if mean_difference is None:
+                continue
+            d.update({idx: mean_difference})
+            dihedral_difference_means.append(mean_difference)
+
+        # Writes out a CSV file with the dictionary of the RMSD results.
+        df = pd.DataFrame(d.items(),
+                          columns=['Ligand ID',
+                                   'Dihedral angle differences'])
+        df.to_csv(os.path.join(self.output_path,
+                               '{}.csv'.format(output_name)))
+
+        # Plots an histogram of the computed RMSD values
+        plt.figure(figsize=(7, 5))
+        plt.hist(dihedral_difference_means, bins=10, rwidth=0.8, align='mid',
+                 color='gray')
+        plt.xlabel('Mean dihedral angle difference (degrees)')
         plt.ylabel('Frequency')
         plt.title('Structural Histogram')
         plt.savefig(os.path.join(self.output_path,
