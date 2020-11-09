@@ -879,7 +879,7 @@ class MinimizationBenchmark(object):
                 idx1 = dihedral.atom1_idx
                 idx2 = dihedral.atom2_idx
                 idx3 = dihedral.atom3_idx
-                idx4 = dihedral.atom3_idx
+                idx4 = dihedral.atom4_idx
 
                 if rdkit_mol1.GetBondBetweenAtoms(idx2, idx3).IsInRing():
                     continue
