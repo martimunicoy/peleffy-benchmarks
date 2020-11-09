@@ -732,9 +732,9 @@ class MinimizationBenchmark(object):
             rdkit_mol1 = mol1.rdkit_molecule
             conformer1 = rdkit_mol1.GetConformer()
 
-            conformer2 = \
-                Chem.rdmolfiles.MolFromPDBFile(pdb_file2,
-                                               removeHs=False).GetConformer()
+            conformer2 = Chem.rdmolfiles.MolFromPDBFile(
+                pdb_file2, proximityBonding=False,
+                removeHs=False).GetConformer()
 
             torsion_differences = []
 
