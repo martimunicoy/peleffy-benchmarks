@@ -596,6 +596,7 @@ class MinimizationBenchmark(object):
         import numpy as np
         from peleffy.topology import Molecule
         from rdkit.Chem import rdMolTransforms
+        from rdkit import Chem
 
         idx, (pdb_file1, pdb_file2) = data
 
@@ -606,9 +607,8 @@ class MinimizationBenchmark(object):
             rdkit_mol1 = mol1.rdkit_molecule
             conformer1 = rdkit_mol1.GetConformer()
 
-            mol2 = Molecule(pdb_file2, connectivity_template=rdkit_mol1)
-            rdkit_mol2 = mol2.rdkit_molecule
-            conformer2 = rdkit_mol2.GetConformer()
+            conformer2 = \
+                Chem.rdmolfiles.MolFromPDBFile(pdb_file2).GetConformer()
 
             bond_differences = []
 
@@ -632,7 +632,7 @@ class MinimizationBenchmark(object):
             return mean_difference
 
         except Exception as e:
-            print('Skipping RMSD comparison between \''
+            print('Skipping mean bond length computation between \''
                   + pdb_file1 + '\' \'' + pdb_file2 + '\': '
                   + str(e))
 
@@ -695,6 +695,135 @@ class MinimizationBenchmark(object):
         # Plots an histogram of the computed RMSD values
         plt.figure(figsize=(7, 5))
         plt.hist(bond_difference_means, bins=10, rwidth=0.8, align='mid',
+                 range=(0, 0.5), color='gray')
+        plt.xlabel('Mean bond length difference (Å)')
+        plt.ylabel('Frequency')
+        plt.title('Structural Histogram')
+        plt.savefig(os.path.join(self.output_path,
+                                 '{}.png'.format(output_name)))
+
+    def _get_torsion_differences(self, data):
+        """
+        It calculates the mean torsion differences of each linked pair of
+        PDB files.
+
+        Parameters
+        ----------
+        data : tuple[int, tuple[str, str]]
+            The data to compute the bond differences of a linked pair
+
+        Returns
+        -------
+        mean_difference : float
+            The mean difference of torsion angles for the current linked
+            pair of PDB files
+        """
+        import numpy as np
+        from peleffy.topology import Molecule
+        from rdkit.Chem import rdMolTransforms
+        from rdkit import Chem
+
+        idx, (pdb_file1, pdb_file2) = data
+
+        try:
+            mol1 = Molecule(pdb_file1)
+            mol1.parameterize('openff_unconstrained-1.2.1.offxml',
+                              charge_method='gasteiger')
+            rdkit_mol1 = mol1.rdkit_molecule
+            conformer1 = rdkit_mol1.GetConformer()
+
+            conformer2 = \
+                Chem.rdmolfiles.MolFromPDBFile(pdb_file2).GetConformer()
+
+            torsion_differences = []
+
+            for angle in mol1.angles:
+                idx1 = angle.atom1_idx
+                idx2 = angle.atom2_idx
+                idx3 = angle.atom3_idx
+
+            if rdkit_mol1.GetBondBetweenAtoms(idx1, idx2).IsInRing():
+                continue
+
+            if rdkit_mol1.GetBondBetweenAtoms(idx2, idx3).IsInRing():
+                continue
+
+                angle1 = rdMolTransforms.GetAngleDeg(conformer1,
+                                                     idx1, idx2, idx3)
+
+                angle2 = rdMolTransforms.GetAngleDeg(conformer2,
+                                                     idx1, idx2, idx3)
+
+                torsion_differences.append(abs(angle1 - angle2))
+
+            mean_difference = np.mean(torsion_differences)
+
+            return mean_difference
+
+        except Exception as e:
+            print('Skipping mean torsion computation between \''
+                  + pdb_file1 + '\' \'' + pdb_file2 + '\': '
+                  + str(e))
+
+            return None
+
+    def compute_torsion_differences(self, paths_set1, paths_set2,
+                                    labeling1='file', labeling2='file',
+                                    output_name='torsion_differences'):
+        """
+        For a collection of structures stored in two sets, it saves a
+        CSV file with a dictionary of the torsion comparison between
+        PELE and QM minimized structures. It also generates an histogram
+        of the computed differences.
+
+        Parameters
+        ----------
+        paths_set1 : list[str]
+            The first set of PDB paths
+        paths_set2 : list[str]
+            The second set of PDB paths
+        labeling1 : str
+            Labeling criteria for the first set. One of ['file', 'folder']
+        labeling2 : str
+            Labeling criteria for the first set. One of ['file', 'folder']
+        output_name : str
+            The name to use with the output files. Default is
+            'torsion_differences'
+        """
+        import os
+        import pandas as pd
+        import matplotlib.pyplot as plt
+        from multiprocessing import Pool
+        from tqdm import tqdm
+
+        # Find links between the PDB paths from each set
+        links = self._link_pdb_paths(paths_set1, paths_set2, labeling1,
+                                     labeling2)
+
+        # Computes the RMSD between PELE and QM minimized structures
+        d = {}
+        torsion_difference_means = []
+        with Pool(self.n_proc) as pool:
+            results = list(tqdm(pool.imap(self._get_torsion_differences,
+                                          links.items()),
+                                total=len(links)))
+
+        for idx, mean_difference in zip(links, results):
+            if mean_difference is None:
+                continue
+            d.update({idx: mean_difference})
+            torsion_difference_means.append(mean_difference)
+
+        # Writes out a CSV file with the dictionary of the RMSD results.
+        df = pd.DataFrame(d.items(),
+                          columns=['Ligand ID',
+                                   'Torsion angle differences'])
+        df.to_csv(os.path.join(self.output_path,
+                               '{}.csv'.format(output_name)))
+
+        # Plots an histogram of the computed RMSD values
+        plt.figure(figsize=(7, 5))
+        plt.hist(torsion_difference_means, bins=10, rwidth=0.8, align='mid',
                  range=(0, 0.5), color='gray')
         plt.xlabel('Mean bond length difference (Å)')
         plt.ylabel('Frequency')
