@@ -136,14 +136,18 @@ class MinimizationBenchmark(object):
         if self.distort_torsions:
             from peleffybenchmarktools.structure import DistortAngles
 
-            distorter = DistortAngles(mol, seed + 1)
+            if seed is not None:
+                seed += 1
+            distorter = DistortAngles(mol, seed)
             distorted_mol = distorter.randomly(self.range_for_torsions)
             mol.rdkit_molecule = distorted_mol
 
         if self.distort_dihedrals:
             from peleffybenchmarktools.structure import DistortDihedrals
 
-            distorter = DistortDihedrals(mol, seed + 2)
+            if seed is not None:
+                seed += 1
+            distorter = DistortDihedrals(mol, seed)
             distorted_mol = distorter.randomly(self.range_for_dihedrals)
 
         from rdkit import Chem
