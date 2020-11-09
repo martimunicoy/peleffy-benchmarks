@@ -156,8 +156,8 @@ class DistortAngles(_DistortionWrapper):
             if rdkit_mol.GetBondBetweenAtoms(idx2, idx3).IsInRing():
                 continue
 
-            torsion_angle = rdMolTransforms.GetBondLength(conformer,
-                                                          idx1, idx2, idx3)
+            torsion_angle = rdMolTransforms.GetAngleDeg(conformer,
+                                                        idx1, idx2, idx3)
             torsion_delta = uniform(-range, range)
 
             rdMolTransforms.SetAngleDeg(conformer, idx1, idx2, idx3,
@@ -200,8 +200,8 @@ class DistortAngles(_DistortionWrapper):
             if rdkit_mol.GetBondBetweenAtoms(idx2, idx3).IsInRing():
                 continue
 
-            torsion_angle = rdMolTransforms.GetBondLength(conformer,
-                                                          idx1, idx2, idx3)
+            torsion_angle = rdMolTransforms.GetAngleDeg(conformer,
+                                                        idx1, idx2, idx3)
             torsion_delta = value
 
             rdMolTransforms.SetAngleDeg(conformer, idx1, idx2, idx3,
