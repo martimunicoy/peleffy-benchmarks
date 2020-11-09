@@ -222,7 +222,7 @@ class MinimizationBenchmark(object):
                 PELE_src=self.PELE_src,
                 PELE_license=self.PELE_license,
                 output_path=output_path,
-                self.forcefield)
+                forcefield=self.forcefield)
             output_file = pele_minimization.run(
                 mol, output_file='PELE_output.txt',
                 pdb_path=distorted_molecule_path)
