@@ -185,7 +185,7 @@ class MinimizationBenchmark(object):
 
             # Distort molecule, if it is the case
             distorted_molecule_path = None
-            if (self.distort_bonds or self.distort_angles
+            if (self.distort_bonds or self.distort_torsions
                     or self.distort_dihedrals):
                 distorted_molecule_path = self._distort_molecule(mol,
                                                                  output_path,
