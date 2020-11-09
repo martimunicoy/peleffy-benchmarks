@@ -577,6 +577,131 @@ class MinimizationBenchmark(object):
         plt.savefig(os.path.join(self.output_path,
                                  '{}.png'.format(output_name)))
 
+    def _get_bond_differences(self, data):
+        """
+        It calculates the mean bond differences of each linked pair of
+        PDB files.
+
+        Parameters
+        ----------
+        data : tuple[int, tuple[str, str]]
+            The data to compute the bond differences of a linked pair
+
+        Returns
+        -------
+        mean_difference : float
+            The mean difference of bond lenghts for the current linked
+            pair of PDB files
+        """
+        import numpy as np
+        from peleffy.topology import Molecule
+        from rdkit.Chem import rdMolTransforms
+
+        idx, (pdb_file1, pdb_file2) = data
+
+        try:
+            mol1 = Molecule(pdb_file1)
+            mol1.parameterize('openff_unconstrained-1.2.1.offxml',
+                              charge_method='gasteiger')
+            rdkit_mol1 = mol1.rdkit_molecule
+            conformer1 = rdkit_mol1.GetConformer()
+
+            mol2 = Molecule(pdb_file2)
+            rdkit_mol2 = mol2.rdkit_molecule
+            conformer2 = rdkit_mol2.GetConformer()
+
+            bond_differences = []
+
+            for bond in mol1.bonds:
+                idx1 = bond.atom1_idx
+                idx2 = bond.atom2_idx
+
+                if rdkit_mol1.GetBondBetweenAtoms(idx1, idx2).IsInRing():
+                    continue
+
+                bond1 = rdMolTransforms.GetBondLength(conformer1,
+                                                      idx1, idx2)
+
+                bond2 = rdMolTransforms.GetBondLength(conformer2,
+                                                      idx1, idx2)
+
+                bond_differences.append(abs(bond1 - bond2))
+
+            mean_difference = np.mean(bond_differences)
+
+            return mean_difference
+
+        except Exception as e:
+            print('Skipping RMSD comparison between \''
+                  + pdb_file1 + '\' \'' + pdb_file2 + '\': '
+                  + str(e))
+
+            return None
+
+    def compute_bond_differences(self, paths_set1, paths_set2,
+                                 labeling1='file', labeling2='file',
+                                 output_name='bond_differences'):
+        """
+        For a collection of structures stored in two sets, it saves a
+        CSV file with a dictionary of the bond lengths comparison between
+        PELE and QM minimized structures. It also generates an histogram
+        of the computed differences.
+
+        Parameters
+        ----------
+        paths_set1 : list[str]
+            The first set of PDB paths
+        paths_set2 : list[str]
+            The second set of PDB paths
+        labeling1 : str
+            Labeling criteria for the first set. One of ['file', 'folder']
+        labeling2 : str
+            Labeling criteria for the first set. One of ['file', 'folder']
+        output_name : str
+            The name to use with the output files. Default is
+            'bond_differences'
+        """
+        import os
+        import pandas as pd
+        import matplotlib.pyplot as plt
+        from multiprocessing import Pool
+        from tqdm import tqdm
+
+        # Find links between the PDB paths from each set
+        links = self._link_pdb_paths(paths_set1, paths_set2, labeling1,
+                                     labeling2)
+
+        # Computes the RMSD between PELE and QM minimized structures
+        d = {}
+        bond_difference_means = []
+        with Pool(self.n_proc) as pool:
+            results = list(tqdm(pool.imap(self._get_bond_differences,
+                                          links.items()),
+                                total=len(links.items())))
+
+        for idx, mean_difference in zip(links, results):
+            if mean_difference is None:
+                continue
+            d.update({idx: mean_difference})
+            bond_difference_means.append(mean_difference)
+
+        # Writes out a CSV file with the dictionary of the RMSD results.
+        df = pd.DataFrame(d.items(),
+                          columns=['Ligand ID',
+                                   'Mean bond length differences'])
+        df.to_csv(os.path.join(self.output_path,
+                               '{}.csv'.format(output_name)))
+
+        # Plots an histogram of the computed RMSD values
+        plt.figure(figsize=(7, 5))
+        plt.hist(bond_difference_means, bins=10, rwidth=0.8, align='mid',
+                 range=(0, 0.5), color='gray')
+        plt.xlabel('Mean bond length difference (Å)')
+        plt.ylabel('Frequency')
+        plt.title('Structural Histogram')
+        plt.savefig(os.path.join(self.output_path,
+                                 '{}.png'.format(output_name)))
+
     def energetic_difference(self, minimized_pdb_paths,
                              output_name='energies'):
         """
