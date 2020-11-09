@@ -216,13 +216,18 @@ class MinimizationBenchmark(object):
                                                                  output_path,
                                                                  seed)
 
+            if 'openff' in self.forcefield.lower():
+                forcefield_name = 'OpenForceField'
+            else:
+                forcefield_name = 'OPLS2005'
+
             # Runs a PELE Minimization
             pele_minimization = PELEMinimization(
                 PELE_exec=self.PELE_exec,
                 PELE_src=self.PELE_src,
                 PELE_license=self.PELE_license,
                 output_path=output_path,
-                forcefield=self.forcefield)
+                forcefield=forcefield_name)
             output_file = pele_minimization.run(
                 mol, output_file='PELE_output.txt',
                 pdb_path=distorted_molecule_path)
