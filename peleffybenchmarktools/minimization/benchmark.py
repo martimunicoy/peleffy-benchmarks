@@ -131,7 +131,7 @@ class MinimizationBenchmark(object):
 
             distorter = DistortBonds(mol, seed)
             distorted_mol = distorter.randomly(self.range_for_bonds)
-            mol.rdkit_molecule = distorted_mol
+            mol._rdkit_molecule = distorted_mol
 
         if self.distort_torsions:
             from peleffybenchmarktools.structure import DistortAngles
@@ -140,7 +140,7 @@ class MinimizationBenchmark(object):
                 seed += 1
             distorter = DistortAngles(mol, seed)
             distorted_mol = distorter.randomly(self.range_for_torsions)
-            mol.rdkit_molecule = distorted_mol
+            mol._rdkit_molecule = distorted_mol
 
         if self.distort_dihedrals:
             from peleffybenchmarktools.structure import DistortDihedrals
@@ -152,8 +152,8 @@ class MinimizationBenchmark(object):
 
         from rdkit import Chem
         import os
-        os.makedirs(os.path.join(self.output_path, mol.name), exist_ok=True)
-        output_file = os.path.join(self.output_path, mol.name,
+        os.makedirs(os.path.join(output_path, mol.name), exist_ok=True)
+        output_file = os.path.join(output_path, mol.name,
                                    'perturbed.pdb')
         Chem.rdmolfiles.MolToPDBFile(distorted_mol, output_file)
 
