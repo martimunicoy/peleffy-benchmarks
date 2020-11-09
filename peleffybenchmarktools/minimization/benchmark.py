@@ -606,7 +606,7 @@ class MinimizationBenchmark(object):
             rdkit_mol1 = mol1.rdkit_molecule
             conformer1 = rdkit_mol1.GetConformer()
 
-            mol2 = Molecule(pdb_file2)
+            mol2 = Molecule(pdb_file2, connectivity_template=rdkit_mol1)
             rdkit_mol2 = mol2.rdkit_molecule
             conformer2 = rdkit_mol2.GetConformer()
 
@@ -677,7 +677,7 @@ class MinimizationBenchmark(object):
         with Pool(self.n_proc) as pool:
             results = list(tqdm(pool.imap(self._get_bond_differences,
                                           links.items()),
-                                total=len(links.items())))
+                                total=len(links)))
 
         for idx, mean_difference in zip(links, results):
             if mean_difference is None:
