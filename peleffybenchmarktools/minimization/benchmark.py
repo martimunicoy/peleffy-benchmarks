@@ -16,7 +16,7 @@ class MinimizationBenchmark(object):
                  forcefield='openff_unconstrained-1.3.0.offxml',
                  charge_method=None,
                  distort_bonds=False, range_for_bonds=0.5,
-                 distort_angles=False, range_for_angles=20,
+                 distort_torsions=False, range_for_torsions=20,
                  distort_dihedrals=False, range_for_dihedrals=20):
         """
         It initializes a MinimizationBenchmark object.
@@ -94,13 +94,14 @@ class MinimizationBenchmark(object):
         self.forcefield = forcefield
         self.charge_method = charge_method
         self.distort_bonds = distort_bonds
-        self.distort_angles = distort_angles
+        self.distort_torsions = distort_torsions
         self.distort_dihedrals = distort_dihedrals
         self.range_for_bonds = range_for_bonds
-        self.range_for_angles = range_for_angles
+        self.range_for_torsions = range_for_torsions
         self.range_for_dihedrals = range_for_dihedrals
 
-    def _distort_molecule(self, molecule_to_distort, output_path):
+    def _distort_molecule(self, molecule_to_distort, output_path,
+                          seed):
         """
         It distorts the input molecule, according to the supplied
         distortion settings.
@@ -111,6 +112,8 @@ class MinimizationBenchmark(object):
             The molecule to distort
         output_path : str
             The path used as output in the benchmark
+        seed : int
+            Seed for the pseudo-random generator
 
         Returns
         -------
@@ -126,21 +129,21 @@ class MinimizationBenchmark(object):
         if self.distort_bonds:
             from peleffybenchmarktools.structure import DistortBonds
 
-            distorter = DistortBonds(mol)
+            distorter = DistortBonds(mol, seed)
             distorted_mol = distorter.randomly(self.range_for_bonds)
             mol.rdkit_molecule = distorted_mol
 
         if self.distort_torsions:
             from peleffybenchmarktools.structure import DistortAngles
 
-            distorter = DistortAngles(mol)
+            distorter = DistortAngles(mol, seed + 1)
             distorted_mol = distorter.randomly(self.range_for_torsions)
             mol.rdkit_molecule = distorted_mol
 
         if self.distort_dihedrals:
             from peleffybenchmarktools.structure import DistortDihedrals
 
-            distorter = DistortDihedrals(mol)
+            distorter = DistortDihedrals(mol, seed + 2)
             distorted_mol = distorter.randomly(self.range_for_dihedrals)
 
         from rdkit import Chem
@@ -151,7 +154,7 @@ class MinimizationBenchmark(object):
 
         return output_file
 
-    def _get_molecule_minimized(self, output_path, pdb_path):
+    def _get_molecule_minimized(self, output_path, pdb_path, seed=None):
         """
         It minimized the molecule using PELE's minimization.
 
@@ -161,6 +164,8 @@ class MinimizationBenchmark(object):
             The path where to run the PELE simulation and save the output
         pdb_path : str
             The path to the PDB of the molecule to minimize
+        seed : int
+            Seed for the pseudo-random generator. Default is None
 
         Returns
         -------
@@ -183,7 +188,8 @@ class MinimizationBenchmark(object):
             if (self.distort_bonds or self.distort_angles
                     or self.distort_dihedrals):
                 distorted_molecule_path = self._distort_molecule(mol,
-                                                                 output_path)
+                                                                 output_path,
+                                                                 seed)
 
             # Runs a PELE Minimization
             pele_minimization = PELEMinimization(
