@@ -742,11 +742,11 @@ class MinimizationBenchmark(object):
                 idx2 = angle.atom2_idx
                 idx3 = angle.atom3_idx
 
-            if rdkit_mol1.GetBondBetweenAtoms(idx1, idx2).IsInRing():
-                continue
+                if rdkit_mol1.GetBondBetweenAtoms(idx1, idx2).IsInRing():
+                    continue
 
-            if rdkit_mol1.GetBondBetweenAtoms(idx2, idx3).IsInRing():
-                continue
+                if rdkit_mol1.GetBondBetweenAtoms(idx2, idx3).IsInRing():
+                    continue
 
                 angle1 = rdMolTransforms.GetAngleDeg(conformer1,
                                                      idx1, idx2, idx3)
