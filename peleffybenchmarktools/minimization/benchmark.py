@@ -21,7 +21,8 @@ class MinimizationBenchmark(object):
                  random_distort=False,
                  bond_constants_factor=1.0,
                  torsion_constants_factor=1.0,
-                 dihedral_constants_factor=1.0):
+                 dihedral_constants_factor=1.0,
+                 force_parameterization=False):
         """
         It initializes a MinimizationBenchmark object.
 
@@ -72,6 +73,10 @@ class MinimizationBenchmark(object):
             The factor to customize torsion force constants. Default is 1.0
         dihedral_constants_factor : float
             The factor to customize dihedral force constants. Default is 1.0
+        force_parameterization : bool
+            In case the template of a molecule already exists, its
+            parameterization will be skipped unless force_parameterization
+            is set to true. Default is False
 
         Examples:
         ----------
@@ -115,6 +120,7 @@ class MinimizationBenchmark(object):
         self.bond_constants_factor = bond_constants_factor
         self.torsion_constants_factor = torsion_constants_factor
         self.dihedral_constants_factor = dihedral_constants_factor
+        self.force_parameterization = force_parameterization
 
     def _distort_molecule(self, molecule_to_distort, output_path,
                           seed):
@@ -216,8 +222,12 @@ class MinimizationBenchmark(object):
         # Load and parameterize the molecule
         try:
             mol = Molecule(pdb_path)
-            mol.parameterize(self.forcefield,
-                             charge_method=self.charge_method)
+            if (not os.path.exists(os.path.join(output_path,
+                                                mol.name,
+                                                'DataLocal'))
+                    or self.force_parameterization):
+                mol.parameterize(self.forcefield,
+                                 charge_method=self.charge_method)
 
             # Distort molecule, if it is the case
             distorted_molecule_path = None
