@@ -317,38 +317,48 @@ class MinimizationBenchmark(object):
         from simtk.openmm.app import PDBFile
         from simtk import openmm, unit
 
-        smiles_tag = smiles_tags_by_index[index]
-        pdb_path = pdb_paths_by_index[index]
+        try:
+            smiles_tag = smiles_tags_by_index[index]
+            pdb_path = pdb_paths_by_index[index]
 
-        mol = Molecule.from_pdb_and_smiles(pdb_path, smiles_tag)
-        pdbfile = PDBFile(pdb_path)
+            mol = Molecule.from_pdb_and_smiles(pdb_path, smiles_tag)
+            pdbfile = PDBFile(pdb_path)
 
-        omm_topology = pdbfile.topology
-        off_topology = Topology.from_openmm(omm_topology, unique_molecules=[mol])
+            omm_topology = pdbfile.topology
+            off_topology = Topology.from_openmm(omm_topology,
+                                                unique_molecules=[mol])
 
-        forcefield = ForceField('openff_unconstrained-1.2.1.offxml')
+            forcefield = ForceField('openff_unconstrained-1.2.1.offxml')
 
-        system = forcefield.create_openmm_system(off_topology)
+            system = forcefield.create_openmm_system(off_topology)
 
-        time_step = 2 * unit.femtoseconds  # simulation timestep
-        temperature = 300 * unit.kelvin  # simulation temperature
-        friction = 1 / unit.picosecond  # collision rate
-        integrator = openmm.LangevinIntegrator(temperature, friction, time_step)
+            time_step = 2 * unit.femtoseconds  # simulation timestep
+            temperature = 300 * unit.kelvin  # simulation temperature
+            friction = 1 / unit.picosecond  # collision rate
+            integrator = openmm.LangevinIntegrator(temperature,
+                                                   friction, time_step)
 
-        simulation = openmm.app.Simulation(omm_topology, system, integrator)
+            simulation = openmm.app.Simulation(omm_topology, system, integrator)
 
-        positions = pdbfile.getPositions()
-        simulation.context.setPositions(positions)
+            positions = pdbfile.getPositions()
+            simulation.context.setPositions(positions)
 
-        simulation.minimizeEnergy()
+            simulation.minimizeEnergy()
 
-        with open(os.path.join(output_path,
-                               str(index + 1) + '.pdb'), 'w') as f:
-            f.write(
-                PDBFile.writeModel(
-                    simulation.topology,
-                    simulation.context.getState(
-                        getPositions=True).getPositions()))
+            output_file = os.path.join(output_path, str(index + 1) + '.pdb')
+
+            with open(output_file, 'w') as f:
+                PDBFile.writeModel(simulation.topology,
+                                   simulation.context.getState(
+                                       getPositions=True).getPositions(), f)
+
+            return output_file
+
+        except Exception as e:
+            print('Skipping minimization for molecule {}: '.format(pdb_path)
+                  + str(e))
+
+            return None
 
     def _parse_output_file(self, file):
         """
