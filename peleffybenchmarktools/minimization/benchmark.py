@@ -321,12 +321,6 @@ class MinimizationBenchmark(object):
             smiles_tag = smiles_tags_by_index[index]
             pdb_path = pdb_paths_by_index[index]
 
-            if (self.distort_bonds or self.distort_torsions
-                    or self.distort_dihedrals):
-                distorted_molecule_path = self._distort_molecule(mol,
-                                                                 output_path,
-                                                                 seed)
-
             mol = Molecule.from_pdb_and_smiles(pdb_path, smiles_tag)
             pdbfile = PDBFile(pdb_path)
 
