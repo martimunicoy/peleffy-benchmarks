@@ -231,7 +231,7 @@ class MinimizationBenchmark(object):
 
             output_handler = OutputPathHandler(
                 mol,
-                output_path=os.path.join(self.output_path, mol.name),
+                output_path=os.path.join(output_path, mol.name),
                 as_datalocal=True)
 
             impact_output_path = output_handler.get_impact_template_path()
