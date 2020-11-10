@@ -140,7 +140,7 @@ class PELEBaseJob(object):
                    link_path)
 
     def _generate_parameters(self, molecule, output_path,
-                             forcefield, charges_method,
+                             forcefield, charge_method,
                              force_parameterization):
         """
         It generates the parameters of the molecule (from the input_file)
@@ -155,12 +155,13 @@ class PELEBaseJob(object):
         forcefield : str
             The Open Force Field force field to generate the parameters
             with
-        charges_method : str
-            The charges method to calculate the partial charges with
+        charge_method : str
+            The charge method to calculate the partial charges with
         force_parameterization : bool
             If the molecule is already parameterized, do we need to
             force a new parameterization?
         """
+        import os
         import peleffy
         from peleffy.template import Impact
         from peleffy.solvent import OBC2
@@ -175,24 +176,29 @@ class PELEBaseJob(object):
         solvent_output_path = output_handler.get_solvent_template_path()
 
         # Generate rotamer library
-        rotamer_library = peleffy.topology.RotamerLibrary(molecule)
-        rotamer_library.to_file(rotamer_library_output_path)
+        if (force_parameterization
+                or not os.path.exist(rotamer_library_output_path)):
+            rotamer_library = peleffy.topology.RotamerLibrary(molecule)
+            rotamer_library.to_file(rotamer_library_output_path)
 
         # Generate parameters
-        if force_parameterization or not molecule.parameterized:
-            molecule.parameterize(forcefield, charges_method=charges_method)
+        if (force_parameterization
+                or os.path.exist(impact_output_path)
+                or os.path.exist(solvent_output_path)):
+            if (force_parameterization or not molecule.parameterized):
+                molecule.parameterize(forcefield, charge_method=charge_method)
 
-        # Save template file
-        impact = Impact(molecule)
-        impact.write(impact_output_path)
+            # Save template file
+            impact = Impact(molecule)
+            impact.write(impact_output_path)
 
-        # Generate solvent parameters
-        solvent = OBC2(molecule)
-        solvent.to_json_file(solvent_output_path)
+            # Generate solvent parameters
+            solvent = OBC2(molecule)
+            solvent.to_json_file(solvent_output_path)
 
     def run(self, molecule, pdb_path=None,
             forcefield='openff_unconstrained-1.2.0.offxml',
-            charges_method='am1bcc',
+            charge_method='am1bcc',
             force_parameterization=False,
             output_file='PELE_output.txt'):
         """
@@ -208,7 +214,7 @@ class PELEBaseJob(object):
         forcefield : str
             The Open Force Field force field to generate the parameters
             with. Default is 'openff_unconstrained-1.2.0.offxml'
-        charges_method : str
+        charge_method : str
             The charges method to calculate the partial charges with.
             Default is 'am1bcc'
         force_parameterization : bool
@@ -236,7 +242,7 @@ class PELEBaseJob(object):
             self._link_folders(output_path)
 
             self._generate_parameters(molecule, output_path,
-                                      forcefield, charges_method,
+                                      forcefield, charge_method,
                                       force_parameterization)
 
             if pdb_path is None:

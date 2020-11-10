@@ -218,16 +218,29 @@ class MinimizationBenchmark(object):
         import os
         from peleffy.topology import Molecule
         from peleffybenchmarktools.utils.pele import PELEMinimization
+        from peleffy.utils import OutputPathHandler
+        from peleffy.forcefield import ForceFieldSelector
 
         # Load and parameterize the molecule
         try:
             mol = Molecule(pdb_path)
-            if (not os.path.exists(os.path.join(output_path,
-                                                mol.name,
-                                                'DataLocal'))
+            ff_selector = ForceFieldSelector()
+            forcefield = ff_selector.get_by_name(self.forcefield)
+            mol.set_forcefield(forcefield)
+
+            output_handler = OutputPathHandler(
+                mol,
+                output_path=os.path.join(self.output_path, mol.name),
+                as_datalocal=True)
+
+            impact_output_path = output_handler.get_impact_template_path()
+            solvent_output_path = output_handler.get_solvent_template_path()
+
+            if (not os.path.exists(impact_output_path)
+                    or not os.path.exists(solvent_output_path)
                     or self.force_parameterization):
-                mol.parameterize(self.forcefield,
-                                 charge_method=self.charge_method)
+                mol.parameterize(charge_method=self.charge_method)
+                self._apply_parameter_factors(mol)
 
             # Distort molecule, if it is the case
             distorted_molecule_path = None
@@ -251,7 +264,10 @@ class MinimizationBenchmark(object):
                 forcefield=forcefield_name)
             output_file = pele_minimization.run(
                 mol, output_file='PELE_output.txt',
-                pdb_path=distorted_molecule_path)
+                pdb_path=distorted_molecule_path,
+                force_parameterization=False,
+                forcefield=self.forcefield,
+                charge_method=self.charge_method)
 
             # Return not the path to the PELE output file but the path to
             # the PELE minimized PDB file
@@ -652,8 +668,6 @@ class MinimizationBenchmark(object):
             conformer2 = Chem.rdmolfiles.MolFromPDBFile(
                 pdb_file2, proximityBonding=False,
                 removeHs=False).GetConformer()
-
-            self._apply_parameter_factors(mol1)
 
             bond_differences = []
 
