@@ -284,9 +284,10 @@ class MinimizationBenchmark(object):
 
             return None
 
-    def _get_molecule_minimized_with_openmm(self, output_path, pdb_paths,
-                                            smiles_tags, index,
-                                            seed=None):
+    def _get_molecule_minimized_with_openmm(self, output_path,
+                                            pdb_paths_by_index,
+                                            smiles_tags_by_index,
+                                            index, seed=None):
         """
         It minimizes the molecule using OpenMM's minimization.
 
@@ -294,10 +295,10 @@ class MinimizationBenchmark(object):
         ----------
         output_path : str
             The path where to run the PELE simulation and save the output
-        pdb_paths : list[str]
-            The list of paths to the PDBs of the molecules to minimize
-        smiles_tags : list[str]
-            The list of smiles tags of the molecules to minimize
+        pdb_paths_by_index : dict[int, str]
+            The dictionary of paths to the PDBs keyed by molecule index
+        smiles_tags_by_index : dict[int, str]
+            The dictionary of smiles tags keyed by molecule index
         index : int
             The index that belongs to the molecule that is going to be
             minimized in the current iteration
@@ -316,8 +317,8 @@ class MinimizationBenchmark(object):
         from simtk.openmm.app import PDBFile
         from simtk import openmm, unit
 
-        smiles_tag = smiles_tags[index]
-        pdb_path = pdb_paths[index]
+        smiles_tag = smiles_tags_by_index[index]
+        pdb_path = pdb_paths_by_index[index]
 
         mol = Molecule.from_pdb_and_smiles(pdb_path, smiles_tag)
         pdbfile = PDBFile(pdb_path)
@@ -563,11 +564,17 @@ class MinimizationBenchmark(object):
                        for item in
                        list(qcportal.get_data('OpenFF Optimization Set 1',
                                               'OptimizationDataset').values())]
-        parallel_function = partial(self._get_molecule_minimized_with_openmm,
-                                    current_output, pdb_paths, smiles_tags)
 
         pdb_indexes = [int(os.path.splitext(os.path.basename(pdb_path))[0])
                        for pdb_path in pdb_paths]
+
+        pdb_paths_by_index = dict(zip(pdb_indexes, pdb_paths))
+
+        smiles_tags_by_index = dict(zip(pdb_indexes, smiles_tags))
+
+        parallel_function = partial(self._get_molecule_minimized_with_openmm,
+                                    current_output, pdb_paths_by_index,
+                                    smiles_tags_by_index)
 
         # Loads the molecules from the Dataset and runs a PELEMinimization
         print(' - Minimizing molecules')
