@@ -286,11 +286,18 @@ class DistortDihedrals(_DistortionWrapper):
         rdkit_mol = deepcopy(self._original_mol.rdkit_molecule)
         conformer = rdkit_mol.GetConformer()
 
+        already_visited = set()
+
         for proper in self._original_mol.propers:
             idx1 = proper.atom1_idx
             idx2 = proper.atom2_idx
             idx3 = proper.atom3_idx
             idx4 = proper.atom4_idx
+            if (idx2, idx3) in already_visited:
+                 continue
+            else:
+                already_visited.add((idx2, idx3))
+                already_visited.add((idx3, idx2))
 
             if rdkit_mol.GetBondBetweenAtoms(idx2, idx3).IsInRing():
                 continue
@@ -298,6 +305,11 @@ class DistortDihedrals(_DistortionWrapper):
             proper_angle = rdMolTransforms.GetDihedralDeg(conformer,
                                                           idx1, idx2,
                                                           idx3, idx4)
+
+            if proper_angle < 0:
+                proper_angle += 360
+            if proper_angle >= 360:
+                proper_angle -= 360
 
             proper_delta = value
 

@@ -973,6 +973,7 @@ class MinimizationBenchmark(object):
                 pdb_file2, proximityBonding=False,
                 removeHs=False).GetConformer()
 
+            already_visited = set()
             dihedral_differences = []
 
             for dihedral in mol1.propers:
@@ -980,6 +981,11 @@ class MinimizationBenchmark(object):
                 idx2 = dihedral.atom2_idx
                 idx3 = dihedral.atom3_idx
                 idx4 = dihedral.atom4_idx
+                if (idx2, idx3) in already_visited:
+                    continue
+                else:
+                    already_visited.add((idx2, idx3))
+                    already_visited.add((idx3, idx2))
 
                 if rdkit_mol1.GetBondBetweenAtoms(idx2, idx3).IsInRing():
                     continue
@@ -994,10 +1000,16 @@ class MinimizationBenchmark(object):
 
                 if dihedral1 < 0:
                     dihedral1 += 360
+                if dihedral1 >= 360:
+                    dihedral1 -= 360
                 if dihedral2 < 0:
                     dihedral2 += 360
+                if dihedral2 >= 360:
+                    dihedral2 -= 360
 
-                dihedral_differences.append(abs(dihedral1 - dihedral2))
+                dihedral_differences.append(min([abs(dihedral1 - dihedral2),
+                                                 abs(dihedral1 + 360 - dihedral2),
+                                                 abs(dihedral1 - dihedral2 - 360)]))
 
             if len(dihedral_differences) > 0:
                 mean_difference = np.mean(dihedral_differences)
