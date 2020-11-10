@@ -220,6 +220,7 @@ class MinimizationBenchmark(object):
         from peleffybenchmarktools.utils.pele import PELEMinimization
         from peleffy.utils import OutputPathHandler
         from peleffy.forcefield import ForceFieldSelector
+        import shutil
 
         # Load and parameterize the molecule
         try:
@@ -241,6 +242,8 @@ class MinimizationBenchmark(object):
                     or self.force_parameterization):
                 mol.parameterize(charge_method=self.charge_method)
                 self._apply_parameter_factors(mol)
+                shutil.rmtree(impact_output_path)
+                shutil.rmtree(solvent_output_path)
 
             # Distort molecule, if it is the case
             distorted_molecule_path = None
