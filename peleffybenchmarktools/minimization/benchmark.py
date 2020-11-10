@@ -566,11 +566,14 @@ class MinimizationBenchmark(object):
         parallel_function = partial(self._get_molecule_minimized_with_openmm,
                                     current_output, pdb_paths, smiles_tags)
 
+        pdb_indexes = [int(os.path.splitext(os.path.basename(pdb_path))[0])
+                       for pdb_path in pdb_paths]
+
         # Loads the molecules from the Dataset and runs a PELEMinimization
         print(' - Minimizing molecules')
         with Pool(self.n_proc) as pool:
             min_pdb_paths = list(tqdm(pool.imap(parallel_function,
-                                                range(0, len(pdb_paths))),
+                                                pdb_indexes),
                                       total=len(pdb_paths)))
 
         # Filter out None pdb paths that belong to failing builds
