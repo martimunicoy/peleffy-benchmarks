@@ -198,7 +198,7 @@ class MinimizationBenchmark(object):
 
     def _get_molecule_minimized(self, output_path, pdb_path, seed=None):
         """
-        It minimized the molecule using PELE's minimization.
+        It minimizes the molecule using PELE's minimization.
 
         Parameters
         ----------
@@ -283,6 +283,70 @@ class MinimizationBenchmark(object):
                   + str(e))
 
             return None
+
+    def _get_molecule_minimized_with_openmm(self, output_path, pdb_paths,
+                                            smiles_tags, index,
+                                            seed=None):
+        """
+        It minimizes the molecule using OpenMM's minimization.
+
+        Parameters
+        ----------
+        output_path : str
+            The path where to run the PELE simulation and save the output
+        pdb_paths : list[str]
+            The list of paths to the PDBs of the molecules to minimize
+        smiles_tags : list[str]
+            The list of smiles tags of the molecules to minimize
+        index : int
+            The index that belongs to the molecule that is going to be
+            minimized in the current iteration
+        seed : int
+            Seed for the pseudo-random generator. Default is None
+
+        Returns
+        -------
+        output_file : str
+            The path to the PELE minimized PDB file. It is None if PELE
+            exits with a non-zero code
+        """
+        import os
+        from openforcefield.topology import Molecule, Topology
+        from openforcefield.typing.engines.smirnoff import ForceField
+        from simtk.openmm.app import PDBFile
+        from simtk import openmm, unit
+
+        smiles_tag = smiles_tags[index]
+        pdb_path = pdb_paths[index]
+
+        mol = Molecule.from_pdb_and_smiles(pdb_path, smiles_tag)
+        pdbfile = PDBFile(pdb_path)
+
+        omm_topology = pdbfile.topology
+        off_topology = Topology.from_openmm(omm_topology, unique_molecules=[mol])
+
+        forcefield = ForceField('openff_unconstrained-1.2.1.offxml')
+
+        system = forcefield.create_openmm_system(off_topology)
+
+        time_step = 2 * unit.femtoseconds  # simulation timestep
+        temperature = 300 * unit.kelvin  # simulation temperature
+        friction = 1 / unit.picosecond  # collision rate
+        integrator = openmm.LangevinIntegrator(temperature, friction, time_step)
+
+        simulation = openmm.app.Simulation(omm_topology, system, integrator)
+
+        positions = pdbfile.getPositions()
+        simulation.context.setPositions(positions)
+
+        simulation.minimizeEnergy()
+
+        with open(os.path.join(output_path, str(index + 1) + '.pdb')) as f:
+            f.write(
+                PDBFile.writeModel(
+                    simulation.topology,
+                    simulation.context.getState(
+                        getPositions=True).getPositions()))
 
     def _parse_output_file(self, file):
         """
@@ -488,18 +552,23 @@ class MinimizationBenchmark(object):
         from multiprocessing import Pool
         from tqdm import tqdm
         from functools import partial
+        from peleffybenchmarktools.utils import QCPortal
 
         # Handles output paths
-        current_output = os.path.join(os.getcwd(), self.output_path, 'PELE')
+        current_output = os.path.join(os.getcwd(), self.output_path, 'OpenMM')
         os.makedirs(current_output, exist_ok=True)
 
-        parallel_function = partial(self._get_molecule_minimized,
-                                    current_output)
+        qcportal = QCPortal()
+        smiles_tags = list(qcportal.get_data(self.dataset_name,
+                                             'OptimizationDataset').values())
+        parallel_function = partial(self._get_molecule_minimized_with_openmm,
+                                    current_output, pdb_paths, smiles_tags)
 
         # Loads the molecules from the Dataset and runs a PELEMinimization
         print(' - Minimizing molecules')
         with Pool(self.n_proc) as pool:
-            min_pdb_paths = list(tqdm(pool.imap(parallel_function, pdb_paths),
+            min_pdb_paths = list(tqdm(pool.imap(parallel_function,
+                                                range(0, len(pdb_paths))),
                                       total=len(pdb_paths)))
 
         # Filter out None pdb paths that belong to failing builds
