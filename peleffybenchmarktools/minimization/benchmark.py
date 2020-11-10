@@ -18,7 +18,10 @@ class MinimizationBenchmark(object):
                  distort_bonds=False, distort_value_for_bonds=0.5,
                  distort_torsions=False, distort_value_for_torsions=20,
                  distort_dihedrals=False, distort_value_for_dihedrals=20,
-                 random_distort=False):
+                 random_distort=False,
+                 bond_constants_factor=1.0,
+                 torsion_constants_factor=1.0,
+                 dihedral_constants_factor=1.0):
         """
         It initializes a MinimizationBenchmark object.
 
@@ -63,7 +66,12 @@ class MinimizationBenchmark(object):
         random_distort : bool
             Whether to apply a random distort or a fixed one. Default is
             False
-
+        bond_constants_factor : float
+            The factor to customize bond force constants. Default is 1.0
+        torsion_constants_factor : float
+            The factor to customize torsion force constants. Default is 1.0
+        dihedral_constants_factor : float
+            The factor to customize dihedral force constants. Default is 1.0
 
         Examples:
         ----------
@@ -104,6 +112,9 @@ class MinimizationBenchmark(object):
         self.distort_value_for_torsions = distort_value_for_torsions
         self.distort_value_for_dihedrals = distort_value_for_dihedrals
         self.random_distort = random_distort
+        self.bond_constants_factor = bond_constants_factor
+        self.torsion_constants_factor = torsion_constants_factor
+        self.dihedral_constants_factor = dihedral_constants_factor
 
     def _distort_molecule(self, molecule_to_distort, output_path,
                           seed):
@@ -577,6 +588,27 @@ class MinimizationBenchmark(object):
         plt.savefig(os.path.join(self.output_path,
                                  '{}.png'.format(output_name)))
 
+    def _apply_parameter_factors(self, mol):
+        """
+        It applies the parameter factors to the molecule.
+
+        Parameters
+        ----------
+        mol : an peleffy.topology.Molecule object
+            The molecule whose parameters will be customized
+        """
+        if self.bond_constants_factor != 1.0:
+            for bond in mol.bonds:
+                bond.spring_constant *= self.bond_constants_factor
+
+        if self.torsion_constants_factor != 1.0:
+            for torsion in mol.angles:
+                torsion.spring_constant *= self.torsion_constants_factor
+
+        if self.dihedral_constants_factor != 1.0:
+            for dihedral in mol.propers:
+                dihedral.constant *= self.dihedral_constants_factor
+
     def _get_bond_differences(self, data):
         """
         It calculates the mean bond differences of each linked pair of
@@ -610,6 +642,8 @@ class MinimizationBenchmark(object):
             conformer2 = Chem.rdmolfiles.MolFromPDBFile(
                 pdb_file2, proximityBonding=False,
                 removeHs=False).GetConformer()
+
+            self._apply_parameter_factors(mol1)
 
             bond_differences = []
 
