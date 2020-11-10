@@ -321,6 +321,12 @@ class MinimizationBenchmark(object):
             smiles_tag = smiles_tags_by_index[index]
             pdb_path = pdb_paths_by_index[index]
 
+            if (self.distort_bonds or self.distort_torsions
+                    or self.distort_dihedrals):
+                distorted_molecule_path = self._distort_molecule(mol,
+                                                                 output_path,
+                                                                 seed)
+
             mol = Molecule.from_pdb_and_smiles(pdb_path, smiles_tag)
             pdbfile = PDBFile(pdb_path)
 
@@ -345,7 +351,7 @@ class MinimizationBenchmark(object):
 
             simulation.minimizeEnergy()
 
-            output_file = os.path.join(output_path, str(index + 1) + '.pdb')
+            output_file = os.path.join(output_path, str(index) + '.pdb')
 
             with open(output_file, 'w') as f:
                 PDBFile.writeModel(simulation.topology,
@@ -570,6 +576,7 @@ class MinimizationBenchmark(object):
         current_output = os.path.join(os.getcwd(), self.output_path, 'OpenMM')
         os.makedirs(current_output, exist_ok=True)
 
+        print(' - Retrieving smiles tags')
         qcportal = QCPortal()
         smiles_tags = [item['canonical_isomeric_explicit_hydrogen_smiles']
                        for item in
