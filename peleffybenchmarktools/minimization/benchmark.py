@@ -545,7 +545,7 @@ class MinimizationBenchmark(object):
 
         return min_pdb_paths
 
-    def minimize_structures_with_openmm(self, pdb_paths):
+    def minimize_structures_with_openmm(self, pdb_paths, labeling='file'):
         """
         It runs an OpenMM minimization for each of the PDB files from the
         the supplied list.
@@ -566,6 +566,10 @@ class MinimizationBenchmark(object):
         from functools import partial
         from peleffybenchmarktools.utils import QCPortal
 
+        # Check parameters
+        if labeling not in ['file', 'folder']:
+            raise NameError('Wrong selected labeling: ' + labeling)
+
         # Handles output paths
         current_output = os.path.join(os.getcwd(), self.output_path, 'OpenMM')
         os.makedirs(current_output, exist_ok=True)
@@ -577,8 +581,12 @@ class MinimizationBenchmark(object):
                        list(qcportal.get_data('OpenFF Optimization Set 1',
                                               'OptimizationDataset').values())]
 
-        pdb_indexes = [int(os.path.splitext(os.path.basename(pdb_path))[0])
-                       for pdb_path in pdb_paths]
+        if labeling == 'file':
+            pdb_indexes = [int(os.path.splitext(os.path.basename(pdb_path))[0])
+                           for pdb_path in pdb_paths]
+        else:
+            pdb_indexes = [int(os.path.basename(os.path.dirname(pdb_path)))
+                           for pdb_path in pdb_paths]
 
         pdb_paths_by_index = dict(zip(pdb_indexes, pdb_paths))
 
