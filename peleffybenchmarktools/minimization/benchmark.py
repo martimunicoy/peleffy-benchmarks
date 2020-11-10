@@ -342,7 +342,8 @@ class MinimizationBenchmark(object):
 
         simulation.minimizeEnergy()
 
-        with open(os.path.join(output_path, str(index + 1) + '.pdb')) as f:
+        with open(os.path.join(output_path,
+                               str(index + 1) + '.pdb'), 'w') as f:
             f.write(
                 PDBFile.writeModel(
                     simulation.topology,
