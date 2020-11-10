@@ -177,14 +177,14 @@ class PELEBaseJob(object):
 
         # Generate rotamer library
         if (force_parameterization
-                or not os.path.exist(rotamer_library_output_path)):
+                or not os.path.exists(rotamer_library_output_path)):
             rotamer_library = peleffy.topology.RotamerLibrary(molecule)
             rotamer_library.to_file(rotamer_library_output_path)
 
         # Generate parameters
         if (force_parameterization
-                or os.path.exist(impact_output_path)
-                or os.path.exist(solvent_output_path)):
+                or os.path.exists(impact_output_path)
+                or os.path.exists(solvent_output_path)):
             if (force_parameterization or not molecule.parameterized):
                 molecule.parameterize(forcefield, charge_method=charge_method)
 
