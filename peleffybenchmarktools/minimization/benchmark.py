@@ -625,15 +625,15 @@ class MinimizationBenchmark(object):
         """
         if self.bond_constants_factor != 1.0:
             for bond in mol.bonds:
-                bond.spring_constant *= self.bond_constants_factor
+                bond._spring_constant *= self.bond_constants_factor
 
         if self.torsion_constants_factor != 1.0:
             for torsion in mol.angles:
-                torsion.spring_constant *= self.torsion_constants_factor
+                torsion._spring_constant *= self.torsion_constants_factor
 
         if self.dihedral_constants_factor != 1.0:
             for dihedral in mol.propers:
-                dihedral.constant *= self.dihedral_constants_factor
+                dihedral._constant *= self.dihedral_constants_factor
 
     def _get_bond_differences(self, data):
         """
