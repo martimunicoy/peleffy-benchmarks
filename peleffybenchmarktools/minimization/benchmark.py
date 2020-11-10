@@ -559,8 +559,10 @@ class MinimizationBenchmark(object):
         os.makedirs(current_output, exist_ok=True)
 
         qcportal = QCPortal()
-        smiles_tags = list(qcportal.get_data(self.dataset_name,
-                                             'OptimizationDataset').values())
+        smiles_tags = [item['canonical_isomeric_explicit_hydrogen_smiles']
+                       for item in
+                       list(qcportal.get_data('OpenFF Optimization Set 1',
+                                              'OptimizationDataset').values())]
         parallel_function = partial(self._get_molecule_minimized_with_openmm,
                                     current_output, pdb_paths, smiles_tags)
 
