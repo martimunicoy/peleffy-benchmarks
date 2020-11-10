@@ -570,7 +570,7 @@ class MinimizationBenchmark(object):
 
         pdb_paths_by_index = dict(zip(pdb_indexes, pdb_paths))
 
-        smiles_tags_by_index = dict(zip(pdb_indexes, smiles_tags))
+        smiles_tags_by_index = dict(enumerate(smiles_tags, start=1))
 
         parallel_function = partial(self._get_molecule_minimized_with_openmm,
                                     current_output, pdb_paths_by_index,
