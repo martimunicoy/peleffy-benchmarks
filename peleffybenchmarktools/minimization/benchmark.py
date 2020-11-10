@@ -469,6 +469,44 @@ class MinimizationBenchmark(object):
 
         return min_pdb_paths
 
+    def minimize_structures_with_openmm(self, pdb_paths):
+        """
+        It runs an OpenMM minimization for each of the PDB files from the
+        the supplied list.
+
+        Parameters
+        ----------
+        pdb_paths : list[str]
+            The list containing the paths to generated PDB files
+
+        Returns
+        -------
+        minimization_paths : list[str]
+            The list containing the minimized PDB files.
+        """
+        import os
+        from multiprocessing import Pool
+        from tqdm import tqdm
+        from functools import partial
+
+        # Handles output paths
+        current_output = os.path.join(os.getcwd(), self.output_path, 'PELE')
+        os.makedirs(current_output, exist_ok=True)
+
+        parallel_function = partial(self._get_molecule_minimized,
+                                    current_output)
+
+        # Loads the molecules from the Dataset and runs a PELEMinimization
+        print(' - Minimizing molecules')
+        with Pool(self.n_proc) as pool:
+            min_pdb_paths = list(tqdm(pool.imap(parallel_function, pdb_paths),
+                                      total=len(pdb_paths)))
+
+        # Filter out None pdb paths that belong to failing builds
+        min_pdb_paths = [p for p in min_pdb_paths if p is not None]
+
+        return min_pdb_paths
+
     def load_pdbs_from(self, search_path):
         """
         Given a path, it loads all the PDB files that it finds in it.
@@ -953,6 +991,11 @@ class MinimizationBenchmark(object):
                 dihedral2 = rdMolTransforms.GetDihedralDeg(conformer2,
                                                            idx1, idx2,
                                                            idx3, idx4)
+
+                if dihedral1 < 0:
+                    dihedral1 += 360
+                if dihedral2 < 0:
+                    dihedral2 += 360
 
                 dihedral_differences.append(abs(dihedral1 - dihedral2))
 
