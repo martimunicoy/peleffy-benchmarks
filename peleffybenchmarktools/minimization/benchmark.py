@@ -991,7 +991,8 @@ class MinimizationBenchmark(object):
 
     def compute_torsion_differences(self, paths_set1, paths_set2,
                                     labeling1='file', labeling2='file',
-                                    output_name='torsion_differences'):
+                                    output_name='torsion_differences',
+                                    range=None):
         """
         For a collection of structures stored in two sets, it saves a
         CSV file with a dictionary of the torsion comparison between
@@ -1011,6 +1012,9 @@ class MinimizationBenchmark(object):
         output_name : str
             The name to use with the output files. Default is
             'torsion_differences'
+        range : tuple[float, float]
+            The range of values to display in the horizontal axis. Default
+            is None
         """
         import os
         import pandas as pd
@@ -1021,6 +1025,15 @@ class MinimizationBenchmark(object):
         # Find links between the PDB paths from each set
         links = self._link_pdb_paths(paths_set1, paths_set2, labeling1,
                                      labeling2)
+
+        # Verify supplied range
+        if range is not None:
+            if not isinstance(range, tuple) and not isinstance(range, list):
+                raise TypeError('Invalid range')
+            if (len(range) != 2
+                    or any([not isinstance(i, float)
+                            and not isinstance(i, int) for i in range])):
+                raise ValueError('Range must contain floats')
 
         # Computes the RMSD between PELE and QM minimized structures
         d = {}
@@ -1046,7 +1059,7 @@ class MinimizationBenchmark(object):
         # Plots an histogram of the computed RMSD values
         plt.figure(figsize=(7, 5))
         plt.hist(torsion_difference_means, bins=10, rwidth=0.8, align='mid',
-                 color='gray')
+                 range=range, color='gray')
         plt.xlabel('Mean torsion angle difference (degrees)')
         plt.ylabel('Frequency')
         plt.title('Structural Histogram')
@@ -1141,7 +1154,8 @@ class MinimizationBenchmark(object):
 
     def compute_dihedral_differences(self, paths_set1, paths_set2,
                                      labeling1='file', labeling2='file',
-                                     output_name='dihedral_differences'):
+                                     output_name='dihedral_differences',
+                                     range=None):
         """
         For a collection of structures stored in two sets, it saves a
         CSV file with a dictionary of the dihedral comparison between
@@ -1161,6 +1175,9 @@ class MinimizationBenchmark(object):
         output_name : str
             The name to use with the output files. Default is
             'dihedral_differences'
+        range : tuple[float, float]
+            The range of values to display in the horizontal axis. Default
+            is None
         """
         import os
         import pandas as pd
@@ -1171,6 +1188,15 @@ class MinimizationBenchmark(object):
         # Find links between the PDB paths from each set
         links = self._link_pdb_paths(paths_set1, paths_set2, labeling1,
                                      labeling2)
+
+        # Verify supplied range
+        if range is not None:
+            if not isinstance(range, tuple) and not isinstance(range, list):
+                raise TypeError('Invalid range')
+            if (len(range) != 2
+                    or any([not isinstance(i, float)
+                            and not isinstance(i, int) for i in range])):
+                raise ValueError('Range must contain floats')
 
         # Computes the RMSD between PELE and QM minimized structures
         d = {}
@@ -1196,7 +1222,7 @@ class MinimizationBenchmark(object):
         # Plots an histogram of the computed RMSD values
         plt.figure(figsize=(7, 5))
         plt.hist(dihedral_difference_means, bins=10, rwidth=0.8, align='mid',
-                 color='gray')
+                 range=range, color='gray')
         plt.xlabel('Mean dihedral angle difference (degrees)')
         plt.ylabel('Frequency')
         plt.title('Structural Histogram')
