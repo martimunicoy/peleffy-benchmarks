@@ -882,10 +882,11 @@ class MinimizationBenchmark(object):
 
         # Verify supplied range
         if range is not None:
-            if range is not tuple or range is not list:
+            if not isinstance(range, tuple) and not isinstance(range, list):
                 raise TypeError('Invalid range')
             if (len(range) != 2
-                    or any([not isinstance(i, float) for i in range])):
+                    or any([not isinstance(i, float)
+                            and not isinstance(i, int) for i in range])):
                 raise ValueError('Range must contain floats')
 
         # Computes the RMSD between PELE and QM minimized structures
