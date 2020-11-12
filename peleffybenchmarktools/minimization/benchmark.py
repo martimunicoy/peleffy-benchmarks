@@ -860,6 +860,7 @@ class MinimizationBenchmark(object):
             template = Molecule(pdb_template)
             template.parameterize('openff_unconstrained-1.2.1.offxml',
                                   charge_method='gasteiger')
+            template_mol = template.rdkit_molecule
 
             conformer1 = Chem.rdmolfiles.MolFromPDBFile(
                 pdb_file1, proximityBonding=False,
@@ -875,7 +876,7 @@ class MinimizationBenchmark(object):
                 idx1 = bond.atom1_idx
                 idx2 = bond.atom2_idx
 
-                if template.GetBondBetweenAtoms(idx1, idx2).IsInRing():
+                if template_mol.GetBondBetweenAtoms(idx1, idx2).IsInRing():
                     continue
 
                 bond1 = rdMolTransforms.GetBondLength(conformer1,
