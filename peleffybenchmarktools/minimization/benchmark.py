@@ -286,6 +286,7 @@ class MinimizationBenchmark(object):
 
     def _get_molecule_minimized_with_openmm(self, output_path,
                                             pdb_paths_by_index,
+                                            template_paths_by_index,
                                             smiles_tags_by_index,
                                             index, seed=None):
         """
@@ -297,6 +298,9 @@ class MinimizationBenchmark(object):
             The path where to run the PELE simulation and save the output
         pdb_paths_by_index : dict[int, str]
             The dictionary of paths to the PDBs keyed by molecule index
+        template_paths_by_index : dict[int, str]
+            The dictionary of paths to the PDB files to be used as
+            template, keyed by molecule index
         smiles_tags_by_index : dict[int, str]
             The dictionary of smiles tags keyed by molecule index
         index : int
@@ -321,8 +325,13 @@ class MinimizationBenchmark(object):
             smiles_tag = smiles_tags_by_index[index]
             pdb_path = pdb_paths_by_index[index]
 
-            mol = Molecule.from_pdb_and_smiles(pdb_path, smiles_tag)
-            pdbfile = PDBFile(pdb_path)
+            if template_paths_by_index is not None:
+                pdb_template = template_paths_by_index[index]
+            else:
+                pdb_template = pdb_path
+
+            mol = Molecule.from_pdb_and_smiles(pdb_template, smiles_tag)
+            pdbfile = PDBFile(pdb_template)
 
             omm_topology = pdbfile.topology
             off_topology = Topology.from_openmm(omm_topology,
@@ -545,7 +554,10 @@ class MinimizationBenchmark(object):
 
         return min_pdb_paths
 
-    def minimize_structures_with_openmm(self, pdb_paths, labeling='file'):
+    def minimize_structures_with_openmm(self, pdb_paths,
+                                        pdb_labeling='file',
+                                        template_paths=None,
+                                        template_labeling='file'):
         """
         It runs an OpenMM minimization for each of the PDB files from the
         the supplied list.
@@ -554,6 +566,16 @@ class MinimizationBenchmark(object):
         ----------
         pdb_paths : list[str]
             The list containing the paths to generated PDB files
+        pdb_labeling : str
+            The type of labeling corresponding to the paths to PDB files.
+            One of ['file', 'folder']. Default is 'file'
+        template_paths : list[str]
+            The list containing the paths to the PDB files to use as
+            templates. Default is None
+        template_labeling : str
+            The type of labeling corresponding to the paths to the
+            PDB template files. One of ['file', 'folder']. Default is
+            'file'
 
         Returns
         -------
@@ -567,8 +589,11 @@ class MinimizationBenchmark(object):
         from peleffybenchmarktools.utils import QCPortal
 
         # Check parameters
-        if labeling not in ['file', 'folder']:
-            raise NameError('Wrong selected labeling: ' + labeling)
+        if pdb_labeling not in ['file', 'folder']:
+            raise NameError('Wrong selected PDB labeling: ' + pdb_labeling)
+        if template_labeling not in ['file', 'folder']:
+            raise NameError('Wrong selected template labeling: '
+                            + template_labeling)
 
         # Handles output paths
         current_output = os.path.join(os.getcwd(), self.output_path, 'OpenMM')
@@ -581,7 +606,7 @@ class MinimizationBenchmark(object):
                        list(qcportal.get_data('OpenFF Optimization Set 1',
                                               'OptimizationDataset').values())]
 
-        if labeling == 'file':
+        if pdb_labeling == 'file':
             pdb_indexes = [int(os.path.splitext(os.path.basename(pdb_path))[0])
                            for pdb_path in pdb_paths]
         else:
@@ -592,8 +617,24 @@ class MinimizationBenchmark(object):
 
         smiles_tags_by_index = dict(enumerate(smiles_tags, start=1))
 
+        if template_paths is not None:
+            if template_labeling == 'file':
+                template_indexes = \
+                    [int(os.path.splitext(os.path.basename(pdb_path))[0])
+                     for pdb_path in template_paths]
+            else:
+                template_indexes = \
+                    [int(os.path.basename(os.path.dirname(pdb_path)))
+                     for pdb_path in template_paths]
+
+            pdb_templates_by_index = dict(zip(template_indexes,
+                                              template_paths))
+        else:
+            pdb_templates_by_index = None
+
         parallel_function = partial(self._get_molecule_minimized_with_openmm,
                                     current_output, pdb_paths_by_index,
+                                    pdb_templates_by_index,
                                     smiles_tags_by_index)
 
         # Loads the molecules from the Dataset and runs a PELEMinimization
