@@ -696,9 +696,10 @@ class MinimizationBenchmark(object):
 
         return links
 
-    def compute_RMSD(self, paths_set1, paths_set2,
+    def compute_RMSD(self, paths_set1, paths_set2, template_set=None,
                      labeling1='file', labeling2='file',
-                     output_name='rmsd', range=None):
+                     labeling_template='file', output_name='rmsd',
+                     range=None):
         """
         For a collection of structures stored in two sets, it saves a
         CSV file with a dictionary of the RMSD comparison between
@@ -711,10 +712,14 @@ class MinimizationBenchmark(object):
             The first set of PDB paths
         paths_set2 : list[str]
             The second set of PDB paths
+        template_set : list[str]
+            The set of PDB paths to be used as template
         labeling1 : str
             Labeling criteria for the first set. One of ['file', 'folder']
         labeling2 : str
             Labeling criteria for the first set. One of ['file', 'folder']
+        labeling_template : str
+            Labeling criteria for the template set. One of ['file', 'folder']
         output_name : str
             The name to use with the output files. Default is 'rmsd'
         range : tuple[float, float]
@@ -781,13 +786,18 @@ class MinimizationBenchmark(object):
             for dihedral in mol.propers:
                 dihedral._constant *= self.dihedral_constants_factor
 
-    def _get_bond_differences(self, data):
+    def _get_bond_differences(self, template_links, data):
         """
         It calculates the mean bond differences of each linked pair of
         PDB files.
 
         Parameters
         ----------
+        template_links : dict
+            The dictionary keyed with PDB indexes and the corresponding
+            pairing of PDB paths, the first PDB path of each pair is
+            used as a template to build the molecule representation
+            (since it contains information about the connectivity)
         data : tuple[int, tuple[str, str]]
             The data to compute the bond differences of a linked pair
 
@@ -803,13 +813,16 @@ class MinimizationBenchmark(object):
         from rdkit import Chem
 
         idx, (pdb_file1, pdb_file2) = data
+        pdb_template, _ = template_links[idx]
 
         try:
-            mol1 = Molecule(pdb_file1)
-            mol1.parameterize('openff_unconstrained-1.2.1.offxml',
-                              charge_method='gasteiger')
-            rdkit_mol1 = mol1.rdkit_molecule
-            conformer1 = rdkit_mol1.GetConformer()
+            template = Molecule(pdb_template)
+            template.parameterize('openff_unconstrained-1.2.1.offxml',
+                                  charge_method='gasteiger')
+
+            conformer1 = Chem.rdmolfiles.MolFromPDBFile(
+                pdb_file1, proximityBonding=False,
+                removeHs=False).GetConformer()
 
             conformer2 = Chem.rdmolfiles.MolFromPDBFile(
                 pdb_file2, proximityBonding=False,
@@ -817,11 +830,11 @@ class MinimizationBenchmark(object):
 
             bond_differences = []
 
-            for bond in mol1.bonds:
+            for bond in template.bonds:
                 idx1 = bond.atom1_idx
                 idx2 = bond.atom2_idx
 
-                if rdkit_mol1.GetBondBetweenAtoms(idx1, idx2).IsInRing():
+                if template.GetBondBetweenAtoms(idx1, idx2).IsInRing():
                     continue
 
                 bond1 = rdMolTransforms.GetBondLength(conformer1,
@@ -847,7 +860,8 @@ class MinimizationBenchmark(object):
             return None
 
     def compute_bond_differences(self, paths_set1, paths_set2,
-                                 labeling1='file', labeling2='file',
+                                 template_set=None, labeling1='file',
+                                 labeling2='file', labeling_template='file',
                                  output_name='bond_differences',
                                  range=None):
         """
@@ -875,6 +889,7 @@ class MinimizationBenchmark(object):
         """
         import os
         import pandas as pd
+        from functools import partial
         import matplotlib.pyplot as plt
         from multiprocessing import Pool
         from tqdm import tqdm
@@ -882,6 +897,18 @@ class MinimizationBenchmark(object):
         # Find links between the PDB paths from each set
         links = self._link_pdb_paths(paths_set1, paths_set2, labeling1,
                                      labeling2)
+
+        # Find links between the PDB paths from each set
+        if template_set is not None:
+            template_links = self._link_pdb_paths(template_set,
+                                                  paths_set1,
+                                                  labeling_template,
+                                                  labeling1)
+        else:
+            template_links = links
+
+        # Define the parallel function
+        parallel_f = partial(self._get_bond_differences, template_links)
 
         # Verify supplied range
         if range is not None:
@@ -896,8 +923,7 @@ class MinimizationBenchmark(object):
         d = {}
         bond_difference_means = []
         with Pool(self.n_proc) as pool:
-            results = list(tqdm(pool.imap(self._get_bond_differences,
-                                          links.items()),
+            results = list(tqdm(pool.imap(parallel_f, links.items()),
                                 total=len(links)))
 
         for idx, mean_difference in zip(links, results):
