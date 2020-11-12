@@ -698,7 +698,7 @@ class MinimizationBenchmark(object):
 
     def compute_RMSD(self, paths_set1, paths_set2,
                      labeling1='file', labeling2='file',
-                     output_name='rmsd'):
+                     output_name='rmsd', range=None):
         """
         For a collection of structures stored in two sets, it saves a
         CSV file with a dictionary of the RMSD comparison between
@@ -717,6 +717,9 @@ class MinimizationBenchmark(object):
             Labeling criteria for the first set. One of ['file', 'folder']
         output_name : str
             The name to use with the output files. Default is 'rmsd'
+        range : tuple[float, float]
+            The range of values to display in the horizontal axis. Default
+            is None
         """
         import os
         import mdtraj as md
@@ -750,7 +753,7 @@ class MinimizationBenchmark(object):
         # Plots an histogram of the computed RMSD values
         plt.figure(figsize=(7, 5))
         plt.hist(rmsd_results, bins=10, rwidth=0.8, align='mid',
-                 range=(0, 0.5), color='gray')
+                 range=range, color='gray')
         plt.xlabel('RMSD')
         plt.ylabel('Frequency')
         plt.title('Structural Histogram')
