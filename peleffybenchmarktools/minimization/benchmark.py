@@ -918,10 +918,14 @@ class MinimizationBenchmark(object):
             The first set of PDB paths
         paths_set2 : list[str]
             The second set of PDB paths
+        template_set : list[str]
+            The list of PDB files to use as template
         labeling1 : str
             Labeling criteria for the first set. One of ['file', 'folder']
         labeling2 : str
             Labeling criteria for the first set. One of ['file', 'folder']
+        labeling_template : str
+            Labeling criteria for the template set. One of ['file', 'folder']
         output_name : str
             The name to use with the output files. Default is
             'bond_differences'
@@ -991,13 +995,18 @@ class MinimizationBenchmark(object):
         plt.savefig(os.path.join(self.output_path,
                                  '{}.png'.format(output_name)))
 
-    def _get_torsion_differences(self, data):
+    def _get_torsion_differences(self, template_links, data):
         """
         It calculates the mean torsion differences of each linked pair of
         PDB files.
 
         Parameters
         ----------
+        template_links : dict
+            The dictionary keyed with PDB indexes and the corresponding
+            pairing of PDB paths, the first PDB path of each pair is
+            used as a template to build the molecule representation
+            (since it contains information about the connectivity)
         data : tuple[int, tuple[str, str]]
             The data to compute the torsion differences of a linked pair
 
@@ -1013,13 +1022,17 @@ class MinimizationBenchmark(object):
         from rdkit import Chem
 
         idx, (pdb_file1, pdb_file2) = data
+        pdb_template, _ = template_links[idx]
 
         try:
-            mol1 = Molecule(pdb_file1)
-            mol1.parameterize('openff_unconstrained-1.2.1.offxml',
-                              charge_method='gasteiger')
-            rdkit_mol1 = mol1.rdkit_molecule
-            conformer1 = rdkit_mol1.GetConformer()
+            template = Molecule(pdb_template)
+            template.parameterize('openff_unconstrained-1.2.1.offxml',
+                                  charge_method='gasteiger')
+            template_mol = template.rdkit_molecule
+
+            conformer1 = Chem.rdmolfiles.MolFromPDBFile(
+                pdb_file1, proximityBonding=False,
+                removeHs=False).GetConformer()
 
             conformer2 = Chem.rdmolfiles.MolFromPDBFile(
                 pdb_file2, proximityBonding=False,
@@ -1027,15 +1040,15 @@ class MinimizationBenchmark(object):
 
             torsion_differences = []
 
-            for angle in mol1.angles:
+            for angle in template.angles:
                 idx1 = angle.atom1_idx
                 idx2 = angle.atom2_idx
                 idx3 = angle.atom3_idx
 
-                if rdkit_mol1.GetBondBetweenAtoms(idx1, idx2).IsInRing():
+                if template_mol.GetBondBetweenAtoms(idx1, idx2).IsInRing():
                     continue
 
-                if rdkit_mol1.GetBondBetweenAtoms(idx2, idx3).IsInRing():
+                if template_mol.GetBondBetweenAtoms(idx2, idx3).IsInRing():
                     continue
 
                 angle1 = rdMolTransforms.GetAngleDeg(conformer1,
@@ -1061,7 +1074,9 @@ class MinimizationBenchmark(object):
             return None
 
     def compute_torsion_differences(self, paths_set1, paths_set2,
-                                    labeling1='file', labeling2='file',
+                                    template_set=None, labeling1='file',
+                                    labeling2='file',
+                                    labeling_template='file',
                                     output_name='torsion_differences',
                                     range=None):
         """
@@ -1076,19 +1091,24 @@ class MinimizationBenchmark(object):
             The first set of PDB paths
         paths_set2 : list[str]
             The second set of PDB paths
+        template_set : list[str]
+            The list of PDB files to use as template
         labeling1 : str
             Labeling criteria for the first set. One of ['file', 'folder']
         labeling2 : str
             Labeling criteria for the first set. One of ['file', 'folder']
+        labeling_template : str
+            Labeling criteria for the template set. One of ['file', 'folder']
         output_name : str
             The name to use with the output files. Default is
-            'torsion_differences'
+            'bond_differences'
         range : tuple[float, float]
             The range of values to display in the horizontal axis. Default
             is None
         """
         import os
         import pandas as pd
+        from functools import partial
         import matplotlib.pyplot as plt
         from multiprocessing import Pool
         from tqdm import tqdm
@@ -1096,6 +1116,18 @@ class MinimizationBenchmark(object):
         # Find links between the PDB paths from each set
         links = self._link_pdb_paths(paths_set1, paths_set2, labeling1,
                                      labeling2)
+
+        # Find links between the PDB paths from each set
+        if template_set is not None:
+            template_links = self._link_pdb_paths(template_set,
+                                                  paths_set1,
+                                                  labeling_template,
+                                                  labeling1)
+        else:
+            template_links = links
+
+        # Define the parallel function
+        parallel_f = partial(self._get_torsion_differences, template_links)
 
         # Verify supplied range
         if range is not None:
@@ -1110,8 +1142,7 @@ class MinimizationBenchmark(object):
         d = {}
         torsion_difference_means = []
         with Pool(self.n_proc) as pool:
-            results = list(tqdm(pool.imap(self._get_torsion_differences,
-                                          links.items()),
+            results = list(tqdm(pool.imap(parallel_f, links.items()),
                                 total=len(links)))
 
         for idx, mean_difference in zip(links, results):
@@ -1137,13 +1168,18 @@ class MinimizationBenchmark(object):
         plt.savefig(os.path.join(self.output_path,
                                  '{}.png'.format(output_name)))
 
-    def _get_dihedral_differences(self, data):
+    def _get_dihedral_differences(self, template_links, data):
         """
         It calculates the mean dihedral differences of each linked pair of
         PDB files.
 
         Parameters
         ----------
+        template_links : dict
+            The dictionary keyed with PDB indexes and the corresponding
+            pairing of PDB paths, the first PDB path of each pair is
+            used as a template to build the molecule representation
+            (since it contains information about the connectivity)
         data : tuple[int, tuple[str, str]]
             The data to compute the dihedral differences of a linked pair
 
@@ -1159,13 +1195,17 @@ class MinimizationBenchmark(object):
         from rdkit import Chem
 
         idx, (pdb_file1, pdb_file2) = data
+        pdb_template, _ = template_links[idx]
 
         try:
-            mol1 = Molecule(pdb_file1)
-            mol1.parameterize('openff_unconstrained-1.2.1.offxml',
-                              charge_method='gasteiger')
-            rdkit_mol1 = mol1.rdkit_molecule
-            conformer1 = rdkit_mol1.GetConformer()
+            template = Molecule(pdb_template)
+            template.parameterize('openff_unconstrained-1.2.1.offxml',
+                                  charge_method='gasteiger')
+            template_mol = template.rdkit_molecule
+
+            conformer1 = Chem.rdmolfiles.MolFromPDBFile(
+                pdb_file1, proximityBonding=False,
+                removeHs=False).GetConformer()
 
             conformer2 = Chem.rdmolfiles.MolFromPDBFile(
                 pdb_file2, proximityBonding=False,
@@ -1174,7 +1214,7 @@ class MinimizationBenchmark(object):
             already_visited = set()
             dihedral_differences = []
 
-            for dihedral in mol1.propers:
+            for dihedral in template.propers:
                 idx1 = dihedral.atom1_idx
                 idx2 = dihedral.atom2_idx
                 idx3 = dihedral.atom3_idx
@@ -1185,7 +1225,7 @@ class MinimizationBenchmark(object):
                     already_visited.add((idx2, idx3))
                     already_visited.add((idx3, idx2))
 
-                if rdkit_mol1.GetBondBetweenAtoms(idx2, idx3).IsInRing():
+                if template_mol.GetBondBetweenAtoms(idx2, idx3).IsInRing():
                     continue
 
                 dihedral1 = rdMolTransforms.GetDihedralDeg(conformer1,
@@ -1224,7 +1264,9 @@ class MinimizationBenchmark(object):
             return None
 
     def compute_dihedral_differences(self, paths_set1, paths_set2,
+                                     template_set=None,
                                      labeling1='file', labeling2='file',
+                                     labeling_template='file',
                                      output_name='dihedral_differences',
                                      range=None):
         """
@@ -1239,19 +1281,24 @@ class MinimizationBenchmark(object):
             The first set of PDB paths
         paths_set2 : list[str]
             The second set of PDB paths
+        template_set : list[str]
+            The list of PDB files to use as template
         labeling1 : str
             Labeling criteria for the first set. One of ['file', 'folder']
         labeling2 : str
             Labeling criteria for the first set. One of ['file', 'folder']
+        labeling_template : str
+            Labeling criteria for the template set. One of ['file', 'folder']
         output_name : str
             The name to use with the output files. Default is
-            'dihedral_differences'
+            'bond_differences'
         range : tuple[float, float]
             The range of values to display in the horizontal axis. Default
             is None
         """
         import os
         import pandas as pd
+        from functools import partial
         import matplotlib.pyplot as plt
         from multiprocessing import Pool
         from tqdm import tqdm
@@ -1259,6 +1306,18 @@ class MinimizationBenchmark(object):
         # Find links between the PDB paths from each set
         links = self._link_pdb_paths(paths_set1, paths_set2, labeling1,
                                      labeling2)
+
+        # Find links between the PDB paths from each set
+        if template_set is not None:
+            template_links = self._link_pdb_paths(template_set,
+                                                  paths_set1,
+                                                  labeling_template,
+                                                  labeling1)
+        else:
+            template_links = links
+
+        # Define the parallel function
+        parallel_f = partial(self._get_dihedral_differences, template_links)
 
         # Verify supplied range
         if range is not None:
@@ -1273,8 +1332,7 @@ class MinimizationBenchmark(object):
         d = {}
         dihedral_difference_means = []
         with Pool(self.n_proc) as pool:
-            results = list(tqdm(pool.imap(self._get_dihedral_differences,
-                                          links.items()),
+            results = list(tqdm(pool.imap(parallel_f, links.items()),
                                 total=len(links)))
 
         for idx, mean_difference in zip(links, results):
