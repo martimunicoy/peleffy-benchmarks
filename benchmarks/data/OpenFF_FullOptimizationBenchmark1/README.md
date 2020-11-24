@@ -1,5 +1,5 @@
 # Sets of molecules
-They belong to the `[benchmarkff](https://github.com/MobleyLab/benchmarkff/tree/master/molecules)` from the MobleyLab
+They belong to the [`benchmarkff`](https://github.com/MobleyLab/benchmarkff/tree/master/molecules) from the MobleyLab
 
 - `visualize_final_set.ipynb`: Notebook for visualization of final set of molecules; generates PDF in `molecule_PDFs`
 - `issues`: Molecules which were removed from analysis due to various types of failures
