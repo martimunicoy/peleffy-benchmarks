@@ -139,7 +139,7 @@ class PELEBaseJob(object):
         os.symlink(os.path.join(self._PELE_src, 'Documents'),
                    link_path)
 
-    def _generate_parameters(self, molecule, output_path,
+    def _generate_parameters(self, topology, output_path,
                              forcefield, charge_method,
                              force_parameterization):
         """
@@ -166,8 +166,12 @@ class PELEBaseJob(object):
         from peleffy.template import Impact
         from peleffy.solvent import OBC2
         from peleffy.utils import OutputPathHandler
+        from peleffy.forcefield import OpenForceField
 
-        output_handler = OutputPathHandler(molecule, output_path=output_path,
+        ff = OpenForceField(forcefield)
+        output_handler = OutputPathHandler(molecule = topology.molecule,
+                                           forcefield = ff,
+                                           output_path=output_path,
                                            as_datalocal=True)
 
         # Saving paths
@@ -178,25 +182,22 @@ class PELEBaseJob(object):
         # Generate rotamer library
         if (force_parameterization
                 or not os.path.exists(rotamer_library_output_path)):
-            rotamer_library = peleffy.topology.RotamerLibrary(molecule)
+            rotamer_library = peleffy.topology.RotamerLibrary(topology.molecule)
             rotamer_library.to_file(rotamer_library_output_path)
 
         # Generate parameters
         if (force_parameterization
                 or not os.path.exists(impact_output_path)
                 or not os.path.exists(solvent_output_path)):
-            if (force_parameterization or not molecule.parameterized):
-                molecule.parameterize(forcefield, charge_method=charge_method)
 
-            # Save template file
-            impact = Impact(molecule)
-            impact.write(impact_output_path)
+            impact = Impact(topology)
+            impact.to_file(impact_output_path)
 
             # Generate solvent parameters
-            solvent = OBC2(molecule)
-            solvent.to_json_file(solvent_output_path)
+            solvent = OBC2(topology)
+            solvent.to_file(solvent_output_path)
 
-    def run(self, molecule, pdb_path=None,
+    def run(self, topology, pdb_path=None,
             forcefield='openff_unconstrained-1.2.0.offxml',
             charge_method='am1bcc',
             force_parameterization=False,
@@ -235,18 +236,19 @@ class PELEBaseJob(object):
         control_file = self._select_control_file()
 
         with control_file as file_path:
-            output_path = self._get_output_path(molecule)
+            output_path = self._get_output_path(topology.molecule)
 
             self._create_directory(output_path)
 
             self._link_folders(output_path)
 
-            self._generate_parameters(molecule, output_path,
+            self._generate_parameters(topology, output_path,
                                       forcefield, charge_method,
                                       force_parameterization)
 
+
             if pdb_path is None:
-                molecule.to_pdb_file(os.path.join(output_path, 'ligand.pdb'))
+                topology.molecule.to_pdb_file(os.path.join(output_path, 'ligand.pdb'))
             else:
                 from shutil import copyfile
                 copyfile(pdb_path, os.path.join(output_path, 'ligand.pdb'))
@@ -256,7 +258,7 @@ class PELEBaseJob(object):
 
             previous_dir = os.getcwd()
             os.chdir(os.path.join(os.getcwd(), output_path))
-
+            print(self._PELE_exec, file_path, output_file)
             try:
                 subprocess.check_output(["{} {} > {}".format(
                     self._PELE_exec, file_path, output_file)], shell=True)
@@ -344,7 +346,7 @@ class PELEMinimization(PELEBaseJob):
 
     def __init__(self, PELE_exec, PELE_src, PELE_license,
                  output_path=None, solvent_type='VACUUM',
-                 forcefield='OpenForceField'):
+                 forcefield='OpenFF-OPLS2005'):
         """
         It initializes a PELEMinimization job.
 
